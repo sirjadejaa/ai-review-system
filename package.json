@@ -5,13 +5,14 @@
   "description": "Production-ready review and digital customer card application for a medical shop",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed"
   },
