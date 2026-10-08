@@ -13,6 +13,7 @@ import { ActivityTrendChart } from '@/components/admin/activity-trend-chart';
 import { EventBreakdownCard } from '@/components/admin/event-breakdown-card';
 import { ErrorState } from '@/components/ui/error-state';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 
 export const metadata: Metadata = {
   title: 'QR Scan & Conversion Analytics',
@@ -51,17 +52,20 @@ export default async function AdminAnalyticsPage({ searchParams }: AdminAnalytic
     ? rawTab
     : 'overview';
 
-  // 3. Fetch analytics data
+  // 3. Fetch analytics data & settings
   let analyticsData;
   let allTimeTotals;
+  let settings;
 
   try {
-    const [periodRes, allTimeRes] = await Promise.all([
+    const [periodRes, allTimeRes, settingsRes] = await Promise.all([
       getOwnerDashboardAnalytics(range),
       getAnalyticsSummary(),
+      getShopSettings(),
     ]);
     analyticsData = periodRes;
     allTimeTotals = allTimeRes;
+    settings = settingsRes;
   } catch (error) {
     console.error('Non-fatal: Failed to load detailed analytics', error);
     return (
@@ -85,6 +89,8 @@ export default async function AdminAnalyticsPage({ searchParams }: AdminAnalytic
     <AdminLayout
       title="Analytics"
       subtitle="Track customer engagement and growth."
+      shopName={settings?.shopName}
+      logoUrl={settings?.logoUrl}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', width: '100%' }}>
         {/* Time Range Selector */}

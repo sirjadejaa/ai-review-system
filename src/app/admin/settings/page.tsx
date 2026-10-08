@@ -20,6 +20,8 @@ export default async function AdminSettingsPage() {
       <AdminLayout
         title="Pharmacy Settings"
         subtitle="Manage your pharmacy identity and preferences."
+        shopName={settings?.shopName}
+        logoUrl={settings?.logoUrl}
       >
         <SettingsManager initialSettings={settings} />
       </AdminLayout>

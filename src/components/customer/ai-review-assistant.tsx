@@ -10,7 +10,7 @@ import type { PredefinedFeedbackTag } from '@/lib/validation/feedback-schema';
 import { generateReviewDraftsAction } from '@/lib/actions/ai-review-actions';
 import { trackGoogleReviewClickAction } from '@/lib/actions/customer-actions';
 import { isValidExternalUrl } from '@/lib/format/contact-links';
-import { Check } from 'lucide-react';
+import { Check, ShieldCheck, Info, ExternalLink } from 'lucide-react';
 
 export interface AIReviewAssistantProps {
   rating: number | null;
@@ -44,11 +44,14 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [showHandoffModal, setShowHandoffModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isTrackingGoogleClickRef = useRef(false);
   const activeRequestIdRef = useRef(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastKeyRef = useRef('');
+  const prevCustomerNoteRef = useRef(customerNote);
 
   const handleGoogleClick = useCallback(() => {
     if (isTrackingGoogleClickRef.current) return;
@@ -61,9 +64,16 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
     }, 4000);
   }, [source]);
 
-  // Automatic AI Generation: Triggers immediately when rating is defined,
-  // debounced for tag toggles and customer note edits.
+  // Live countdown timer for rate-limit cooldown
   useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setCooldownSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownSeconds]);
+
+  const executeGeneration = useCallback((forceRetry = false) => {
     if (!rating) {
       setDrafts([]);
       setSelectedDraftId(null);
@@ -73,58 +83,90 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       return;
     }
 
+    const sortedTags = [...selectedTags].sort().join('|');
+    const note = customerNote.trim().toLowerCase();
+    const currentKey = `${rating}:${language}:${sortedTags}:${note}`;
+
+    if (!forceRetry && lastKeyRef.current === currentKey && drafts.length === 3) {
+      return;
+    }
+    lastKeyRef.current = currentKey;
+
+    const currentRequestId = ++activeRequestIdRef.current;
+    setIsGenerating(true);
+    setError(null);
+
+    generateReviewDraftsAction({
+      rating,
+      selectedTags,
+      customerNote: customerNote.trim() || undefined,
+      language,
+      shopName,
+    })
+      .then((result) => {
+        if (currentRequestId !== activeRequestIdRef.current) return;
+
+        if (result.success && result.drafts && result.drafts.length === 3) {
+          setDrafts(result.drafts);
+          setSelectedDraftId(result.drafts[0].id);
+          setEditedReview(result.drafts[0].text);
+          setShowHandoffModal(false);
+          setCooldownSeconds(0);
+          setError(null);
+        } else {
+          if (result.isRateLimited && result.retryAfterSeconds) {
+            setCooldownSeconds(result.retryAfterSeconds);
+          }
+          setError(
+            result.error ||
+              "We couldn't create suggestions right now. You can write your review manually below."
+          );
+        }
+      })
+      .catch(() => {
+        if (currentRequestId !== activeRequestIdRef.current) return;
+        setError(
+          "We couldn't create suggestions right now. You can write your review manually below."
+        );
+      })
+      .finally(() => {
+        if (currentRequestId === activeRequestIdRef.current) {
+          setIsGenerating(false);
+        }
+      });
+  }, [rating, selectedTags, customerNote, language, shopName, drafts.length]);
+
+  // Automatic AI Generation: Triggers upon rating selection with adaptive debounce
+  useEffect(() => {
+    if (!rating) {
+      setDrafts([]);
+      setSelectedDraftId(null);
+      setEditedReview('');
+      setIsGenerating(false);
+      setError(null);
+      lastKeyRef.current = '';
+      return;
+    }
+
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // 350ms debounce prevents request storms when selecting tags or typing notes
+    // Adaptive debounce: 800ms when user is typing text note, 350ms for chip/rating clicks
+    const isTyping = prevCustomerNoteRef.current !== customerNote;
+    prevCustomerNoteRef.current = customerNote;
+    const debounceMs = isTyping ? 800 : 350;
+
     debounceTimerRef.current = setTimeout(() => {
-      const currentRequestId = ++activeRequestIdRef.current;
-      setIsGenerating(true);
-      setError(null);
-
-      generateReviewDraftsAction({
-        rating,
-        selectedTags,
-        customerNote: customerNote.trim() || undefined,
-        language,
-        shopName,
-      })
-        .then((result) => {
-          // Stale request protection: Ignore out-of-order older response
-          if (currentRequestId !== activeRequestIdRef.current) return;
-
-          if (result.success && result.drafts && result.drafts.length === 3) {
-            setDrafts(result.drafts);
-            setSelectedDraftId(result.drafts[0].id);
-            setEditedReview(result.drafts[0].text);
-            setShowHandoffModal(false);
-          } else {
-            setError(
-              result.error ||
-                "We couldn't create suggestions right now. You can write your review manually below."
-            );
-          }
-        })
-        .catch(() => {
-          if (currentRequestId !== activeRequestIdRef.current) return;
-          setError(
-            "We couldn't create suggestions right now. You can write your review manually below."
-          );
-        })
-        .finally(() => {
-          if (currentRequestId === activeRequestIdRef.current) {
-            setIsGenerating(false);
-          }
-        });
-    }, 350);
+      executeGeneration(false);
+    }, debounceMs);
 
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [rating, selectedTags, customerNote, language, shopName]);
+  }, [rating, selectedTags, customerNote, language, executeGeneration]);
 
   const handleLanguageChange = (newLang: LanguageCode) => {
     if (newLang === language) return;
@@ -223,10 +265,31 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
         </div>
       )}
 
-      {/* Error Alert */}
-      {error && (
+      {/* Cooldown / Rate Limit Banner */}
+      {cooldownSeconds > 0 && (
+        <div className={styles.cooldownBanner} role="status">
+          <div className={styles.cooldownHeader}>
+            <span>Generation rate limit active</span>
+            <span className={styles.cooldownBadge}>{cooldownSeconds}s</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 'var(--font-size-xs)', lineHeight: 'var(--line-height-normal)' }}>
+            AI review suggestion capacity is briefly paused. You can wait {cooldownSeconds}s to retry or compose your review directly below.
+          </p>
+        </div>
+      )}
+
+      {/* Error Alert with Usable Retry */}
+      {error && cooldownSeconds === 0 && (
         <div className={styles.errorBanner} role="alert">
           <span>{error}</span>
+          <button
+            type="button"
+            className={styles.retryButton}
+            onClick={() => executeGeneration(true)}
+            disabled={isGenerating}
+          >
+            Retry Suggestions
+          </button>
         </div>
       )}
 
@@ -299,13 +362,14 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
           </Button>
         </div>
 
-        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', textAlign: 'center', margin: 'var(--space-1) 0 0' }}>
-          🔒 Your personal information is not shared.
+        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', textAlign: 'center', margin: 'var(--space-1) 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-1)' }}>
+          <ShieldCheck size={14} aria-hidden="true" style={{ color: 'var(--color-primary)' }} />
+          <span>Your personal information is not shared.</span>
         </p>
 
         {!hasValidGoogleUrl && (
           <div className={styles.googleUnavailableNotice} role="note">
-            <span aria-hidden="true">ℹ️</span>
+            <Info size={16} aria-hidden="true" style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
             <span>
               Google Review link is not configured yet. Your review was copied to your clipboard.
             </span>
@@ -336,7 +400,8 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
                   rel="noopener noreferrer"
                   className={styles.handoffPrimaryBtn}
                 >
-                  Continue to Google ↗
+                  <span>Continue to Google</span>
+                  <ExternalLink size={16} aria-hidden="true" style={{ marginLeft: '6px' }} />
                 </a>
                 <a
                   href={googleReviewUrl!}

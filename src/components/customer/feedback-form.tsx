@@ -15,6 +15,7 @@ import {
 import { submitCustomerFeedbackAction } from '@/lib/actions/feedback-actions';
 import { AIReviewAssistant } from './ai-review-assistant';
 import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { Check, Plus, ShieldCheck, ArrowLeft } from 'lucide-react';
 
 const RATING_LABELS: Record<number, string> = {
   1: '1 Star — Needs Improvement',
@@ -32,7 +33,7 @@ export interface FeedbackFormProps {
 }
 
 export const FeedbackForm: React.FC<FeedbackFormProps> = ({
-  shopName = 'Pharmacy',
+  shopName = 'Arogya Pharmacy',
   logoUrl,
   googleReviewUrl,
   source,
@@ -103,7 +104,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
       <div className={styles.container}>
         <div className={styles.successCard}>
           <div className={styles.successIcon} aria-hidden="true">
-            ✓
+            <Check size={32} strokeWidth={2.5} />
           </div>
           <Badge variant="success" size="md">
             Feedback Received
@@ -141,7 +142,8 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
     <div className={styles.container}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 'var(--space-2)' }}>
         <Link href={source ? `/?source=${encodeURIComponent(source)}` : '/'} className={styles.backLink}>
-          ← Return to Home
+          <ArrowLeft size={16} aria-hidden="true" style={{ marginRight: 'var(--space-1)' }} />
+          <span>Return to Home</span>
         </Link>
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -215,7 +217,11 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                   onClick={() => handleTagToggle(tag)}
                   className={`${styles.tagButton} ${isSelected ? styles.tagSelected : ''}`}
                 >
-                  <span aria-hidden="true">{isSelected ? '✓ ' : '+ '}</span>
+                  {isSelected ? (
+                    <Check size={14} aria-hidden="true" style={{ color: 'var(--color-primary)' }} />
+                  ) : (
+                    <Plus size={14} aria-hidden="true" style={{ opacity: 0.6 }} />
+                  )}
                   <span>{tag}</span>
                 </button>
               );
@@ -242,7 +248,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
 
         {/* Medical Privacy Guidance Callout */}
         <div className={styles.privacyNotice} role="note">
-          <span aria-hidden="true">🔒</span>
+          <ShieldCheck size={16} aria-hidden="true" style={{ color: 'var(--color-primary)', flexShrink: 0, marginTop: '2px' }} />
           <span>
             <strong>Privacy Note:</strong> Please avoid sharing sensitive medical history, doctor prescriptions, or health conditions.
           </span>

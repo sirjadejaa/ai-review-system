@@ -80,6 +80,8 @@ export default async function AdminOverviewPage({ searchParams }: AdminDashboard
     <AdminLayout
       title="Dashboard"
       subtitle="Overview of your pharmacy performance"
+      shopName={settings?.shopName}
+      logoUrl={settings?.logoUrl}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)', width: '100%' }}>
         {/* Top Controls: Time Range Selector */}

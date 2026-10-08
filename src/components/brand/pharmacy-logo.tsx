@@ -22,8 +22,8 @@ export const PharmacyLogo: React.FC<PharmacyLogoProps> = ({
   inverted = false,
   className = '',
   showSubtitle = true,
-  shopName = 'Pharmacy',
-  tagline = 'Licensed Pharmacy & Healthcare',
+  shopName = 'Arogya Pharmacy',
+  tagline = 'Better Health. Brighter Tomorrow.',
   logoUrl,
 }) => {
   const pixelSizes = {

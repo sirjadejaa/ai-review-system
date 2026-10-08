@@ -19,6 +19,7 @@ import { QrScanTracker } from '@/components/customer/qr-scan-tracker';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { OfferList } from '@/components/customer/offer-list';
 import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { Star, CreditCard, AlertCircle, MapPin, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Home & Customer Portal',
@@ -264,8 +265,8 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 }}
                 role="status"
               >
-                <span aria-hidden="true">🚨</span>
-                <span>Emergency Availability: Essential medicine support open</span>
+                <AlertCircle size={15} aria-hidden="true" style={{ flexShrink: 0 }} />
+                <span>Emergency Availability: Essential medicine counter active</span>
               </div>
             )}
           </div>
@@ -281,8 +282,22 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
             href={validatedSource ? `/customer/review?source=${validatedSource}` : '/customer/review'}
             style={{ textDecoration: 'none' }}
           >
-            <Button variant="primary" size="lg" fullWidth style={{ minHeight: '52px', fontSize: '1rem', letterSpacing: '0.01em' }}>
-              ⭐ Give a Review
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              style={{
+                minHeight: '52px',
+                fontSize: '1rem',
+                letterSpacing: '0.01em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              <Star size={18} fill="#c97a18" stroke="#c97a18" aria-hidden="true" />
+              <span>Rate &amp; Review Us</span>
             </Button>
           </Link>
 
@@ -291,8 +306,21 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
             href={validatedSource ? `/customer/card?source=${validatedSource}` : '/customer/card'}
             style={{ textDecoration: 'none' }}
           >
-            <Button variant="outline" size="lg" fullWidth style={{ minHeight: '48px', backgroundColor: '#ffffff' }}>
-              💳 Digital Card
+            <Button
+              variant="outline"
+              size="lg"
+              fullWidth
+              style={{
+                minHeight: '48px',
+                backgroundColor: 'var(--color-bg-surface)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'var(--space-2)',
+              }}
+            >
+              <CreditCard size={18} aria-hidden="true" />
+              <span>Digital Pharmacy Pass</span>
             </Button>
           </Link>
         </section>
@@ -322,9 +350,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
             }}
             aria-label="Pharmacy Address"
           >
-            <span aria-hidden="true" style={{ lineHeight: 1.4 }}>
-              📍
-            </span>
+            <MapPin size={18} style={{ color: 'var(--color-primary)', marginTop: '2px', flexShrink: 0 }} aria-hidden="true" />
             <span>{settings.address}</span>
           </section>
         )}
@@ -352,9 +378,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 paddingBottom: 'var(--space-2)',
               }}
             >
-              <span aria-hidden="true" style={{ fontSize: 'var(--font-size-base)' }}>
-                🕒
-              </span>
+              <Clock size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} aria-hidden="true" />
               <h2
                 style={{
                   fontSize: 'var(--font-size-sm)',

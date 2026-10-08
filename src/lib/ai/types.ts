@@ -34,7 +34,9 @@ export type AIErrorCode =
 export class AIProviderError extends Error {
   constructor(
     public readonly code: AIErrorCode,
-    message: string
+    message: string,
+    public readonly retryAfterSeconds?: number,
+    public readonly isProviderQuota?: boolean
   ) {
     super(message);
     this.name = 'AIProviderError';

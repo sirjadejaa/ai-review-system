@@ -13,6 +13,8 @@ import {
   ErrorState,
   Button,
 } from '@/components/ui';
+import { ArrowLeft } from 'lucide-react';
+import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 
 export const metadata: Metadata = {
   title: 'Reviews & Customer Feedback',
@@ -24,14 +26,17 @@ export default async function AdminReviewsPage() {
 
   let feedbackList;
   let summary;
+  let settings;
 
   try {
-    const [fetchedList, fetchedSummary] = await Promise.all([
+    const [fetchedList, fetchedSummary, fetchedSettings] = await Promise.all([
       listFeedback({ limit: 50 }),
       getFeedbackSummary(),
+      getShopSettings(),
     ]);
     feedbackList = fetchedList;
     summary = fetchedSummary;
+    settings = fetchedSettings;
   } catch (error) {
     console.error('Non-fatal: Failed to load reviews for admin', error);
     return (
@@ -53,6 +58,8 @@ export default async function AdminReviewsPage() {
     <AdminLayout
       title="Customer Reviews & Feedback"
       subtitle="View and manage customer feedback."
+      shopName={settings?.shopName}
+      logoUrl={settings?.logoUrl}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
         {/* Navigation & Summary Bar */}
@@ -67,8 +74,9 @@ export default async function AdminReviewsPage() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <Link href="/admin" style={{ textDecoration: 'none' }}>
-              <Button variant="ghost" size="sm">
-                ← Back to Dashboard
+              <Button variant="ghost" size="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                <ArrowLeft size={14} aria-hidden="true" />
+                <span>Back to Dashboard</span>
               </Button>
             </Link>
             <Badge variant="primary" size="sm">

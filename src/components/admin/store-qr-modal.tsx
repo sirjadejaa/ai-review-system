@@ -62,7 +62,7 @@ const PLACEMENTS: PlacementOption[] = [
 export const StoreQrModal: React.FC<StoreQrModalProps> = ({
   isOpen,
   onClose,
-  shopName = 'Pharmacy',
+  shopName = 'Arogya Pharmacy',
   defaultDomain,
 }) => {
   const [activePlacement, setActivePlacement] = useState<'counter' | 'qr' | 'table' | 'card'>('counter');

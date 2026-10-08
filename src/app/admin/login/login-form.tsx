@@ -14,6 +14,7 @@ import {
 } from '@/components/ui';
 import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
 import { loginAction, type LoginActionState } from '@/lib/auth/actions';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 
 interface LoginFormProps {
   returnUrl?: string;
@@ -21,7 +22,7 @@ interface LoginFormProps {
   logoUrl?: string | null;
 }
 
-export function LoginForm({ returnUrl = '/admin', shopName = 'Pharmacy', logoUrl }: LoginFormProps) {
+export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', logoUrl }: LoginFormProps) {
   const [state, formAction, isPending] = useActionState<LoginActionState | null, FormData>(
     loginAction,
     null
@@ -91,7 +92,7 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Pharmacy', logoUrl
                 gap: 'var(--space-2)',
               }}
             >
-              <span aria-hidden="true">⚠️</span>
+              <AlertCircle size={16} aria-hidden="true" style={{ flexShrink: 0 }} />
               <span>{state.error}</span>
             </div>
           )}
@@ -142,7 +143,7 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Pharmacy', logoUrl
               fontStyle: 'italic',
             }}
           >
-            Your health. Our priority.
+            Better Health. Brighter Tomorrow.
           </p>
           <Link
             href="/"
@@ -151,9 +152,14 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Pharmacy', logoUrl
               color: 'var(--color-primary)',
               textDecoration: 'none',
               fontWeight: 'var(--font-weight-medium)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--space-1)',
             }}
           >
-            ← Back to Customer Experience
+            <ArrowLeft size={13} aria-hidden="true" />
+            <span>Back to Customer Experience</span>
           </Link>
         </CardFooter>
       </Card>

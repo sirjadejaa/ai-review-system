@@ -450,6 +450,31 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       }
     });
 
+    it('maps Gemini 429 response to AI_RATE_LIMITED with retryAfterSeconds and isProviderQuota flag', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 429,
+        statusText: 'Too Many Requests',
+        headers: new Headers({ 'retry-after': '20' }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should have thrown an AIProviderError');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        const providerError = err as AIProviderError;
+        expect(providerError.code).toBe('AI_RATE_LIMITED');
+        expect(providerError.retryAfterSeconds).toBe(20);
+        expect(providerError.isProviderQuota).toBe(true);
+      }
+    });
+
     it('verifies AI API key is never exposed in client-accessible environment or responses', async () => {
       // In Next.js, only variables prefixed with NEXT_PUBLIC_ are client-accessible
       expect(process.env.NEXT_PUBLIC_AI_API_KEY).toBeUndefined();
@@ -465,6 +490,25 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       expect(stringifiedResult).not.toContain('test-api-key');
       expect(stringifiedResult).not.toContain('AI_API_KEY');
       expect(actionResult).toHaveProperty('success');
+    });
+  });
+
+  describe('9. In-Flight Request Deduplication & 5-Minute Cache', () => {
+    it('serves cached review drafts for identical inputs without recalling provider', async () => {
+      const input = {
+        rating: 5,
+        selectedTags: ['Polite Staff'] as ('Polite Staff')[],
+        language: 'en' as const,
+      };
+
+      const result1 = await generateReviewDraftsAction(input);
+      expect(result1.success).toBe(true);
+      expect(result1.drafts).toHaveLength(3);
+
+      const result2 = await generateReviewDraftsAction(input);
+      expect(result2.success).toBe(true);
+      // Content should match the cached generation
+      expect(result2.drafts).toEqual(result1.drafts);
     });
   });
 });

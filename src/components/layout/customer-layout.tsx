@@ -15,8 +15,8 @@ export interface CustomerLayoutProps {
 
 export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
   children,
-  shopName = 'Pharmacy',
-  tagline,
+  shopName = 'Arogya Pharmacy',
+  tagline = 'Better Health. Brighter Tomorrow.',
   logoUrl,
   isEmergencyOpen = false,
 }) => {
@@ -39,7 +39,9 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
               <span className={styles.shopName} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.05rem', letterSpacing: '-0.02em' }}>
                 {shopName}
               </span>
-              <span className={styles.shopCategory}>Licensed Healthcare & Pharmacy</span>
+              <span className={styles.shopCategory}>
+                {tagline || 'Better Health. Brighter Tomorrow.'}
+              </span>
             </div>
           </Link>
           {isEmergencyOpen ? (
@@ -60,7 +62,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
         <div className="container-customer">
           <p className={styles.footerText}>
             © {new Date().getFullYear()} {shopName}
-            {tagline ? ` • ${tagline}` : ''}
+            {tagline ? ` • ${tagline}` : ' • Better Health. Brighter Tomorrow.'}
           </p>
         </div>
       </footer>

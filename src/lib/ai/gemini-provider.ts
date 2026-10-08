@@ -53,7 +53,22 @@ export class GeminiProvider implements AIServiceProvider {
 
       if (!response.ok) {
         if (response.status === 429) {
-          throw new AIProviderError('AI_RATE_LIMITED', 'AI generation rate limit exceeded.');
+          const retryHeader = response.headers.get('retry-after');
+          let retryAfterSeconds = retryHeader ? parseInt(retryHeader, 10) : 15;
+          if (isNaN(retryAfterSeconds) || retryAfterSeconds <= 0) {
+            retryAfterSeconds = 15;
+          }
+
+          console.warn('[GeminiProvider] Upstream Gemini 429 rate limit or quota exceeded', {
+            retryAfterSeconds,
+          });
+
+          throw new AIProviderError(
+            'AI_RATE_LIMITED',
+            'AI generation rate limit exceeded.',
+            retryAfterSeconds,
+            true
+          );
         }
         throw new AIProviderError(
           'AI_SERVICE_UNAVAILABLE',

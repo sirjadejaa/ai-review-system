@@ -19,7 +19,7 @@ import { isValidExternalUrl } from '@/lib/format/contact-links';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { ShareCardButton } from '@/components/customer/share-card-button';
 import { OfferList } from '@/components/customer/offer-list';
-import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, AlertTriangle, Star } from 'lucide-react';
 import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
 import styles from '@/components/customer/digital-card.module.css';
 
@@ -58,7 +58,7 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
   } catch (error) {
     console.error('Non-fatal: Failed to load shop settings for customer card', error);
     return (
-      <CustomerLayout shopName="Medical & Pharmacy">
+      <CustomerLayout shopName="Arogya Pharmacy">
         <div style={{ padding: 'var(--space-8) 0' }}>
           <ErrorState
             title="Unable to load pharmacy card"
@@ -285,8 +285,20 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
               </CardHeader>
               <CardContent>
                 <Link href={reviewHref} style={{ textDecoration: 'none' }}>
-                  <Button variant="primary" size="lg" fullWidth>
-                    ⭐ Give a Review
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    fullWidth
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 'var(--space-2)',
+                      minHeight: '52px',
+                    }}
+                  >
+                    <Star size={18} fill="#c97a18" stroke="#c97a18" aria-hidden="true" />
+                    <span>Rate &amp; Review on Google</span>
                   </Button>
                 </Link>
               </CardContent>

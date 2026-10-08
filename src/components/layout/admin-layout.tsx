@@ -42,7 +42,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   title,
   subtitle,
   logoUrl,
-  shopName = 'Pharmacy',
+  shopName = 'Arogya Pharmacy',
 }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -294,7 +294,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                 value={shopName}
                 error={fieldErrors.shopName}
                 helpText="The primary business title for your pharmacy."
-                placeholder="e.g. City Care Pharmacy"
+                placeholder="e.g. Arogya Pharmacy"
                 onChange={(e) => setShopName(e.target.value)}
               />
 
@@ -302,8 +302,8 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                 label="Tagline (Optional)"
                 value={tagline}
                 error={fieldErrors.tagline}
-                helpText="Short trust banner (e.g. Genuine Medicines • Caring Healthcare)."
-                placeholder="e.g. Your Trusted Neighborhood Pharmacy"
+                helpText="Short trust banner (e.g. Better Health. Brighter Tomorrow.)."
+                placeholder="e.g. Better Health. Brighter Tomorrow."
                 onChange={(e) => setTagline(e.target.value)}
               />
             </div>
