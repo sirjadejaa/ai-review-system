@@ -1,0 +1,94 @@
+// Prisma Schema for Single Medical Shop / Pharmacy AI Review & Customer Card System
+// Strictly Single-Tenant. No multi-tenancy or SaaS constructs.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Single Pharmacy Shop Settings (Singleton record: id = "default_shop")
+model ShopSettings {
+  id              String   @id @default("default_shop")
+  shopName        String
+  tagline         String?
+  logoUrl         String?
+  phoneNumber     String?
+  whatsappNumber  String?
+  address         String?
+  googleMapsUrl   String?
+  googleReviewUrl String?
+  openingHours    String   @default("[]") // Structured JSON array: [{"days":"Mon-Sat","hours":"8:00 AM - 10:00 PM"}]
+  isEmergencyOpen Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Internal Customer Feedback (Private to Owner; 1-5 Stars)
+model Feedback {
+  id              String   @id @default(cuid())
+  rating          Int      // 1 to 5 (enforced by application validation and database schema)
+  tags            String   @default("[]") // JSON array string of tags: e.g. ["Quick Service", "Medicines in Stock"]
+  notes           String?  // Optional customer notes
+  customerContact String?  // 100% voluntary phone/email (NO mandatory requirement)
+  status          String   @default("NEW") // "NEW", "REVIEWED", "RESOLVED"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+/// Pharmacy Store Offers & Promotional Deals
+model Offer {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  badge       String?   // e.g. "10% OFF", "SENIOR CITIZEN", "SPECIAL"
+  validUntil  DateTime? // Nullable expiration date
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([validUntil])
+}
+
+/// Privacy-Preserving Analytics Events (Tracking Google Review Clicks, NOT Confirmed Reviews)
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  eventType String   // "QR_SCAN", "GOOGLE_REVIEW_CLICK", "CALL_CLICK", "WHATSAPP_CLICK", "DIRECTIONS_CLICK"
+  source    String?  // Attribution: e.g. "QR", "DIRECT", "COUNTER", "BILL"
+  createdAt DateTime @default(now())
+
+  @@index([eventType, createdAt])
+}
+
+/// Owner Admin User Foundation (Single Store Owner Account)
+model AdminUser {
+  id           String         @id @default(cuid())
+  username     String         @unique
+  passwordHash String         // Strictly password hash (Bcrypt); NEVER plaintext
+  lastLoginAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  sessions     AdminSession[]
+}
+
+/// Server-Side Authenticated Session for Pharmacy Owner
+model AdminSession {
+  id          String    @id @default(cuid())
+  adminUserId String
+  tokenHash   String    @unique // SHA-256 hash of the random 32-byte session token
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
+
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
+  @@index([expiresAt])
+}

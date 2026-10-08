@@ -1,0 +1,195 @@
+/**
+ * ==============================================================================
+ * CENTRALIZED DESIGN TOKENS
+ * Single Medical Shop / Pharmacy AI Review & Digital Customer Card System
+ * ==============================================================================
+ * STRICT RULE: All components and views must consume these tokens.
+ * Do not introduce arbitrary colors, spacing, shadows, or radii.
+ */
+
+:root {
+  /* ----------------------------------------------------------------------------
+   * 1. AROGYA PHARMACY PREMIUM HEALTHCARE COLOR SYSTEM
+   * Deep Forest Green, Muted Sage, Warm Ivory, Warm White, Deep Charcoal
+   * ---------------------------------------------------------------------------- */
+
+  /* Base & Surfaces */
+  --color-bg-app: #faf8f5;            /* Warm Ivory / Soft Off-White background */
+  --color-bg-surface: #ffffff;        /* Warm White for cards and elevated panels */
+  --color-bg-surface-subtle: #f3efe8; /* Soft warm ivory / linen panel */
+  --color-bg-surface-hover: #ebe6dc;  /* Refined warm hover surface */
+  --color-bg-inverse: #102621;        /* Deep Forest Charcoal */
+  
+  /* Text & Content */
+  --color-text-primary: #14221d;      /* Deep Charcoal / Very Dark Green for high contrast & elegance */
+  --color-text-secondary: #3b4d45;    /* Muted Sage Slate for body copy */
+  --color-text-muted: #667870;        /* Restrained Herbal Slate for helper text & captions */
+  --color-text-subtle: #96a59e;       /* Subtle sage for placeholders & inactive icons */
+  --color-text-inverse: #ffffff;      /* Pure white text on dark forest surfaces */
+
+  /* Primary Brand: Deep Forest Green / Dark Teal */
+  --color-primary: #123e35;           /* Deep Forest Green: Clinical authority, premium healthcare */
+  --color-primary-hover: #0c2d27;     /* Deeper forest green hover */
+  --color-primary-active: #08211c;    /* Deep forest active press */
+  --color-primary-subtle: #f0f5f2;    /* Soft tinted sage/mint wash */
+  --color-primary-border: #bfd6cb;    /* Muted mint / sage border */
+  --color-primary-text: #0e3029;      /* Forest green high-contrast text */
+
+  /* Secondary Brand: Muted Sage Green */
+  --color-secondary: #4a6b61;         /* Muted Sage Green */
+  --color-secondary-hover: #3d5950;
+  --color-secondary-subtle: #e9f0ec;
+  --color-secondary-text: #2a4038;
+
+  /* Accent: Muted Mint */
+  --color-accent: #92bfa9;            /* Muted Mint */
+  --color-accent-subtle: #e5f2eb;
+  --color-accent-text: #194534;
+
+  /* Semantic Statuses */
+  --color-success: #1f6b52;           /* Botanical emerald green */
+  --color-success-bg: #edf6f2;        /* Subtle green tint */
+  --color-success-border: #bce0d1;
+  --color-success-text: #164f3c;
+
+  --color-warning: #b45309;           /* Amber-600 */
+  --color-warning-bg: #fdf8ee;
+  --color-warning-border: #f8e1ad;
+  --color-warning-text: #78350f;
+
+  /* Danger: Restrained Burgundy / Red */
+  --color-danger: #8f2323;            /* Restrained Burgundy / Red */
+  --color-danger-bg: #fcf1f1;
+  --color-danger-border: #f3c2c2;
+  --color-danger-text: #6b1414;
+
+  --color-info: #1b5368;              /* Restrained slate teal */
+  --color-info-bg: #eff6f9;
+  --color-info-border: #c3deeb;
+  --color-info-text: #133e4f;
+
+  /* Review Stars (Warm Pharmacy Gold) */
+  --color-star-active: #c97a18;       /* Refined apothecary amber gold */
+  --color-star-empty: #d8d3c7;        /* Soft linen warm gray */
+  --color-star-hover: #dd8d27;
+
+  /* Borders & Dividers */
+  --color-border: #e3ded5;            /* Thin subtle warm ivory/linen border */
+  --color-border-subtle: #ece8df;     /* Soft inner dividers */
+  --color-border-strong: #cac4b7;     /* High-contrast field borders */
+  --color-border-hover: #b8b1a3;
+  --color-border-focus: #123e35;
+  --color-focus-ring: #123e35;        /* Forest green focus ring */
+  --color-focus-ring-offset: #ffffff;
+
+  /* Surface & Brand Aliases */
+  --color-bg-secondary: #f3efe8;
+  --color-primary-light: #f0f5f2;
+
+  /* ----------------------------------------------------------------------------
+   * 2. EDITORIAL HEALTHCARE TYPOGRAPHY SYSTEM
+   * ---------------------------------------------------------------------------- */
+  --font-family-serif: 'Newsreader', 'Playfair Display', 'Cormorant Garamond', 'Georgia', serif;
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  
+  /* Font Sizes & Responsive Line Heights */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --line-height-xs: 1rem;      /* 16px */
+
+  --font-size-sm: 0.875rem;    /* 14px */
+  --line-height-sm: 1.25rem;   /* 20px */
+
+  --font-size-base: 1rem;      /* 16px */
+  --line-height-base: 1.5rem;  /* 24px */
+
+  --font-size-lg: 1.125rem;    /* 18px */
+  --line-height-lg: 1.75rem;   /* 28px */
+
+  --font-size-xl: 1.25rem;     /* 20px */
+  --line-height-xl: 1.75rem;   /* 28px */
+
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --line-height-2xl: 2rem;     /* 32px */
+
+  --font-size-3xl: 1.875rem;   /* 30px */
+  --line-height-3xl: 2.25rem;  /* 36px */
+
+  --font-size-4xl: 2.25rem;    /* 36px */
+  --line-height-4xl: 2.75rem;  /* 44px */
+
+  /* Unitless Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ----------------------------------------------------------------------------
+   * 3. SPACING SCALE
+   * ---------------------------------------------------------------------------- */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+
+  /* ----------------------------------------------------------------------------
+   * 4. CONTROLLED RADIUS SYSTEM (Sophisticated, Not Playful/Pills)
+   * ---------------------------------------------------------------------------- */
+  --radius-xs: 3px;
+  --radius-sm: 5px;    /* Subtle tags, checkboxes */
+  --radius-md: 8px;    /* Inputs, standard buttons */
+  --radius-lg: 12px;   /* Standard content panels, modals */
+  --radius-xl: 16px;   /* Hero containers, bottom sheets */
+  --radius-full: 9999px; /* Status badges, circular icons */
+
+  /* ----------------------------------------------------------------------------
+   * 5. SOFT WARM SHADOW HIERARCHY
+   * ---------------------------------------------------------------------------- */
+  --shadow-none: none;
+  --shadow-subtle: 0 1px 2px 0 rgba(18, 62, 53, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(18, 62, 53, 0.05);
+  --shadow-card: 0 2px 6px -1px rgba(18, 62, 53, 0.04), 0 1px 2px -1px rgba(18, 62, 53, 0.02);
+  --shadow-medium: 0 4px 12px -2px rgba(18, 62, 53, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(18, 62, 53, 0.06);
+  --shadow-elevated: 0 12px 24px -4px rgba(18, 62, 53, 0.08);
+  --shadow-modal: 0 24px 32px -8px rgba(18, 62, 53, 0.12);
+
+  /* ----------------------------------------------------------------------------
+   * 6. TRANSITIONS & ANIMATIONS
+   * ---------------------------------------------------------------------------- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ----------------------------------------------------------------------------
+   * 7. LAYOUT & CONTAINERS
+   * ---------------------------------------------------------------------------- */
+  --container-customer-max: 560px; /* Ergonomic mobile-first customer view */
+  --container-admin-max: 1160px;   /* Calm, readable owner workspace width */
+  --min-touch-target: 48px;        /* WCAG 2.1 touch accessibility */
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
