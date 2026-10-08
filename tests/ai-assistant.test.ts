@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   GenerateReviewDraftsInputSchema,
   validateAndSanitizeAIDrafts,
@@ -8,6 +8,8 @@ import {
   buildUserPrompt,
 } from '@/lib/ai/prompt';
 import { MockAIProvider } from '@/lib/ai/mock-provider';
+import { GeminiProvider } from '@/lib/ai/gemini-provider';
+import { AIProviderError } from '@/lib/ai/types';
 import { getAIProvider, setAIProvider } from '@/lib/ai/provider-factory';
 import {
   isAIRateLimited,
@@ -274,6 +276,195 @@ describe('Phase 6: AI Review Assistant Tests', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBeTruthy();
+    });
+  });
+
+  describe('8. Gemini REST Provider & Model Compatibility (gemini-3.8-flash)', () => {
+    const originalFetch = globalThis.fetch;
+
+    afterEach(() => {
+      globalThis.fetch = originalFetch;
+      vi.restoreAllMocks();
+    });
+
+    it('targets gemini-3.8-flash model endpoint in the HTTP POST request', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      drafts: [
+                        { id: 'draft-1', text: 'Prompt and helpful service.' },
+                        { id: 'draft-2', text: 'All necessary healthcare items were in stock.' },
+                        { id: 'draft-3', text: 'Polite pharmacists and clean store.' },
+                      ],
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      });
+      globalThis.fetch = mockFetch;
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const [url, requestInit] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toContain('/models/gemini-3.8-flash:generateContent');
+      expect(url).toContain('key=test-api-key-xyz');
+      expect(requestInit.method).toBe('POST');
+    });
+
+    it('produces exactly 3 validated drafts from a successful Gemini response', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      drafts: [
+                        { id: 'draft-1', text: 'Quick and efficient service.' },
+                        { id: 'draft-2', text: 'Very courteous team and clean dispensary.' },
+                        { id: 'draft-3', text: 'Reliable local pharmacy with prompt attention.' },
+                      ],
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(drafts).toHaveLength(3);
+      expect(drafts[0].text).toBe('Quick and efficient service.');
+      expect(drafts[1].text).toBe('Very courteous team and clean dispensary.');
+      expect(drafts[2].text).toBe('Reliable local pharmacy with prompt attention.');
+    });
+
+    it('ensures non-fabrication validation remains active on Gemini output', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      drafts: [
+                        { id: 'draft-1', text: 'This pharmacy cured my chronic disease completely!' },
+                        { id: 'draft-2', text: 'Good store' },
+                        { id: 'draft-3', text: 'Quick service' },
+                      ],
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      await expect(
+        provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        })
+      ).rejects.toThrow();
+    });
+
+    it('rejects malformed or unsafe Gemini output', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      drafts: [{ id: 'draft-1', text: 'Only one draft' }],
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      await expect(
+        provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        })
+      ).rejects.toThrow();
+    });
+
+    it('maps Gemini 404 response to AI_SERVICE_UNAVAILABLE error', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should have thrown an AIProviderError');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        const providerError = err as AIProviderError;
+        expect(providerError.code).toBe('AI_SERVICE_UNAVAILABLE');
+        expect(providerError.message).toContain('Gemini API responded with status 404');
+      }
+    });
+
+    it('verifies AI API key is never exposed in client-accessible environment or responses', async () => {
+      // In Next.js, only variables prefixed with NEXT_PUBLIC_ are client-accessible
+      expect(process.env.NEXT_PUBLIC_AI_API_KEY).toBeUndefined();
+
+      // Server action response never includes sensitive API key or internal credentials
+      const actionResult = await generateReviewDraftsAction({
+        rating: 5,
+        selectedTags: ['Clean Store'],
+        language: 'en',
+      });
+
+      const stringifiedResult = JSON.stringify(actionResult);
+      expect(stringifiedResult).not.toContain('test-api-key');
+      expect(stringifiedResult).not.toContain('AI_API_KEY');
+      expect(actionResult).toHaveProperty('success');
     });
   });
 });
