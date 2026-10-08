@@ -170,6 +170,9 @@ describe('Phase 11: Final Quality & Security Hardening Tests', () => {
       expect(headerMap.get('X-Content-Type-Options')).toBe('nosniff');
       expect(headerMap.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin');
       expect(headerMap.get('Strict-Transport-Security')).toContain('max-age=63072000');
+      expect(headerMap.get('Content-Security-Policy')).toBeDefined();
+      expect(headerMap.get('Content-Security-Policy')).toContain("default-src 'self'");
+      expect(headerMap.get('Content-Security-Policy')).toContain("frame-ancestors 'none'");
     });
   });
 });
