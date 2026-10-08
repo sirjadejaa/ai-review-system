@@ -12,7 +12,7 @@ export class GeminiProvider implements AIServiceProvider {
   private readonly apiKey: string;
   private readonly model: string;
 
-  constructor(apiKey: string, model = 'gemini-1.5-flash') {
+  constructor(apiKey: string, model = 'gemini-3.8-flash') {
     if (!apiKey) {
       throw new AIProviderError('AI_CONFIGURATION_ERROR', 'Gemini API key is missing.');
     }
