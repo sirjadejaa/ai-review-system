@@ -623,6 +623,131 @@ describe('Phase 6: AI Review Assistant Tests', () => {
         expect((err as AIProviderError).code).toBe('AI_CONFIGURATION_ERROR');
       }
     });
+
+    it('retries on HTTP 503 and succeeds on retry attempt', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            ok: false,
+            status: 503,
+            statusText: 'Service Unavailable',
+            json: async () => ({ error: { message: 'Overloaded', status: 'UNAVAILABLE' } }),
+          };
+        }
+        return {
+          ok: true,
+          json: async () => ({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: JSON.stringify({
+                        drafts: [
+                          { id: 'draft-1', text: 'Quick and efficient service.' },
+                          { id: 'draft-2', text: 'Very courteous team.' },
+                          { id: 'draft-3', text: 'Reliable local pharmacy.' },
+                        ],
+                      }),
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(callCount).toBe(2);
+      expect(drafts).toHaveLength(3);
+    });
+
+    it('fails with AI_SERVICE_UNAVAILABLE when HTTP 503 persists across all retries', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        return {
+          ok: false,
+          status: 503,
+          statusText: 'Service Unavailable',
+          json: async () => ({ error: { message: 'Overloaded', status: 'UNAVAILABLE' } }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw AIProviderError on persistent 503');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        expect((err as AIProviderError).code).toBe('AI_SERVICE_UNAVAILABLE');
+        expect((err as AIProviderError).message).toContain('503');
+        // Initial attempt + 2 retries = 3 calls
+        expect(callCount).toBe(3);
+      }
+    });
+
+    it('does not retry permanent 4xx errors (e.g. HTTP 400)', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        return {
+          ok: false,
+          status: 400,
+          statusText: 'Bad Request',
+          json: async () => ({ error: { message: 'Invalid payload', status: 'INVALID_ARGUMENT' } }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw error for 400 without retrying');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        // Only 1 attempt made, permanent 400 was not retried
+        expect(callCount).toBe(1);
+      }
+    });
+
+    it('handles request timeout and throws AI_SERVICE_UNAVAILABLE', async () => {
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        const error = new Error('The operation was aborted');
+        error.name = 'AbortError';
+        throw error;
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw timeout error');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        expect((err as AIProviderError).code).toBe('AI_SERVICE_UNAVAILABLE');
+        expect((err as AIProviderError).message).toContain('timed out');
+      }
+    });
   });
 
   describe('9. In-Flight Request Deduplication & 5-Minute Cache', () => {

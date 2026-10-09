@@ -23,13 +23,23 @@ export class GeminiProvider implements AIServiceProvider {
   private async fetchWithRetry(
     endpoint: string,
     payload: object,
-    maxRetries = 1
+    maxRetries = 2
   ): Promise<Response> {
+    const overallStartTime = Date.now();
+    const overallTimeoutMs = 20000; // 20s overall timeout across all attempts
+
     let lastError: unknown = null;
+    let lastResponse: Response | null = null;
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const remainingTime = overallTimeoutMs - (Date.now() - overallStartTime);
+      if (remainingTime <= 1000) {
+        throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'AI request timed out.');
+      }
+
+      const attemptTimeoutMs = Math.min(8000, remainingTime);
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      const timeout = setTimeout(() => controller.abort(), attemptTimeoutMs);
 
       try {
         const response = await fetch(endpoint, {
@@ -42,33 +52,75 @@ export class GeminiProvider implements AIServiceProvider {
           signal: controller.signal,
         });
 
-        // If server responded with 503/502/504 and we have retries left, wait and retry
-        if (attempt < maxRetries && [502, 503, 504].includes(response.status)) {
-          clearTimeout(timeout);
-          console.warn(`[GeminiProvider] Transient HTTP ${response.status}, retrying in 500ms...`);
-          await new Promise((resolve) => setTimeout(resolve, 500));
+        clearTimeout(timeout);
+        lastResponse = response;
+
+        // Success - return immediately
+        if (response.ok) {
+          return response;
+        }
+
+        // Check if status is a retryable transient error: 500, 502, 503, 504, or short 429
+        const isTransient = [429, 500, 502, 503, 504].includes(response.status);
+
+        if (attempt < maxRetries && isTransient) {
+          const retryHeader = response.headers?.get ? response.headers.get('retry-after') : null;
+          const parsedRetryAfter = retryHeader ? parseInt(retryHeader, 10) : NaN;
+
+          // If Retry-After is > 3s, do not stall the current server action; surface rate limit immediately
+          if (!isNaN(parsedRetryAfter) && parsedRetryAfter > 3) {
+            return response;
+          }
+
+          let delayMs: number;
+          if (!isNaN(parsedRetryAfter) && parsedRetryAfter > 0 && parsedRetryAfter <= 3) {
+            delayMs = parsedRetryAfter * 1000;
+          } else {
+            // Exponential backoff with jitter: 300ms * 2^attempt + jitter (0-150ms)
+            const baseMs = 300 * Math.pow(2, attempt);
+            const jitterMs = Math.floor(Math.random() * 150);
+            delayMs = baseMs + jitterMs;
+          }
+
+          console.warn(
+            `[GeminiProvider] Transient HTTP ${response.status} on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delayMs}ms...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
         }
 
-        clearTimeout(timeout);
+        // Non-transient error (e.g. 400, 401, 403, 404) or retries exhausted: return response
         return response;
       } catch (err: unknown) {
         clearTimeout(timeout);
         lastError = err;
 
-        // If transient connection reset / socket drop and we have retries left, wait and retry
         const isAbort = err instanceof Error && err.name === 'AbortError';
-        if (attempt < maxRetries && !isAbort) {
-          console.warn('[GeminiProvider] Network connection reset or dropped, retrying in 500ms...', {
-            attempt: attempt + 1,
-            error: err instanceof Error ? err.message : String(err),
-          });
-          await new Promise((resolve) => setTimeout(resolve, 500));
+        const isOverallTimeout = Date.now() - overallStartTime >= overallTimeoutMs;
+
+        if (attempt < maxRetries && !isAbort && !isOverallTimeout) {
+          const baseMs = 300 * Math.pow(2, attempt);
+          const jitterMs = Math.floor(Math.random() * 150);
+          const delayMs = baseMs + jitterMs;
+
+          console.warn(
+            `[GeminiProvider] Network failure on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delayMs}ms...`,
+            { error: err instanceof Error ? err.message : String(err) }
+          );
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
           continue;
+        }
+
+        if (isAbort) {
+          throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'AI request timed out.');
         }
 
         throw err;
       }
+    }
+
+    if (lastResponse) {
+      return lastResponse;
     }
 
     throw lastError;
@@ -149,6 +201,18 @@ export class GeminiProvider implements AIServiceProvider {
           throw new AIProviderError(
             'AI_SERVICE_UNAVAILABLE',
             `Gemini API responded with status 404: Model '${this.model}' not found.`
+          );
+        }
+
+        if (response.status === 503) {
+          console.warn('[GeminiProvider] Gemini 503 Service Unavailable after retries', {
+            status: 503,
+            providerStatus,
+            message: providerMessage,
+          });
+          throw new AIProviderError(
+            'AI_SERVICE_UNAVAILABLE',
+            `Gemini API responded with status 503 (Service Unavailable): ${providerMessage || 'Upstream service busy'}`
           );
         }
 
