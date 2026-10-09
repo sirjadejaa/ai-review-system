@@ -491,6 +491,138 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       expect(stringifiedResult).not.toContain('AI_API_KEY');
       expect(actionResult).toHaveProperty('success');
     });
+
+    it('retries on transient network socket reset and succeeds on attempt 2', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          throw new Error('read tcp connection reset by peer');
+        }
+        return {
+          ok: true,
+          json: async () => ({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: JSON.stringify({
+                        drafts: [
+                          { id: 'draft-1', text: 'Quick and efficient service.' },
+                          { id: 'draft-2', text: 'Very courteous team.' },
+                          { id: 'draft-3', text: 'Reliable local pharmacy.' },
+                        ],
+                      }),
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(callCount).toBe(2);
+      expect(drafts).toHaveLength(3);
+    });
+
+    it('strips markdown code fences from Gemini JSON response', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: '```json\n' + JSON.stringify({
+                      drafts: [
+                        { id: 'draft-1', text: 'Prompt and helpful service.' },
+                        { id: 'draft-2', text: 'Medicines were in stock.' },
+                        { id: 'draft-3', text: 'Polite staff and clean store.' },
+                      ],
+                    }) + '\n```',
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(drafts).toHaveLength(3);
+      expect(drafts[0].id).toBe('draft-1');
+    });
+
+    it('maps HTTP 403 or RESOURCE_EXHAUSTED error payload to AI_RATE_LIMITED', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        json: async () => ({
+          error: {
+            code: 403,
+            message: 'Quota exceeded for project.',
+            status: 'RESOURCE_EXHAUSTED',
+          },
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw rate limit error');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        expect((err as AIProviderError).code).toBe('AI_RATE_LIMITED');
+        expect((err as AIProviderError).isProviderQuota).toBe(true);
+      }
+    });
+
+    it('maps HTTP 401 or standard 403 to AI_CONFIGURATION_ERROR', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: async () => ({
+          error: {
+            code: 401,
+            message: 'API key not valid.',
+            status: 'INVALID_ARGUMENT',
+          },
+        }),
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw configuration error');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        expect((err as AIProviderError).code).toBe('AI_CONFIGURATION_ERROR');
+      }
+    });
   });
 
   describe('9. In-Flight Request Deduplication & 5-Minute Cache', () => {
@@ -509,6 +641,42 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       expect(result2.success).toBe(true);
       // Content should match the cached generation
       expect(result2.drafts).toEqual(result1.drafts);
+    });
+
+    it('cleans up in-flight request map on failure and permits successful retry', async () => {
+      let callCount = 0;
+      const customProvider = {
+        name: 'test-custom',
+        generateReviewDrafts: vi.fn().mockImplementation(async () => {
+          callCount++;
+          if (callCount === 1) {
+            throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'Temporary failure');
+          }
+          return [
+            { id: 'draft-1', text: 'Retry success text 1.', language: 'en' as const },
+            { id: 'draft-2', text: 'Retry success text 2.', language: 'en' as const },
+            { id: 'draft-3', text: 'Retry success text 3.', language: 'en' as const },
+          ];
+        }),
+      };
+
+      setAIProvider(customProvider);
+
+      const input = {
+        rating: 4,
+        selectedTags: ['Medicines in Stock'] as ('Medicines in Stock')[],
+        customerNote: 'Unique note for retry test',
+        language: 'en' as const,
+      };
+
+      // Attempt 1 fails
+      const result1 = await generateReviewDraftsAction(input);
+      expect(result1.success).toBe(false);
+
+      // Attempt 2 succeeds (proves inFlightRequests cleaned up the rejected promise)
+      const result2 = await generateReviewDraftsAction(input);
+      expect(result2.success).toBe(true);
+      expect(result2.drafts).toHaveLength(3);
     });
   });
 });

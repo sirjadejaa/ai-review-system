@@ -114,6 +114,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
           setCooldownSeconds(0);
           setError(null);
         } else {
+          lastKeyRef.current = '';
           if (result.isRateLimited && result.retryAfterSeconds) {
             setCooldownSeconds(result.retryAfterSeconds);
           }
@@ -125,6 +126,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       })
       .catch(() => {
         if (currentRequestId !== activeRequestIdRef.current) return;
+        lastKeyRef.current = '';
         setError(
           "We couldn't create suggestions right now. You can write your review manually below."
         );
@@ -329,7 +331,9 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       {/* Screen 5: Editorial Text Editor & Unified Copy Action */}
       <div className={styles.editorContainer}>
         <div className={styles.editorHeader}>
-          <h3 className={styles.editorTitle}>Edit &amp; Copy</h3>
+          <h3 className={styles.editorTitle}>
+            {drafts.length > 0 ? 'Edit & Copy' : 'Write & Copy Review'}
+          </h3>
           <span className={styles.editorSubtitle}>
             {editedReview.length} characters
           </span>
@@ -344,7 +348,11 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
           }}
           maxLength={2000}
           rows={3}
-          placeholder="Select an option above or write your honest review here..."
+          placeholder={
+            drafts.length > 0
+              ? 'Select an option above or write your honest review here...'
+              : 'Write your honest review here...'
+          }
           aria-label="Editable review text"
         />
 

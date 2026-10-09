@@ -28,7 +28,7 @@ export function getAIProvider(): AIServiceProvider {
   }
 
   if (providerType === 'gemini') {
-    return new GeminiProvider(apiKey);
+    return new GeminiProvider(apiKey, process.env.AI_MODEL);
   }
 
   if (providerType === 'openai') {

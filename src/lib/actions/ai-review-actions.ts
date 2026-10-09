@@ -91,11 +91,15 @@ export async function generateReviewDraftsAction(
     const cacheKey = computeCacheKey(parsed.data);
     const now = Date.now();
     const cached = draftsCache.get(cacheKey);
-    if (cached && cached.expiresAt > now) {
-      return {
-        success: true,
-        drafts: cached.drafts,
-      };
+    if (cached) {
+      if (cached.expiresAt > now) {
+        return {
+          success: true,
+          drafts: cached.drafts,
+        };
+      } else {
+        draftsCache.delete(cacheKey);
+      }
     }
 
     // 4. In-flight request deduplication: reuse running promise if identical request is pending
@@ -103,9 +107,13 @@ export async function generateReviewDraftsAction(
 
     if (!draftsPromise) {
       const provider = getAIProvider();
-      draftsPromise = provider.generateReviewDrafts(parsed.data).finally(() => {
-        inFlightRequests.delete(cacheKey);
-      });
+      draftsPromise = (async () => {
+        try {
+          return await provider.generateReviewDrafts(parsed.data);
+        } finally {
+          inFlightRequests.delete(cacheKey);
+        }
+      })();
       inFlightRequests.set(cacheKey, draftsPromise);
     }
 
@@ -140,11 +148,17 @@ export async function generateReviewDraftsAction(
       };
     }
 
-    // Sanitize error: never leak API keys, model names, or internal stack traces
-    console.error('Non-fatal: AI review draft generation failed', error);
+    // Diagnostic server-side logging without leaking secrets or customer details
+    const errorCode = error instanceof AIProviderError ? error.code : 'UNKNOWN_ERROR';
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[AI Action] Review draft generation failed', {
+      errorCode,
+      errorMessage,
+    });
+
     return {
       success: false,
-      error: "We couldn't create the review drafts right now. Please try again.",
+      error: "We couldn't create suggestions right now. You can write your review manually below or retry.",
     };
   }
 }
