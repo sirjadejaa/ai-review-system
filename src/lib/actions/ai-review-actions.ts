@@ -48,6 +48,7 @@ export async function clearAIDraftsCache(): Promise<void> {
 export async function generateReviewDraftsAction(
   input: GenerateReviewDraftsInputData
 ): Promise<GenerateReviewDraftsResult> {
+  const actionStartTime = Date.now();
   try {
     // 1. Abuse protection: Check in-memory rate limiter per client request context
     let clientKey = 'anonymous:client';
@@ -128,16 +129,27 @@ export async function generateReviewDraftsAction(
     // 5. Record successful generation against internal abuse rate limiter
     recordAIRequest(clientKey);
 
+    const totalDurationMs = Date.now() - actionStartTime;
+    console.info('[AI Action Timing]', {
+      action: 'generateReviewDrafts',
+      totalDurationMs,
+      draftsCount: drafts.length,
+      success: true,
+    });
+
     return {
       success: true,
       drafts,
     };
   } catch (error) {
+    const totalDurationMs = Date.now() - actionStartTime;
+
     if (error instanceof AIProviderError && error.code === 'AI_RATE_LIMITED') {
       const retryAfterSeconds = error.retryAfterSeconds ?? 15;
       console.warn('[AI Provider Rate Limit] Upstream Gemini 429 quota reached', {
         retryAfterSeconds,
         isProviderQuota: error.isProviderQuota,
+        totalDurationMs,
       });
 
       return {
@@ -151,9 +163,20 @@ export async function generateReviewDraftsAction(
     // Diagnostic server-side logging without leaking secrets or customer details
     const errorCode = error instanceof AIProviderError ? error.code : 'UNKNOWN_ERROR';
     const errorMessage = error instanceof Error ? error.message : String(error);
+    const timeoutLayer =
+      error instanceof AIProviderError && error.timeoutLayer
+        ? error.timeoutLayer
+        : errorMessage.toLowerCase().includes('timeout')
+          ? 'ACTION_OR_RUNTIME_TIMEOUT'
+          : undefined;
+    const httpStatus = error instanceof AIProviderError ? error.httpStatus : undefined;
+
     console.error('[AI Action] Review draft generation failed', {
       errorCode,
       errorMessage,
+      totalDurationMs,
+      timeoutLayer,
+      httpStatus,
     });
 
     return {

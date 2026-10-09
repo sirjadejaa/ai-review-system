@@ -26,7 +26,7 @@ export class GeminiProvider implements AIServiceProvider {
     maxRetries = 2
   ): Promise<Response> {
     const overallStartTime = Date.now();
-    const overallTimeoutMs = 20000; // 20s overall timeout across all attempts
+    const overallTimeoutMs = 8500; // 8.5s overall timeout across all attempts to stay within Vercel's limit
 
     let lastError: unknown = null;
     let lastResponse: Response | null = null;
@@ -34,12 +34,20 @@ export class GeminiProvider implements AIServiceProvider {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       const remainingTime = overallTimeoutMs - (Date.now() - overallStartTime);
       if (remainingTime <= 1000) {
-        throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'AI request timed out.');
+        throw new AIProviderError(
+          'AI_SERVICE_UNAVAILABLE',
+          'AI request timed out.',
+          undefined,
+          undefined,
+          'PROVIDER_OVERALL_TIMEOUT',
+          408
+        );
       }
 
-      const attemptTimeoutMs = Math.min(8000, remainingTime);
+      const attemptTimeoutMs = Math.min(5000, remainingTime);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), attemptTimeoutMs);
+      const attemptStartTime = Date.now();
 
       try {
         const response = await fetch(endpoint, {
@@ -54,32 +62,47 @@ export class GeminiProvider implements AIServiceProvider {
 
         clearTimeout(timeout);
         lastResponse = response;
+        const attemptDurationMs = Date.now() - attemptStartTime;
 
         // Success - return immediately
         if (response.ok) {
+          console.info('[GeminiProvider Timing] Request succeeded', {
+            attempt: attempt + 1,
+            attemptDurationMs,
+            totalDurationMs: Date.now() - overallStartTime,
+            status: response.status,
+          });
           return response;
         }
 
-        // Check if status is a retryable transient error: 500, 502, 503, 504, or short 429
-        const isTransient = [429, 500, 502, 503, 504].includes(response.status);
+        // Check if status is a retryable transient error: 408, 429, 500, 502, 503, 504
+        const isTransient = [408, 429, 500, 502, 503, 504].includes(response.status);
 
         if (attempt < maxRetries && isTransient) {
           const retryHeader = response.headers?.get ? response.headers.get('retry-after') : null;
           const parsedRetryAfter = retryHeader ? parseInt(retryHeader, 10) : NaN;
 
-          // If Retry-After is > 3s, do not stall the current server action; surface rate limit immediately
-          if (!isNaN(parsedRetryAfter) && parsedRetryAfter > 3) {
+          // If Retry-After is > 2s, do not stall the current server action; surface rate limit immediately
+          if (!isNaN(parsedRetryAfter) && (parsedRetryAfter > 2 || parsedRetryAfter * 1000 >= remainingTime - 1000)) {
             return response;
           }
 
           let delayMs: number;
-          if (!isNaN(parsedRetryAfter) && parsedRetryAfter > 0 && parsedRetryAfter <= 3) {
+          if (!isNaN(parsedRetryAfter) && parsedRetryAfter > 0 && parsedRetryAfter <= 2) {
             delayMs = parsedRetryAfter * 1000;
           } else {
-            // Exponential backoff with jitter: 300ms * 2^attempt + jitter (0-150ms)
-            const baseMs = 300 * Math.pow(2, attempt);
-            const jitterMs = Math.floor(Math.random() * 150);
+            // Exponential backoff with jitter: 250ms * 2^attempt + jitter (0-100ms)
+            const baseMs = 250 * Math.pow(2, attempt);
+            const jitterMs = Math.floor(Math.random() * 100);
             delayMs = baseMs + jitterMs;
+          }
+
+          // If not enough time left in serverless function budget to wait and retry safely, break
+          if (remainingTime - delayMs <= 1500) {
+            console.warn(
+              `[GeminiProvider] Skipping retry on HTTP ${response.status} due to timeout budget exhaustion (${remainingTime}ms remaining)`
+            );
+            return response;
           }
 
           console.warn(
@@ -99,20 +122,33 @@ export class GeminiProvider implements AIServiceProvider {
         const isOverallTimeout = Date.now() - overallStartTime >= overallTimeoutMs;
 
         if (attempt < maxRetries && !isAbort && !isOverallTimeout) {
-          const baseMs = 300 * Math.pow(2, attempt);
-          const jitterMs = Math.floor(Math.random() * 150);
+          const baseMs = 250 * Math.pow(2, attempt);
+          const jitterMs = Math.floor(Math.random() * 100);
           const delayMs = baseMs + jitterMs;
 
-          console.warn(
-            `[GeminiProvider] Network failure on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delayMs}ms...`,
-            { error: err instanceof Error ? err.message : String(err) }
-          );
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
-          continue;
+          if (remainingTime - delayMs > 1500) {
+            console.warn(
+              `[GeminiProvider] Network failure on attempt ${attempt + 1}/${maxRetries + 1}, retrying in ${delayMs}ms...`,
+              { error: err instanceof Error ? err.message : String(err) }
+            );
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            continue;
+          }
         }
 
         if (isAbort) {
-          throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'AI request timed out.');
+          const timeoutLayer =
+            isOverallTimeout || remainingTime <= 1000
+              ? 'PROVIDER_OVERALL_TIMEOUT'
+              : 'PROVIDER_ATTEMPT_TIMEOUT';
+          throw new AIProviderError(
+            'AI_SERVICE_UNAVAILABLE',
+            'AI request timed out.',
+            undefined,
+            undefined,
+            timeoutLayer,
+            408
+          );
         }
 
         throw err;
@@ -127,6 +163,7 @@ export class GeminiProvider implements AIServiceProvider {
   }
 
   async generateReviewDrafts(input: GenerateReviewDraftsInput): Promise<ReviewDraft[]> {
+    const providerStartTime = Date.now();
     const userPrompt = buildUserPrompt(input);
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
 
@@ -142,6 +179,7 @@ export class GeminiProvider implements AIServiceProvider {
       ],
       generationConfig: {
         temperature: 0.7,
+        maxOutputTokens: 350,
         responseMimeType: 'application/json',
       },
     };
@@ -178,7 +216,9 @@ export class GeminiProvider implements AIServiceProvider {
             'AI_RATE_LIMITED',
             'AI generation rate limit exceeded.',
             retryAfterSeconds,
-            true
+            true,
+            undefined,
+            response.status
           );
         }
 
@@ -190,7 +230,11 @@ export class GeminiProvider implements AIServiceProvider {
           });
           throw new AIProviderError(
             'AI_CONFIGURATION_ERROR',
-            `Gemini API authorization failed with status ${response.status}`
+            `Gemini API authorization failed with status ${response.status}`,
+            undefined,
+            undefined,
+            undefined,
+            response.status
           );
         }
 
@@ -200,7 +244,11 @@ export class GeminiProvider implements AIServiceProvider {
           });
           throw new AIProviderError(
             'AI_SERVICE_UNAVAILABLE',
-            `Gemini API responded with status 404: Model '${this.model}' not found.`
+            `Gemini API responded with status 404: Model '${this.model}' not found.`,
+            undefined,
+            undefined,
+            undefined,
+            404
           );
         }
 
@@ -212,7 +260,11 @@ export class GeminiProvider implements AIServiceProvider {
           });
           throw new AIProviderError(
             'AI_SERVICE_UNAVAILABLE',
-            `Gemini API responded with status 503 (Service Unavailable): ${providerMessage || 'Upstream service busy'}`
+            `Gemini API responded with status 503 (Service Unavailable): ${providerMessage || 'Upstream service busy'}`,
+            undefined,
+            undefined,
+            undefined,
+            503
           );
         }
 
@@ -224,7 +276,11 @@ export class GeminiProvider implements AIServiceProvider {
 
         throw new AIProviderError(
           'AI_SERVICE_UNAVAILABLE',
-          `Gemini API responded with status ${response.status}`
+          `Gemini API responded with status ${response.status}`,
+          undefined,
+          undefined,
+          undefined,
+          response.status
         );
       }
 
@@ -245,18 +301,35 @@ export class GeminiProvider implements AIServiceProvider {
         throw new AIProviderError('AI_INVALID_RESPONSE', 'Failed to parse Gemini JSON output.');
       }
 
+      let drafts: ReviewDraft[];
       try {
-        return validateAndSanitizeAIDrafts(parsedJson, input.language);
+        drafts = validateAndSanitizeAIDrafts(parsedJson, input.language);
       } catch (validationErr: unknown) {
         throw new AIProviderError(
           'AI_INVALID_RESPONSE',
           validationErr instanceof Error ? validationErr.message : 'Invalid draft schema.'
         );
       }
+
+      const providerDurationMs = Date.now() - providerStartTime;
+      console.info('[GeminiProvider Timing] Draft generation completed', {
+        model: this.model,
+        providerDurationMs,
+        draftsCount: drafts.length,
+      });
+
+      return drafts;
     } catch (err: unknown) {
       if (err instanceof AIProviderError) throw err;
       if (err instanceof Error && err.name === 'AbortError') {
-        throw new AIProviderError('AI_SERVICE_UNAVAILABLE', 'AI request timed out.');
+        throw new AIProviderError(
+          'AI_SERVICE_UNAVAILABLE',
+          'AI request timed out.',
+          undefined,
+          undefined,
+          'PROVIDER_ATTEMPT_TIMEOUT',
+          408
+        );
       }
       throw new AIProviderError(
         'AI_SERVICE_UNAVAILABLE',

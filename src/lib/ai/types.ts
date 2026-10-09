@@ -36,7 +36,9 @@ export class AIProviderError extends Error {
     public readonly code: AIErrorCode,
     message: string,
     public readonly retryAfterSeconds?: number,
-    public readonly isProviderQuota?: boolean
+    public readonly isProviderQuota?: boolean,
+    public readonly timeoutLayer?: string,
+    public readonly httpStatus?: number
   ) {
     super(message);
     this.name = 'AIProviderError';

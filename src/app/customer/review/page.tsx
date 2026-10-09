@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: 'Share your visit feedback and compose an AI-assisted Google review for our pharmacy.',
 };
 
+export const maxDuration = 15;
+
 interface CustomerReviewPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }

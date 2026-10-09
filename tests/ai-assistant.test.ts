@@ -324,6 +324,10 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       expect(url).toContain('/models/gemini-3.8-flash:generateContent');
       expect(url).toContain('key=test-api-key-xyz');
       expect(requestInit.method).toBe('POST');
+
+      const parsedBody = JSON.parse(requestInit.body as string);
+      expect(parsedBody.generationConfig.maxOutputTokens).toBe(350);
+      expect(parsedBody.generationConfig.responseMimeType).toBe('application/json');
     });
 
     it('produces exactly 3 validated drafts from a successful Gemini response', async () => {
@@ -727,7 +731,7 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       }
     });
 
-    it('handles request timeout and throws AI_SERVICE_UNAVAILABLE', async () => {
+    it('handles request timeout and throws AI_SERVICE_UNAVAILABLE with timeoutLayer and 408 status', async () => {
       globalThis.fetch = vi.fn().mockImplementation(async () => {
         const error = new Error('The operation was aborted');
         error.name = 'AbortError';
@@ -744,8 +748,88 @@ describe('Phase 6: AI Review Assistant Tests', () => {
         expect.fail('Should throw timeout error');
       } catch (err) {
         expect(err).toBeInstanceOf(AIProviderError);
-        expect((err as AIProviderError).code).toBe('AI_SERVICE_UNAVAILABLE');
-        expect((err as AIProviderError).message).toContain('timed out');
+        const providerErr = err as AIProviderError;
+        expect(providerErr.code).toBe('AI_SERVICE_UNAVAILABLE');
+        expect(providerErr.message).toContain('timed out');
+        expect(providerErr.timeoutLayer).toBe('PROVIDER_ATTEMPT_TIMEOUT');
+        expect(providerErr.httpStatus).toBe(408);
+      }
+    });
+
+    it('retries on HTTP 408 Request Timeout and succeeds on retry', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        if (callCount === 1) {
+          return {
+            ok: false,
+            status: 408,
+            statusText: 'Request Timeout',
+            json: async () => ({ error: { message: 'Timed out', status: 'DEADLINE_EXCEEDED' } }),
+          };
+        }
+        return {
+          ok: true,
+          json: async () => ({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: JSON.stringify({
+                        drafts: [
+                          { id: 'draft-1', text: 'Quick and efficient service.' },
+                          { id: 'draft-2', text: 'Very courteous team.' },
+                          { id: 'draft-3', text: 'Reliable local pharmacy.' },
+                        ],
+                      }),
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(callCount).toBe(2);
+      expect(drafts).toHaveLength(3);
+    });
+
+    it('surfaces rate limit immediately when Retry-After is > 2s without stalling', async () => {
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        callCount++;
+        return {
+          ok: false,
+          status: 429,
+          statusText: 'Too Many Requests',
+          headers: new Headers({ 'retry-after': '30' }),
+          json: async () => ({ error: { message: 'Rate limit exceeded' } }),
+        };
+      });
+
+      const provider = new GeminiProvider('test-api-key-xyz');
+      try {
+        await provider.generateReviewDrafts({
+          rating: 5,
+          selectedTags: ['Quick Service'],
+          language: 'en',
+        });
+        expect.fail('Should throw rate limit');
+      } catch (err) {
+        expect(err).toBeInstanceOf(AIProviderError);
+        expect((err as AIProviderError).code).toBe('AI_RATE_LIMITED');
+        expect((err as AIProviderError).retryAfterSeconds).toBe(30);
+        // Only 1 attempt made because Retry-After is too long to wait in serverless action
+        expect(callCount).toBe(1);
       }
     });
   });
