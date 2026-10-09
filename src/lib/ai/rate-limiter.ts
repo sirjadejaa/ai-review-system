@@ -13,7 +13,6 @@ interface AIRateLimitRecord {
 
 const DEFAULT_LIMIT_PER_MINUTE = 10;
 const WINDOW_DURATION_MS = 60 * 1000; // 1 minute
-const LOCKOUT_DURATION_MS = 60 * 1000; // 1 minute lockout
 
 const aiLimitsMap = new Map<string, AIRateLimitRecord>();
 
@@ -42,23 +41,25 @@ export function isAIRateLimited(key: string): { isBlocked: boolean; retryAfterSe
     return { isBlocked: false, retryAfterSeconds: 0 };
   }
 
-  // Active lockout
+  // Active lockout in progress
   if (record.blockedUntil && record.blockedUntil > now) {
-    const retryAfterSeconds = Math.ceil((record.blockedUntil - now) / 1000);
+    const retryAfterSeconds = Math.max(1, Math.ceil((record.blockedUntil - now) / 1000));
     return { isBlocked: true, retryAfterSeconds };
   }
 
-  // Window expired -> reset
-  if (now - record.firstRequestAt > WINDOW_DURATION_MS) {
+  // Window expired or previous lockout ended -> reset client state
+  if (now - record.firstRequestAt > WINDOW_DURATION_MS || (record.blockedUntil && record.blockedUntil <= now)) {
     aiLimitsMap.delete(normalizedKey);
     return { isBlocked: false, retryAfterSeconds: 0 };
   }
 
   const maxRequests = getMaxRequestsPerMinute();
   if (record.requests >= maxRequests) {
-    record.blockedUntil = now + LOCKOUT_DURATION_MS;
+    const remainingInWindow = Math.max(1000, WINDOW_DURATION_MS - (now - record.firstRequestAt));
+    const retryAfterSeconds = Math.max(1, Math.ceil(remainingInWindow / 1000));
+    record.blockedUntil = now + remainingInWindow;
     aiLimitsMap.set(normalizedKey, record);
-    return { isBlocked: true, retryAfterSeconds: Math.ceil(LOCKOUT_DURATION_MS / 1000) };
+    return { isBlocked: true, retryAfterSeconds };
   }
 
   return { isBlocked: false, retryAfterSeconds: 0 };
@@ -72,7 +73,7 @@ export function recordAIRequest(key: string): void {
   const now = Date.now();
   let record = aiLimitsMap.get(normalizedKey);
 
-  if (!record || now - record.firstRequestAt > WINDOW_DURATION_MS) {
+  if (!record || now - record.firstRequestAt > WINDOW_DURATION_MS || (record.blockedUntil && record.blockedUntil <= now)) {
     record = {
       requests: 1,
       firstRequestAt: now,

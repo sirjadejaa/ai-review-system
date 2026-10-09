@@ -45,6 +45,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
   const [showHandoffModal, setShowHandoffModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [isRateLimitedState, setIsRateLimitedState] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isTrackingGoogleClickRef = useRef(false);
@@ -52,6 +53,8 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastKeyRef = useRef('');
   const prevCustomerNoteRef = useRef(customerNote);
+  const cooldownSecondsRef = useRef(cooldownSeconds);
+  cooldownSecondsRef.current = cooldownSeconds;
 
   const handleGoogleClick = useCallback(() => {
     if (isTrackingGoogleClickRef.current) return;
@@ -80,6 +83,13 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       setEditedReview('');
       setIsGenerating(false);
       setError(null);
+      setIsRateLimitedState(false);
+      return;
+    }
+
+    // Guard: Prevent automatic (debounced) generation while rate-limit cooldown is active.
+    // Only an intentional retry (forceRetry === true) or calls after cooldown expiry proceed.
+    if (!forceRetry && cooldownSecondsRef.current > 0) {
       return;
     }
 
@@ -95,6 +105,9 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
     const currentRequestId = ++activeRequestIdRef.current;
     setIsGenerating(true);
     setError(null);
+    if (forceRetry) {
+      setIsRateLimitedState(false);
+    }
 
     generateReviewDraftsAction({
       rating,
@@ -112,11 +125,15 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
           setEditedReview(result.drafts[0].text);
           setShowHandoffModal(false);
           setCooldownSeconds(0);
+          setIsRateLimitedState(false);
           setError(null);
         } else {
           lastKeyRef.current = '';
           if (result.isRateLimited && result.retryAfterSeconds) {
             setCooldownSeconds(result.retryAfterSeconds);
+            setIsRateLimitedState(true);
+          } else {
+            setIsRateLimitedState(false);
           }
           setError(
             result.error ||
@@ -127,6 +144,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       .catch(() => {
         if (currentRequestId !== activeRequestIdRef.current) return;
         lastKeyRef.current = '';
+        setIsRateLimitedState(false);
         setError(
           "We couldn't create suggestions right now. You can write your review manually below."
         );
@@ -146,7 +164,13 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       setEditedReview('');
       setIsGenerating(false);
       setError(null);
+      setIsRateLimitedState(false);
       lastKeyRef.current = '';
+      return;
+    }
+
+    // Do not schedule debounced generations while cooldown is active
+    if (cooldownSeconds > 0) {
       return;
     }
 
@@ -168,7 +192,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [rating, selectedTags, customerNote, language, executeGeneration]);
+  }, [rating, selectedTags, customerNote, language, cooldownSeconds, executeGeneration]);
 
   const handleLanguageChange = (newLang: LanguageCode) => {
     if (newLang === language) return;
@@ -283,7 +307,11 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
       {/* Error Alert with Usable Retry */}
       {error && cooldownSeconds === 0 && (
         <div className={styles.errorBanner} role="alert">
-          <span>{error}</span>
+          <span>
+            {isRateLimitedState
+              ? 'Capacity pause has ended. You can retry generating suggestions now, or compose your review directly below.'
+              : error}
+          </span>
           <button
             type="button"
             className={styles.retryButton}

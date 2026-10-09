@@ -546,4 +546,165 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
       expect(callCount).toBe(2);
     });
   });
+
+  describe('7. Rate Limiting, Cooldown Logic & Capacity-Paused Handling', () => {
+    it('returns capacity-paused error with exact retryAfterSeconds when throttled', async () => {
+      await clearAIDraftsCache();
+      clearAIRateLimits();
+
+      const mockGenerate = vi.fn().mockResolvedValue([
+        { id: 'draft-1', text: 'Good service', language: 'en' },
+        { id: 'draft-2', text: 'Polite staff', language: 'en' },
+        { id: 'draft-3', text: 'Clean store', language: 'en' },
+      ]);
+
+      setAIProvider({
+        name: 'ollama',
+        generateReviewDrafts: mockGenerate,
+      });
+
+      // Exhaust client rate limit
+      for (let i = 0; i < 10; i++) {
+        const res = await generateReviewDraftsAction({
+          rating: 5,
+          selectedTags: ['Clean Store'],
+          customerNote: `Note variation ${i}`,
+          language: 'en',
+        });
+        expect(res.success).toBe(true);
+      }
+
+      // 11th request triggers rate limit
+      const blockedRes = await generateReviewDraftsAction({
+        rating: 5,
+        selectedTags: ['Clean Store'],
+        customerNote: 'Note variation 11',
+        language: 'en',
+      });
+
+      expect(blockedRes.success).toBe(false);
+      expect(blockedRes.isRateLimited).toBe(true);
+      expect(blockedRes.retryAfterSeconds).toBeGreaterThan(0);
+      expect(blockedRes.error).toContain('AI review suggestions are temporarily paused.');
+      expect(blockedRes.error).toContain(`${blockedRes.retryAfterSeconds}s to retry or compose your review directly below.`);
+    });
+
+    it('handles upstream 429 quota exhaustion gracefully and surfaces provider retryAfterSeconds', async () => {
+      await clearAIDraftsCache();
+      clearAIRateLimits();
+
+      const mockGenerate = vi.fn().mockRejectedValue(
+        new AIProviderError('AI_RATE_LIMITED', 'Upstream quota exceeded', 20, true, undefined, 429)
+      );
+
+      setAIProvider({
+        name: 'ollama',
+        generateReviewDrafts: mockGenerate,
+      });
+
+      const res = await generateReviewDraftsAction({
+        rating: 5,
+        selectedTags: ['Good Prices'],
+        language: 'en',
+      });
+
+      expect(res.success).toBe(false);
+      expect(res.isRateLimited).toBe(true);
+      expect(res.retryAfterSeconds).toBe(20);
+      expect(res.error).toBe(
+        'AI review suggestions are temporarily paused. You can wait 20s to retry or compose your review directly below.'
+      );
+    });
+
+    it('maps 401 authentication error to friendly customer message without exposing secrets', async () => {
+      await clearAIDraftsCache();
+      clearAIRateLimits();
+
+      const mockGenerate = vi.fn().mockRejectedValue(
+        new AIProviderError('AI_CONFIGURATION_ERROR', 'Unauthorized', undefined, undefined, undefined, 401)
+      );
+
+      setAIProvider({
+        name: 'ollama',
+        generateReviewDrafts: mockGenerate,
+      });
+
+      const res = await generateReviewDraftsAction({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(res.success).toBe(false);
+      expect(res.isRateLimited).toBeUndefined();
+      expect(res.error).toBe('AI suggestions are temporarily unavailable. You can write your review directly below.');
+    });
+
+    it('maps model not found (404) or busy (503) error to friendly customer message', async () => {
+      await clearAIDraftsCache();
+      clearAIRateLimits();
+
+      const mockGenerate = vi.fn().mockRejectedValue(
+        new AIProviderError('AI_SERVICE_UNAVAILABLE', 'Model not found', undefined, undefined, undefined, 404)
+      );
+
+      setAIProvider({
+        name: 'ollama',
+        generateReviewDrafts: mockGenerate,
+      });
+
+      const res = await generateReviewDraftsAction({
+        rating: 5,
+        selectedTags: ['Quick Service'],
+        language: 'en',
+      });
+
+      expect(res.success).toBe(false);
+      expect(res.error).toBe('AI suggestion service is temporarily busy. You can retry or write your review directly below.');
+    });
+
+    it('deduplicates concurrent requests and prevents duplicate outbound provider calls', async () => {
+      await clearAIDraftsCache();
+      clearAIRateLimits();
+
+      let resolvePromise: (value: unknown) => void;
+      const delayedPromise = new Promise((resolve) => {
+        resolvePromise = resolve;
+      });
+
+      const mockGenerate = vi.fn().mockImplementation(async () => {
+        await delayedPromise;
+        return [
+          { id: 'draft-1', text: 'Concurrent 1', language: 'en' },
+          { id: 'draft-2', text: 'Concurrent 2', language: 'en' },
+          { id: 'draft-3', text: 'Concurrent 3', language: 'en' },
+        ];
+      });
+
+      setAIProvider({
+        name: 'ollama',
+        generateReviewDrafts: mockGenerate,
+      });
+
+      const input = {
+        rating: 5,
+        selectedTags: ['Polite Staff'] as ('Polite Staff')[],
+        customerNote: 'Concurrent test note',
+        language: 'en' as const,
+      };
+
+      // Launch two concurrent requests with identical input
+      const req1 = generateReviewDraftsAction(input);
+      const req2 = generateReviewDraftsAction(input);
+
+      // Resolve provider call
+      resolvePromise!(true);
+
+      const [res1, res2] = await Promise.all([req1, req2]);
+      expect(res1.success).toBe(true);
+      expect(res2.success).toBe(true);
+      expect(mockGenerate).toHaveBeenCalledTimes(1); // Deduped into 1 provider call
+      expect(res1.drafts).toEqual(res2.drafts);
+    });
+  });
 });

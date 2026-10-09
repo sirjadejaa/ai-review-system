@@ -55,9 +55,10 @@ export async function generateReviewDraftsAction(
     try {
       const headerList = await headers();
       const forwardedFor =
+        headerList.get('x-vercel-ip') ||
         headerList.get('x-forwarded-for') ||
-        headerList.get('cf-connecting-ip') ||
-        headerList.get('x-real-ip');
+        headerList.get('x-real-ip') ||
+        headerList.get('cf-connecting-ip');
       const userAgent = headerList.get('user-agent') || '';
       clientKey = `${forwardedFor ? forwardedFor.split(',')[0].trim() : 'anonymous'}:${userAgent.slice(0, 32)}`;
     } catch {
@@ -72,7 +73,7 @@ export async function generateReviewDraftsAction(
       });
       return {
         success: false,
-        error: `AI review suggestions are temporarily paused. Please wait ${rateCheck.retryAfterSeconds}s before requesting new options.`,
+        error: `AI review suggestions are temporarily paused. You can wait ${rateCheck.retryAfterSeconds}s to retry or compose your review directly below.`,
         isRateLimited: true,
         retryAfterSeconds: rateCheck.retryAfterSeconds,
       };
@@ -146,7 +147,7 @@ export async function generateReviewDraftsAction(
 
     if (error instanceof AIProviderError && error.code === 'AI_RATE_LIMITED') {
       const retryAfterSeconds = error.retryAfterSeconds ?? 15;
-      console.warn('[AI Provider Rate Limit] Upstream Gemini 429 quota reached', {
+      console.warn('[AI Provider Rate Limit] Upstream provider quota or rate limit reached', {
         retryAfterSeconds,
         isProviderQuota: error.isProviderQuota,
         totalDurationMs,
@@ -154,7 +155,7 @@ export async function generateReviewDraftsAction(
 
       return {
         success: false,
-        error: `AI suggestion service is temporarily busy. Please wait ${retryAfterSeconds}s and try again.`,
+        error: `AI review suggestions are temporarily paused. You can wait ${retryAfterSeconds}s to retry or compose your review directly below.`,
         isRateLimited: true,
         retryAfterSeconds,
       };
@@ -178,6 +179,20 @@ export async function generateReviewDraftsAction(
       timeoutLayer,
       httpStatus,
     });
+
+    if (error instanceof AIProviderError && error.code === 'AI_CONFIGURATION_ERROR') {
+      return {
+        success: false,
+        error: 'AI suggestions are temporarily unavailable. You can write your review directly below.',
+      };
+    }
+
+    if (error instanceof AIProviderError && error.code === 'AI_SERVICE_UNAVAILABLE') {
+      return {
+        success: false,
+        error: 'AI suggestion service is temporarily busy. You can retry or write your review directly below.',
+      };
+    }
 
     return {
       success: false,
