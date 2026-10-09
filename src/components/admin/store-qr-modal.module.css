@@ -8,7 +8,7 @@
 
 .placementTabs {
   display: grid;
-  grid-templateColumns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: var(--space-2);
 }
 
