@@ -13,11 +13,17 @@ export interface DomainShopSettings {
   shopName: string;
   tagline: string | null;
   logoUrl: string | null;
+  primaryColor: string | null;
+  secondaryColor: string | null;
+  accentColor: string | null;
   phoneNumber: string | null;
   whatsappNumber: string | null;
+  emergencyContact: string | null;
   address: string | null;
   googleMapsUrl: string | null;
   googleReviewUrl: string | null;
+  websiteUrl: string | null;
+  socialLinks: string[];
   openingHours: OpeningHourSlot[];
   isEmergencyOpen: boolean;
   createdAt: Date;

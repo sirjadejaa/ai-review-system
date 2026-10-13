@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Phone, MessageCircle, MapPin } from 'lucide-react';
+import { Phone, MessageCircle, MapPin, Globe } from 'lucide-react';
 import styles from './customer-contact-actions.module.css';
 import { trackContactClickAction } from '@/lib/actions/customer-actions';
 import { formatTelHref, formatWhatsAppHref, isValidExternalUrl } from '@/lib/format/contact-links';
@@ -10,24 +10,27 @@ export interface CustomerContactActionsProps {
   phoneNumber?: string | null;
   whatsappNumber?: string | null;
   googleMapsUrl?: string | null;
+  websiteUrl?: string | null;
 }
 
 /**
- * Customer contact and navigation action buttons (Call, WhatsApp, Directions).
+ * Customer contact and navigation action buttons (Call, WhatsApp, Directions, Website).
  * Features touch-friendly targets (>= 48px), accessible labels, and non-blocking analytics.
  */
 export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
   phoneNumber,
   whatsappNumber,
   googleMapsUrl,
+  websiteUrl,
 }) => {
   const telHref = formatTelHref(phoneNumber);
   const whatsAppHref = formatWhatsAppHref(whatsappNumber);
   const hasPhone = Boolean(telHref);
   const hasWhatsApp = Boolean(whatsAppHref);
   const hasDirections = Boolean(googleMapsUrl && isValidExternalUrl(googleMapsUrl));
+  const hasWebsite = Boolean(websiteUrl && isValidExternalUrl(websiteUrl));
 
-  if (!hasPhone && !hasWhatsApp && !hasDirections) {
+  if (!hasPhone && !hasWhatsApp && !hasDirections && !hasWebsite) {
     return null;
   }
 
@@ -77,6 +80,19 @@ export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
           >
             <MapPin size={16} className={styles.actionIcon} />
             <span>Directions</span>
+          </a>
+        )}
+
+        {hasWebsite && (
+          <a
+            href={websiteUrl!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.actionButton}
+            aria-label="Visit pharmacy official website"
+          >
+            <Globe size={16} className={styles.actionIcon} />
+            <span>Website</span>
           </a>
         )}
       </div>

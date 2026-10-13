@@ -266,7 +266,10 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 role="status"
               >
                 <AlertCircle size={15} aria-hidden="true" style={{ flexShrink: 0 }} />
-                <span>Emergency Availability: Essential medicine counter active</span>
+                <span>
+                  Emergency Availability: Essential medicine counter active
+                  {settings.emergencyContact ? ` • ${settings.emergencyContact}` : ''}
+                </span>
               </div>
             )}
           </div>
@@ -331,6 +334,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
             phoneNumber={settings.phoneNumber}
             whatsappNumber={settings.whatsappNumber}
             googleMapsUrl={settings.googleMapsUrl}
+            websiteUrl={settings.websiteUrl}
           />
         </section>
 

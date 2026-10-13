@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "primaryColor" TEXT DEFAULT '#123e35';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "secondaryColor" TEXT DEFAULT '#4a6b61';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "accentColor" TEXT DEFAULT '#92bfa9';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "emergencyContact" TEXT;
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "websiteUrl" TEXT;
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "socialLinks" TEXT DEFAULT '[]';

@@ -19,7 +19,7 @@ import { isValidExternalUrl } from '@/lib/format/contact-links';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { ShareCardButton } from '@/components/customer/share-card-button';
 import { OfferList } from '@/components/customer/offer-list';
-import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, AlertTriangle, Star } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, AlertTriangle, Star, Globe } from 'lucide-react';
 import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
 import styles from '@/components/customer/digital-card.module.css';
 
@@ -146,6 +146,7 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
   const hasAddress = Boolean(settings.address && settings.address.trim());
   const hasPhone = Boolean(settings.phoneNumber && settings.phoneNumber.trim());
   const hasWhatsApp = Boolean(settings.whatsappNumber && settings.whatsappNumber.trim());
+  const hasWebsite = Boolean(settings.websiteUrl && isValidExternalUrl(settings.websiteUrl));
 
   return (
     <CustomerLayout
@@ -189,7 +190,10 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
           {settings.isEmergencyOpen && (
             <div className={styles.emergencyBanner} role="status">
               <AlertTriangle size={15} aria-hidden="true" />
-              <span>Emergency Availability: Essential medicine support open</span>
+              <span>
+                Emergency Availability: Essential medicine support open
+                {settings.emergencyContact ? ` (${settings.emergencyContact})` : ''}
+              </span>
             </div>
           )}
         </section>
@@ -200,11 +204,12 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
             phoneNumber={settings.phoneNumber}
             whatsappNumber={settings.whatsappNumber}
             googleMapsUrl={settings.googleMapsUrl}
+            websiteUrl={settings.websiteUrl}
           />
         </section>
 
         {/* 3. Operating Hours & Physical Location */}
-        {(hasHours || hasAddress || hasPhone || hasWhatsApp) && (
+        {(hasHours || hasAddress || hasPhone || hasWhatsApp || hasWebsite) && (
           <section className={styles.infoCard} aria-label="Pharmacy Operating Hours and Address">
             <div className={styles.infoHeader}>
               <Clock size={16} color="var(--color-secondary)" aria-hidden="true" />
@@ -235,8 +240,8 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
               </div>
             )}
 
-            {/* Phone & WhatsApp Display Numbers */}
-            {(hasPhone || hasWhatsApp) && (
+            {/* Phone, WhatsApp & Website Display Rows */}
+            {(hasPhone || hasWhatsApp || hasWebsite) && (
               <div className={styles.contactDetailsRow}>
                 {hasPhone && (
                   <div className={styles.contactDetailItem}>
@@ -250,6 +255,20 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
                     <MessageCircle size={14} color="var(--color-secondary)" aria-hidden="true" />
                     <span className={styles.contactDetailLabel}>WhatsApp:</span>
                     <span>{settings.whatsappNumber}</span>
+                  </div>
+                )}
+                {hasWebsite && (
+                  <div className={styles.contactDetailItem}>
+                    <Globe size={14} color="var(--color-primary)" aria-hidden="true" />
+                    <span className={styles.contactDetailLabel}>Website:</span>
+                    <a
+                      href={settings.websiteUrl!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
+                    >
+                      {settings.websiteUrl}
+                    </a>
                   </div>
                 )}
               </div>

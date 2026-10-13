@@ -15,6 +15,15 @@ const SafeUrlSchema = z
     message: 'Must be a valid http:// or https:// URL',
   });
 
+const HexColorSchema = z
+  .preprocess(
+    (val) => (val === '' || val === null || val === undefined ? null : val),
+    z.string().trim().nullable().optional()
+  )
+  .refine((val) => !val || /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(val), {
+    message: 'Must be a valid hex color code (e.g. #123e35)',
+  });
+
 export const ShopSettingsInputSchema = z.object({
   shopName: z
     .string()
@@ -34,6 +43,9 @@ export const ShopSettingsInputSchema = z.object({
     .refine((val) => !val || val.startsWith('/uploads/') || val.startsWith('data:image/') || isValidExternalUrl(val), {
       message: 'Logo must be a valid image URL or upload path',
     }),
+  primaryColor: HexColorSchema,
+  secondaryColor: HexColorSchema,
+  accentColor: HexColorSchema,
   phoneNumber: z
     .preprocess(
       (val) => (val === '' || val === null || val === undefined ? null : val),
@@ -44,6 +56,11 @@ export const ShopSettingsInputSchema = z.object({
       (val) => (val === '' || val === null || val === undefined ? null : val),
       z.string().trim().max(20, 'WhatsApp number must be at most 20 characters').nullable().optional()
     ),
+  emergencyContact: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(100, 'Emergency contact must be at most 100 characters').nullable().optional()
+    ),
   address: z
     .preprocess(
       (val) => (val === '' || val === null || val === undefined ? null : val),
@@ -51,6 +68,8 @@ export const ShopSettingsInputSchema = z.object({
     ),
   googleMapsUrl: SafeUrlSchema,
   googleReviewUrl: SafeUrlSchema,
+  websiteUrl: SafeUrlSchema,
+  socialLinks: z.array(z.string().trim()).default([]),
   openingHours: z.array(OpeningHourSlotSchema).default([]),
   isEmergencyOpen: z.coerce.boolean().default(false),
 });

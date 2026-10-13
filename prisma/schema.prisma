@@ -12,19 +12,25 @@ datasource db {
 
 /// Single Pharmacy Shop Settings (Singleton record: id = "default_shop")
 model ShopSettings {
-  id              String   @id @default("default_shop")
-  shopName        String
-  tagline         String?
-  logoUrl         String?
-  phoneNumber     String?
-  whatsappNumber  String?
-  address         String?
-  googleMapsUrl   String?
-  googleReviewUrl String?
-  openingHours    String   @default("[]") // Structured JSON array: [{"days":"Mon-Sat","hours":"8:00 AM - 10:00 PM"}]
-  isEmergencyOpen Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String   @id @default("default_shop")
+  shopName         String
+  tagline          String?
+  logoUrl          String?
+  primaryColor     String?  @default("#123e35")
+  secondaryColor   String?  @default("#4a6b61")
+  accentColor      String?  @default("#92bfa9")
+  phoneNumber      String?
+  whatsappNumber   String?
+  emergencyContact String?
+  address          String?
+  googleMapsUrl    String?
+  googleReviewUrl  String?
+  websiteUrl       String?
+  socialLinks      String?  @default("[]")
+  openingHours     String   @default("[]") // Structured JSON array: [{"days":"Mon-Sat","hours":"8:00 AM - 10:00 PM"}]
+  isEmergencyOpen  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 /// Internal Customer Feedback (Private to Owner; 1-5 Stars)
