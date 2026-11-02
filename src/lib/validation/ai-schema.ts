@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { FeedbackTagSchema, PREDEFINED_FEEDBACK_TAGS } from './feedback-schema';
 import type { LanguageCode, ReviewDraft } from '@/lib/ai/types';
 
-export const LanguageCodeSchema = z.enum(['en', 'gu', 'gujlish', 'hi', 'hinglish']);
+export const LanguageCodeSchema = z.enum(['en', 'hi', 'gu']);
 
 export const GenerateReviewDraftsInputSchema = z.object({
   rating: z

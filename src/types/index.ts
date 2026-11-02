@@ -3,7 +3,7 @@
  * Strictly single-tenant. No SaaS or multi-tenancy constructs.
  */
 
-export type LanguageCode = 'en' | 'gu' | 'gujlish' | 'hi' | 'hinglish';
+export type LanguageCode = 'en' | 'hi' | 'gu';
 
 export interface ShopSettings {
   shopName: string;

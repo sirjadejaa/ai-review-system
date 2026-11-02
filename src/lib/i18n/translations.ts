@@ -1,12 +1,12 @@
 /**
  * Multi-Language Internationalization Dictionary
- * Supports:
- *  - 'en': English
- *  - 'gu': ગુજરાતી (Gujarati Unicode Script)
- *  - 'gujlish': Gujlish (Natural code-mixed Gujarati + English conversational wording)
+ * Exactly three supported languages:
+ *  - 'en': English (Natural, professional English)
+ *  - 'hi': हिन्दी (Proper Devanagari Script)
+ *  - 'gu': ગુજરાતી (Proper Gujarati Unicode Script)
  */
 
-export type SupportedLanguage = 'en' | 'gu' | 'gujlish';
+export type SupportedLanguage = 'en' | 'hi' | 'gu';
 
 export interface LanguageOption {
   code: SupportedLanguage;
@@ -16,83 +16,83 @@ export interface LanguageOption {
 
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'en', label: 'English', nativeLabel: 'English' },
+  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
   { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી' },
-  { code: 'gujlish', label: 'Gujlish', nativeLabel: 'Gujlish' },
 ];
 
 export interface TagTranslation {
   id: string;
   en: string;
+  hi: string;
   gu: string;
-  gujlish: string;
 }
 
 export const FASHION_TAG_TRANSLATIONS: TagTranslation[] = [
   {
     id: 'Clothing Quality',
     en: 'Clothing Quality',
+    hi: 'कपड़ों की गुणवत्ता',
     gu: 'કપડાંની ગુણવત્તા',
-    gujlish: 'Clothing Quality',
   },
   {
     id: 'Fabric Quality',
     en: 'Fabric Quality',
+    hi: 'कपड़े का फैब्रिक',
     gu: 'ફેબ્રિક',
-    gujlish: 'Fabric Quality',
   },
   {
     id: 'Fitting & Sizing',
     en: 'Fitting & Sizing',
+    hi: 'फिटिंग और साइज',
     gu: 'ફિટિંગ અને સાઇઝ',
-    gujlish: 'Fitting & Sizing',
   },
   {
     id: 'Design & Collection',
     en: 'Design & Collection',
+    hi: 'डिज़ाइन और कलेक्शन',
     gu: 'ડિઝાઇન',
-    gujlish: 'Design',
   },
   {
     id: 'Comfort',
     en: 'Comfort',
+    hi: 'आराम और कम्फर्ट',
     gu: 'આરામ',
-    gujlish: 'Comfort',
   },
   {
     id: 'Pricing & Value',
     en: 'Pricing & Value',
+    hi: 'उचित मूल्य',
     gu: 'કિંમત',
-    gujlish: 'Pricing',
   },
   {
     id: 'Staff Behaviour',
     en: 'Staff Behaviour',
+    hi: 'स्टाफ का व्यवहार',
     gu: 'સ્ટાફનો વ્યવહાર',
-    gujlish: 'Staff Behaviour',
   },
   {
     id: 'Collection',
     en: 'Collection',
+    hi: 'नया कलेक्शन',
     gu: 'કલેક્શન',
-    gujlish: 'Collection',
   },
   {
     id: 'Shopping Experience',
     en: 'Shopping Experience',
+    hi: 'खरीदारी का अनुभव',
     gu: 'ખરીદીનો અનુભવ',
-    gujlish: 'Shopping Experience',
   },
   {
     id: 'Store Ambience',
     en: 'Store Ambience',
+    hi: 'स्टोर का माहौल',
     gu: 'સ્ટોરનું વાતાવરણ',
-    gujlish: 'Store Ambience',
   },
   {
     id: 'Variety & Availability',
     en: 'Variety & Availability',
+    hi: 'विविधता और उपलब्धता',
     gu: 'વિવિધતા',
-    gujlish: 'Variety',
   },
 ];
 
@@ -178,6 +178,87 @@ export const TRANSLATIONS = {
     footerCopyright: 'All rights reserved. Luxury Retail Experience.',
   },
 
+  hi: {
+    // Nav & General
+    shopCategory: 'लक्ज़री वस्त्र बुटीक',
+    privilegePass: 'प्रिविलेज पास',
+    rateVisit: 'अपनी रेटिंग दें',
+    viewCard: 'वीआईपी पास',
+    backToHome: 'बुटीक होम',
+
+    // Hero Section
+    heroBadge: 'नया सीज़नल कलेक्शन',
+    heroTitle: 'अपनी स्टाइल दर्शाएं और अपना अनुभव साझा करें',
+    heroSubtitle:
+      'हम बेहतरीन और आधुनिक फैशन तैयार करते हैं। आपकी राय हमारे कलेक्शन को और बेहतर बनाने में मदद करती है।',
+    rateExperienceCta: 'खरीदारी की समीक्षा दें',
+    viewCollectionCta: 'कलेक्शन देखें',
+
+    // Rating & Feedback Form
+    ratingHeading: 'आपकी खरीदारी का अनुभव कैसा रहा?',
+    ratingSubtitle: 'समीक्षा शुरू करने के लिए अपनी रेटिंग चुनें',
+    ratingLabel: 'अपनी रेटिंग चुनें',
+    ratingHintDefault: 'रेटिंग देने के लिए स्टार पर टैप करें',
+    rating1: '1 स्टार — निराशाजनक अनुभव',
+    rating2: '2 स्टार — सुधार की आवश्यकता है',
+    rating3: '3 स्टार — सामान्य खरीदारी अनुभव',
+    rating4: '4 स्टार — कलेक्शन से बहुत प्रसन्न',
+    rating5: '5 स्टार — शानदार कलेक्शन और उत्कृष्ट सेवा!',
+    selectRatingError: 'कृपया पहले रेटिंग चुनें।',
+
+    // Tags
+    highlightsLabel: 'आपको क्या सबसे अधिक पसंद आया?',
+    highlightsSubtitle: 'अपने अनुभव से संबंधित सभी विकल्प चुनें',
+
+    // Feedback notes
+    notesLabel: 'अतिरिक्त टिप्पणी (वैकल्पिक)',
+    notesPlaceholder: 'कपड़ों, फिटिंग या स्टोर सेवा के बारे में कुछ खास लिखें...',
+    charCount: 'अक्षर शेष',
+
+    // Contact
+    contactOptionalLabel: 'फ़ोन नंबर या ईमेल (वैकल्पिक)',
+    contactPlaceholder: 'ऑर्डर या फिटिंग सहायता के लिए...',
+    privacyNotice:
+      'आपकी गोपनीयता सुरक्षित है। आपकी निजी राय केवल स्टोर प्रबंधन तक सीमित रहेगी।',
+
+    // Actions
+    generateReview: 'रिव्यू बनाएं',
+    generatingReview: 'आपके लिए समीक्षा तैयार हो रही है...',
+    submitPrivateFeedback: 'स्टोर को निजी फीडबैक भेजें',
+    submitting: 'सुरक्षित किया जा रहा है...',
+    reviewReadyTitle: 'आपकी समीक्षा सुझाव तैयार हैं',
+    reviewReadySubtitle: 'नीचे से कोई भी समीक्षा चुनें, चाहें तो संपादित करें और Google पर पोस्ट करें।',
+
+    // Success State
+    thankYouTitle: 'आपकी प्रतिक्रिया के लिए धन्यवाद!',
+    thankYouMessage:
+      'आपकी राय हमारे फैब्रिक, फिटिंग और ग्राहक सेवा को और बेहतर बनाने में मदद करती है।',
+    copyToGoogleCta: 'कॉपी करें और Google Reviews पर पोस्ट करें',
+    viewPrivilegeCardCta: 'अपना वीआईपी पास देखें',
+
+    // Products Section
+    featuredProductsTitle: 'विशेष कलेक्शन',
+    featuredProductsSubtitle: 'नवीनतम डिज़ाइन, पारंपरिक कला और प्रीमियम वस्त्र।',
+    allCategories: 'सभी',
+    viewDetails: 'विवरण देखें',
+    sizeLabel: 'साइज:',
+    colorLabel: 'रंग:',
+    noProductsFound: 'इस श्रेणी में अभी कोई उत्पाद उपलब्ध नहीं है।',
+
+    // Offers Section
+    specialOffersTitle: 'विशेष स्टोर ऑफ़र',
+    specialOffersSubtitle: 'सीज़नल डिस्काउंट, त्योहारों की छूट और वीआईपी सुविधाएं।',
+    validTill: 'वैधता:',
+    offerTerms: 'नियम एवं शर्तें',
+    claimOffer: 'स्टोर पर प्राप्त करें',
+    noOffersFound: 'वर्तमान में कोई सक्रिय ऑफ़र उपलब्ध नहीं है।',
+
+    // Social & Footer
+    connectTitle: 'हमारे सोशल मीडिया से जुड़ें',
+    connectSubtitle: 'नए आगमन और लुकबुक के लिए हमें फॉलो करें।',
+    footerCopyright: 'सर्वाधिकार सुरक्षित। लक्ज़री रिटेल अनुभव।',
+  },
+
   gu: {
     // Nav & General
     shopCategory: 'લક્ઝરી કપડાંનું બુટીક',
@@ -248,99 +329,18 @@ export const TRANSLATIONS = {
     // Offers Section
     specialOffersTitle: 'ખાસ ઑફર્સ અને ડિસ્કાઉન્ટ',
     specialOffersSubtitle: 'સીઝનલ ઑફર્સ, ઉત્સવની છૂટછાટ અને વિશેષ ગ્રાહક લાભ.',
-    validTill: 'માન્યતા તારીખ',
+    validTill: 'વૈધતા:',
     offerTerms: 'નિયમો અને શરતો',
-    claimOffer: 'સ્ટોર પર ઑફર મેળવો',
-    noOffersFound: 'હાલ કોઈ નવી ઑફર ચાલુ નથી. ટૂંક સમયમાં ફરી તપાસો!',
+    claimOffer: 'સ્ટોર પર મેળવો',
+    noOffersFound: 'હાલમાં કોઈ સક્રિય ઑફર ઉપલબ્ધ નથી.',
 
     // Social & Footer
-    connectTitle: 'અમારી સાથે સોશિયલ મીડિયા પર જોડાઓ',
-    connectSubtitle: 'નવા કલેક્શન અને ફેશન અપડેટ્સ માટે અમને ફોલો કરો.',
-    footerCopyright: 'સર્વહક્ક સ્વાધીન. પ્રીમિયમ ફેશન અનુભવ.',
+    connectTitle: 'અમારા સોશિયલ મીડિયા સાથે જોડાવો',
+    connectSubtitle: 'નવા આગમન અને કલેક્શન માટે અમને ફોલો કરો.',
+    footerCopyright: 'સર્વાધિકાર સુરક્ષિત. લક્ઝરી રિટેલ અનુભવ.',
   },
+};
 
-  gujlish: {
-    // Nav & General
-    shopCategory: 'Luxury Clothing Boutique',
-    privilegePass: 'Privilege Pass',
-    rateVisit: 'Rating આપો',
-    viewCard: 'VIP Pass',
-    backToHome: 'Boutique પર પાછા જાઓ',
-
-    // Hero Section
-    heroBadge: 'New Seasonal Collection',
-    heroTitle: 'તમારી Style બતાવો અને Shopping Experience શેર કરો',
-    heroSubtitle:
-      'અમે tailored elegance અને trending fashion લાવીએ છીએ. તમારો genuine feedback બીજા customers ને guide કરશે.',
-    rateExperienceCta: 'Shopping Review આપો',
-    viewCollectionCta: 'Featured Products જુઓ',
-
-    // Rating & Feedback Form
-    ratingHeading: 'તમારો shopping experience કેવો રહ્યો?',
-    ratingSubtitle: 'Personalized review generate કરવા માટે rating પસંદ કરો',
-    ratingLabel: 'તમારું rating પસંદ કરો',
-    ratingHintDefault: 'Rate કરવા માટે star પર tap કરો',
-    rating1: '1 Star — Experience accho na hato',
-    rating2: '2 Stars — Improvement ni jarur che',
-    rating3: '3 Stars — Average shopping experience',
-    rating4: '4 Stars — Collection bahu gamiyu',
-    rating5: '5 Stars — Mind-blowing collection & styling!',
-    selectRatingError: 'Pehle star rating select karo.',
-
-    // Tags
-    highlightsLabel: 'Visit ma shu best lagyu?',
-    highlightsSubtitle: 'Shopping experience na tags select karo',
-
-    // Feedback notes
-    notesLabel: 'Additional Comments (Optional)',
-    notesPlaceholder: 'Fabric, fitting assistance ya boutique visit vishe lakhvo...',
-    charCount: 'characters remaining',
-
-    // Contact
-    contactOptionalLabel: 'Phone number ya Email (Optional)',
-    contactPlaceholder: 'Alterations ya order updates mate...',
-    privacyNotice:
-      'Tamari privacy safe che. Private feedback store management joi sake che. AI thi Google Review generate thai sake che.',
-
-    // Actions
-    generateReview: 'Review બનાવો',
-    generatingReview: 'AI review drafts generate kare che...',
-    submitPrivateFeedback: 'Store ne Feedback moklo',
-    submitting: 'Saving...',
-    reviewReadyTitle: 'Tamara AI Review Suggestions Ready Che',
-    reviewReadySubtitle: 'Koypan draft select karo, edit karvu hoy to karo, ane Google Reviews par copy karo.',
-
-    // Success State
-    thankYouTitle: 'Thank You for Your Feedback!',
-    thankYouMessage:
-      'Tamaro feedback fabric quality, fitting ane service ne perfect banavva ma help kare che.',
-    copyToGoogleCta: 'Copy કરીને Google Review આપો',
-    viewPrivilegeCardCta: 'VIP Boutique Privilege Pass જુઓ',
-
-    // Products Section
-    featuredProductsTitle: 'Featured Products',
-    featuredProductsSubtitle: 'Trending designs, handcrafted fabrics ane seasonal fashion pieces.',
-    allCategories: 'All',
-    viewDetails: 'View Details',
-    sizeLabel: 'Sizes:',
-    colorLabel: 'Colors:',
-    noProductsFound: 'Aa category ma hal products nathi.',
-
-    // Offers Section
-    specialOffersTitle: 'Special Offers & Discounts',
-    specialOffersSubtitle: 'Festival discounts, seasonal sales ane VIP customer benefits.',
-    validTill: 'Valid until',
-    offerTerms: 'Terms & Conditions',
-    claimOffer: 'Store par claim karo',
-    noOffersFound: 'Currently koi active offer nathi. Navi offers mate jaldi visit karo!',
-
-    // Social & Footer
-    connectTitle: 'Social Media par connect thavo',
-    connectSubtitle: 'New arrivals ane styling lookbooks mate follow karo.',
-    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
-  },
-} as const;
-
-export function getTranslation(lang: SupportedLanguage = 'en') {
-  return TRANSLATIONS[lang] ?? TRANSLATIONS.en;
+export function getTranslation(lang: SupportedLanguage) {
+  return TRANSLATIONS[lang] || TRANSLATIONS.en;
 }

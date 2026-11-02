@@ -189,7 +189,7 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
       expect(hasDevanagari).toBe(true);
     });
 
-    it('generates Hinglish drafts in Latin script without Devanagari', async () => {
+    it('generates Gujarati drafts in authentic Gujarati Unicode script', async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
@@ -198,9 +198,9 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
               message: {
                 content: JSON.stringify({
                   drafts: [
-                    { id: 'draft-1', text: 'Service kaafi quick tha aur staff helpful tha.' },
-                    { id: 'draft-2', text: 'Saari medicines easily mil gayi bina kisi wait ke.' },
-                    { id: 'draft-3', text: 'Good experience, pharmacists polite the.' },
+                    { id: 'draft-1', text: 'સ્ટાફનો વ્યવહાર ખૂબ સરસ હતો અને કલેક્શન ઉત્તમ છે.' },
+                    { id: 'draft-2', text: 'કપડાંની ગુણવત્તા અને ફિટિંગ એકદમ પરફેક્ટ છે.' },
+                    { id: 'draft-3', text: 'ખરીદીનો સારો અનુભવ રહ્યો.' },
                   ],
                 }),
               },
@@ -212,14 +212,14 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
       const provider = new OllamaProvider('test-key', 'gemma4:31b');
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Quick Service'],
-        language: 'hinglish',
+        selectedTags: ['Clothing Quality'],
+        language: 'gu',
       });
 
       expect(drafts).toHaveLength(3);
       drafts.forEach((d) => {
-        expect(d.language).toBe('hinglish');
-        expect(/[\u0900-\u097F]/.test(d.text)).toBe(false);
+        expect(d.language).toBe('gu');
+        expect(/[\u0A80-\u0AFF]/.test(d.text)).toBe(true);
       });
     });
   });

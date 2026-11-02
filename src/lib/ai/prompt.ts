@@ -2,6 +2,10 @@ import type { GenerateReviewDraftsInput } from './types';
 
 /**
  * System prompt for clothing boutique review generation.
+ * Supports exactly three languages:
+ *  - English ('en')
+ *  - Hindi ('hi' in Devanagari script)
+ *  - Gujarati ('gu' in Gujarati Unicode script)
  * Enforces strict non-fabrication, prompt injection defense,
  * rating-based tone matching, and structured 3-draft output.
  */
@@ -15,10 +19,8 @@ CRITICAL HUMAN-STYLE RULES:
    - AVOID phrases like: "I had an exquisite shopping extravaganza", "The couture collection was beyond words", "I wholeheartedly endorse this establishment for all sartorial desires".
 2. Keep it conversational, realistic, and believable:
    - English example: "Loved the fabric quality and the fitting was spot on. Staff was super polite and helped me choose the right size."
-   - Gujarati example: "કપડાંની ગુણવત્તા ખૂબ સરસ છે અને ફિટિંગ એકદમ પરફેક્ટ આવી. સ્ટાફનો વ્યવહાર પણ બહુ મદદગાર રહ્યો."
-   - Gujlish example: "Collection super hatu ane fabric quality pan premium che. Staff bahu helpful hato size select karva ma."
-   - Hinglish example: "Collection kaafi accha tha aur fabric quality bhi premium lagi. Staff bohot helpful tha sizing ke time."
    - Hindi example: "कपड़ों की क्वालिटी बहुत बढ़िया थी और फिटिंग भी एकदम सही आई। स्टाफ का व्यवहार बहुत मददगार था।"
+   - Gujarati example: "કપડાંની ગુણવત્તા ખૂબ સરસ છે અને ફિટિંગ એકદમ પરફેક્ટ આવી. સ્ટાફનો વ્યવહાર પણ બહુ મદદગાર રહ્યો."
 3. Make the 3 drafts meaningfully DIFFERENT from each other:
    - Draft 1 (Short & Casual): 1 quick natural sentence.
    - Draft 2 (Warm & Natural): 2 conversational sentences focusing on the visit.
@@ -42,10 +44,8 @@ TONE MATCHING BY RATING:
 
 LANGUAGE SCRIPT RULES:
 - "en": Natural conversational English.
+- "hi": Genuine Hindi in proper Devanagari script (हिन्दी).
 - "gu": Authentic, natural Gujarati written strictly in proper Gujarati Unicode script (ગુજરાતી લિપિ).
-- "gujlish": Natural colloquial Gujlish (code-mixed Gujarati + English), reflecting authentic spoken language of Gujarati fashion shoppers (e.g. "Collection super hatu ane fabric quality premium lagi").
-- "hi": Genuine Hindi in Devanagari script.
-- "hinglish": Natural colloquial Hinglish in LATIN alphabet only (no Devanagari characters).
 
 OUTPUT SPECIFICATION:
 Output ONLY valid JSON with exactly 3 drafts:
@@ -63,10 +63,8 @@ Output ONLY valid JSON with exactly 3 drafts:
 export function buildUserPrompt(input: GenerateReviewDraftsInput): string {
   const languageNames: Record<string, string> = {
     en: 'English',
-    gu: 'Gujarati (proper Gujarati Unicode script)',
-    gujlish: 'Gujlish (colloquial Gujarati-English mixed language)',
     hi: 'Hindi (Devanagari script)',
-    hinglish: 'Hinglish (Latin script)',
+    gu: 'Gujarati (proper Gujarati Unicode script)',
   };
 
   const safeTags = input.selectedTags.length > 0 ? input.selectedTags.join(', ') : 'None selected';
@@ -84,4 +82,67 @@ ${safeNote}
 </customer_note>
 
 Remember: Output valid JSON only, exactly 3 drafts, strictly no unstated facts or fabricated item purchases.`;
+}
+
+/**
+ * Input for Owner Google Review Reply generation.
+ */
+export interface GenerateOwnerReplyInput {
+  reviewerName: string;
+  rating: number; // 1 to 5
+  reviewText?: string | null;
+  shopName: string;
+  language: 'en' | 'hi' | 'gu';
+}
+
+/**
+ * System prompt for store owner Google Review replies.
+ */
+export const AI_OWNER_REPLY_SYSTEM_PROMPT = `You are an expert customer communication assistant for a boutique clothing store and fashion studio owner.
+
+YOUR OBJECTIVE:
+Draft a warm, professional, and respectful owner reply to a customer review posted on the store's Google Business Profile.
+
+CORE REPLY PRINCIPLES:
+1. Warm & Gracious: Thank the customer sincerely by name when provided.
+2. Contextual & Specific: Acknowledge specific compliments or concerns mentioned in the review (e.g. fabric quality, fitting, styling, collection variety).
+3. Professional & De-escalating (For Negative/Neutral Reviews):
+   - Acknowledge their disappointment with empathy and professionalism without being defensive or argumentative.
+   - Express genuine desire to make it right on their next visit.
+   - Do NOT offer specific monetary discounts, coupon codes, or unverified refunds.
+   - Do NOT disclose private customer information.
+4. Concise: 2 to 4 sentences maximum. Respect the customer's reading time.
+5. Language Scripts:
+   - English ("en"): Professional, warm, and natural English.
+   - Hindi ("hi"): Proper Devanagari script (हिन्दी), polite and welcoming (using 'आप', 'धन्यवाद').
+   - Gujarati ("gu"): Authentic Gujarati in proper Gujarati Unicode script (ગુજરાતી), respectful (using 'આપ', 'આભાર').
+
+OUTPUT FORMAT:
+Return ONLY the reply text string, without quotation marks, markdown headings, or explanation.`;
+
+/**
+ * Builds user prompt for owner review reply generation.
+ */
+export function buildOwnerReplyUserPrompt(input: GenerateOwnerReplyInput): string {
+  const languageLabels: Record<string, string> = {
+    en: 'English',
+    hi: 'Hindi (Devanagari script)',
+    gu: 'Gujarati (proper Gujarati Unicode script)',
+  };
+
+  const reviewContent = input.reviewText && input.reviewText.trim()
+    ? input.reviewText.trim()
+    : 'No comment written (rating only)';
+
+  return `Please draft a store owner reply for ${input.shopName} responding to the following Google review:
+
+- Customer Name: ${input.reviewerName || 'Valued Customer'}
+- Star Rating: ${input.rating} / 5 stars
+- Customer's Review Text:
+<review>
+${reviewContent}
+</review>
+- Reply Language Required: ${languageLabels[input.language] || 'English'}
+
+Reply directly as the store owner. Return only the final reply text.`;
 }

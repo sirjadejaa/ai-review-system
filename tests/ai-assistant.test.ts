@@ -41,8 +41,8 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       }
     });
 
-    it('accepts all three supported languages (en, hi, hinglish)', () => {
-      ['en', 'hi', 'hinglish'].forEach((lang) => {
+    it('accepts all three supported languages (en, hi, gu)', () => {
+      ['en', 'hi', 'gu'].forEach((lang) => {
         const result = GenerateReviewDraftsInputSchema.safeParse({
           rating: 4,
           language: lang,
@@ -120,19 +120,19 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       expect(hasDevanagari).toBe(true);
     });
 
-    it('generates Hinglish drafts in Latin script without Devanagari', async () => {
+    it('generates Gujarati drafts in authentic Gujarati Unicode script', async () => {
       const provider = new MockAIProvider();
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Quick Service'],
-        language: 'hinglish',
+        selectedTags: ['Clothing Quality'],
+        language: 'gu',
       });
 
       expect(drafts).toHaveLength(3);
       drafts.forEach((d) => {
-        expect(d.language).toBe('hinglish');
-        // Must NOT contain Devanagari characters
-        expect(/[\u0900-\u097F]/.test(d.text)).toBe(false);
+        expect(d.language).toBe('gu');
+        // Must contain Gujarati characters
+        expect(/[\u0A80-\u0AFF]/.test(d.text)).toBe(true);
       });
     });
   });

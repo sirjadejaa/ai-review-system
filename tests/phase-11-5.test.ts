@@ -151,24 +151,24 @@ describe('Phase 11.5: Product UI Transformation, Real Data & Production UX Tests
       }
     });
 
-    it('generates authentic Hinglish and Hindi reviews naturally', async () => {
-      const hinglishDrafts = await generator.generateReviewDrafts({
+    it('generates authentic Gujarati and Hindi reviews naturally', async () => {
+      const gujaratiDrafts = await generator.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Genuine Medicines'],
+        selectedTags: ['Clothing Quality'],
         customerNote: '',
-        language: 'hinglish',
-        shopName: 'City Pharmacy',
+        language: 'gu',
+        shopName: 'Aura Boutique',
       });
 
-      expect(hinglishDrafts).toHaveLength(3);
-      expect(hinglishDrafts[0].text.toLowerCase()).toContain('medicines');
+      expect(gujaratiDrafts).toHaveLength(3);
+      expect(/[\u0A80-\u0AFF]/.test(gujaratiDrafts[0].text)).toBe(true);
 
       const hindiDrafts = await generator.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Good Guidance'],
+        selectedTags: ['Fabric Quality'],
         customerNote: '',
         language: 'hi',
-        shopName: 'City Pharmacy',
+        shopName: 'Aura Boutique',
       });
 
       expect(hindiDrafts).toHaveLength(3);

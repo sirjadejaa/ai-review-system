@@ -126,3 +126,61 @@ model AdminSession {
   @@index([adminUserId])
   @@index([expiresAt])
 }
+
+/// Google Business Profile OAuth Connection for Store Owner (Singleton: id = "default_connection")
+model GoogleBusinessAccount {
+  id                    String    @id @default("default_connection")
+  accountId             String?   // Google Account Resource Name e.g. "accounts/1029384756..."
+  accountName           String?   // Google Account Display Name
+  locationId            String?   // Google Location Resource Name e.g. "locations/987654321..."
+  locationName          String?   // Store Location Name e.g. "Maison & Thread - MG Road"
+  accessTokenEncrypted  String?   @db.Text
+  refreshTokenEncrypted String?   @db.Text
+  tokenExpiresAt        DateTime?
+  scopes                String?   // Space-separated granted scopes
+  isConnected           Boolean   @default(false)
+  lastSyncAt            DateTime?
+  lastSyncError         String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+/// Google Business Profile Review Synchronized via Official Google API
+model GoogleReview {
+  id               String                   @id @default(cuid())
+  googleReviewId   String                   @unique // Google's unique review name/id
+  reviewerName     String
+  reviewerPhotoUrl String?
+  starRating       Int                      // 1 to 5
+  comment          String?                  @db.Text
+  reviewCreatedAt  DateTime
+  reviewUpdatedAt  DateTime?
+  replyText        String?                  @db.Text
+  replyUpdatedAt   DateTime?
+  replyStatus      String                   @default("UNREPLIED") // "UNREPLIED", "DRAFT_CREATED", "REPLIED"
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  drafts           GoogleReviewReplyDraft[]
+
+  @@index([replyStatus])
+  @@index([starRating])
+  @@index([reviewCreatedAt])
+}
+
+/// AI-Generated & Edited Owner Reply Drafts for Google Reviews
+model GoogleReviewReplyDraft {
+  id          String       @id @default(cuid())
+  reviewId    String
+  draftText   String       @db.Text
+  language    String       @default("en") // 'en' | 'hi' | 'gu'
+  isApproved  Boolean      @default(false)
+  isPublished Boolean      @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  review      GoogleReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@index([language])
+}

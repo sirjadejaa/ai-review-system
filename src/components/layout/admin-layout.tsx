@@ -16,6 +16,7 @@ import {
   User,
   QrCode,
   ShoppingBag,
+  Star,
 } from 'lucide-react';
 import styles from './admin-layout.module.css';
 import { logoutAction } from '@/lib/auth/actions';
@@ -32,9 +33,10 @@ export interface AdminLayoutProps {
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/google-reviews', label: 'Google Reviews', icon: Star },
   { href: '/admin/products', label: 'Products Showcase', icon: ShoppingBag },
   { href: '/admin/offers', label: 'Special Offers', icon: Tag },
-  { href: '/admin/reviews', label: 'Reviews & Feedback', icon: MessageSquare },
+  { href: '/admin/reviews', label: 'Internal Feedback', icon: MessageSquare },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/settings', label: 'Boutique Settings', icon: Settings },
 ];
