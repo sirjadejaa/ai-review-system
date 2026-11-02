@@ -12,7 +12,12 @@ function toDomain(record: {
   title: string;
   description: string | null;
   badge: string | null;
+  imageUrl?: string | null;
+  discountInfo?: string | null;
+  startDate?: Date | null;
   validUntil: Date | null;
+  terms?: string | null;
+  offerUrl?: string | null;
   isActive: boolean;
   sortOrder: number;
   createdAt: Date;
@@ -23,7 +28,12 @@ function toDomain(record: {
     title: record.title,
     description: record.description,
     badge: record.badge,
+    imageUrl: record.imageUrl ?? null,
+    discountInfo: record.discountInfo ?? null,
+    startDate: record.startDate ?? null,
     validUntil: record.validUntil,
+    terms: record.terms ?? null,
+    offerUrl: record.offerUrl ?? null,
     isActive: record.isActive,
     sortOrder: record.sortOrder,
     createdAt: record.createdAt,
@@ -42,7 +52,12 @@ export async function createOffer(input: CreateOfferInput): Promise<DomainOffer>
       title: validated.title,
       description: validated.description ?? null,
       badge: validated.badge ?? null,
+      imageUrl: validated.imageUrl ?? null,
+      discountInfo: validated.discountInfo ?? null,
+      startDate: validated.startDate ?? null,
       validUntil: validated.validUntil ?? null,
+      terms: validated.terms ?? null,
+      offerUrl: validated.offerUrl ?? null,
       isActive: validated.isActive,
       sortOrder: validated.sortOrder,
     },
@@ -63,8 +78,9 @@ export async function getOfferById(id: string): Promise<DomainOffer | null> {
 }
 
 /**
- * Lists active offers suitable for the customer digital card.
- * Filters out expired offers and inactive offers. Sorted by sortOrder asc, createdAt desc.
+ * Lists active offers suitable for customer display.
+ * Filters out expired offers, unstarted offers, and inactive offers.
+ * Sorted by sortOrder asc, createdAt desc.
  */
 export async function listActiveOffers(): Promise<DomainOffer[]> {
   const now = new Date();
@@ -72,9 +88,19 @@ export async function listActiveOffers(): Promise<DomainOffer[]> {
   const records = await prisma.offer.findMany({
     where: {
       isActive: true,
-      OR: [
-        { validUntil: null },
-        { validUntil: { gte: now } },
+      AND: [
+        {
+          OR: [
+            { validUntil: null },
+            { validUntil: { gte: now } },
+          ],
+        },
+        {
+          OR: [
+            { startDate: null },
+            { startDate: { lte: now } },
+          ],
+        },
       ],
     },
     orderBy: [
@@ -110,7 +136,12 @@ export async function updateOffer(id: string, input: UpdateOfferInput): Promise<
   if (validated.title !== undefined) data.title = validated.title;
   if (validated.description !== undefined) data.description = validated.description;
   if (validated.badge !== undefined) data.badge = validated.badge;
+  if (validated.imageUrl !== undefined) data.imageUrl = validated.imageUrl;
+  if (validated.discountInfo !== undefined) data.discountInfo = validated.discountInfo;
+  if (validated.startDate !== undefined) data.startDate = validated.startDate;
   if (validated.validUntil !== undefined) data.validUntil = validated.validUntil;
+  if (validated.terms !== undefined) data.terms = validated.terms;
+  if (validated.offerUrl !== undefined) data.offerUrl = validated.offerUrl;
   if (validated.isActive !== undefined) data.isActive = validated.isActive;
   if (validated.sortOrder !== undefined) data.sortOrder = validated.sortOrder;
 

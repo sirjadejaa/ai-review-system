@@ -1,0 +1,60 @@
+.selectorContainer {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 5;
+}
+
+.pillButton {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  min-width: 72px;
+  text-decoration: none;
+  user-select: none;
+  outline: none;
+}
+
+.pillButton:hover {
+  color: var(--color-text-primary);
+}
+
+.pillButton:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.pillActive {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
+}
+
+.pillActive:hover {
+  color: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .pillButton {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    min-height: 34px;
+    min-width: 64px;
+  }
+}

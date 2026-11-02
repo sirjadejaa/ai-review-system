@@ -207,3 +207,89 @@ export async function deleteOfferAction(id: string): Promise<OfferActionResult> 
     };
   }
 }
+
+const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
+const MAX_BANNER_SIZE_BYTES = 4 * 1024 * 1024; // 4 MB
+
+function isValidImageMagicBytes(buffer: Buffer, mimeType: string): boolean {
+  if (buffer.length < 12) return false;
+  if (mimeType === 'image/png') {
+    return buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47;
+  }
+  if (mimeType === 'image/jpeg') {
+    return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  }
+  if (mimeType === 'image/webp') {
+    return (
+      buffer[0] === 0x52 &&
+      buffer[1] === 0x49 &&
+      buffer[2] === 0x46 &&
+      buffer[3] === 0x46 &&
+      buffer[8] === 0x57 &&
+      buffer[9] === 0x45 &&
+      buffer[10] === 0x42 &&
+      buffer[11] === 0x50
+    );
+  }
+  return false;
+}
+
+/**
+ * Uploads an offer banner with persistent data-URI encoding.
+ */
+export async function uploadOfferBannerAction(
+  formData: FormData
+): Promise<{ success: boolean; message: string; bannerUrl?: string }> {
+  try {
+    await requireAdmin('/admin/offers');
+
+    const file = formData.get('banner');
+    if (!file || !(file instanceof File)) {
+      return { success: false, message: 'Please select a banner image file to upload.' };
+    }
+
+    if (file.size === 0) {
+      return { success: false, message: 'Uploaded banner file is empty.' };
+    }
+
+    if (file.size > MAX_BANNER_SIZE_BYTES) {
+      return {
+        success: false,
+        message: 'Banner image exceeds 4 MB limit. Please choose a smaller image.',
+      };
+    }
+
+    const mimeType = file.type.toLowerCase();
+    if (!ALLOWED_MIME_TYPES.includes(mimeType as (typeof ALLOWED_MIME_TYPES)[number])) {
+      return {
+        success: false,
+        message: 'Invalid image format. Supported formats: PNG, JPEG, and WebP.',
+      };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    if (!isValidImageMagicBytes(buffer, mimeType)) {
+      return {
+        success: false,
+        message: 'Corrupted or invalid image data. Please upload a standard image file.',
+      };
+    }
+
+    const base64Data = buffer.toString('base64');
+    const bannerUrl = `data:${mimeType};base64,${base64Data}`;
+
+    return {
+      success: true,
+      message: 'Offer banner uploaded successfully.',
+      bannerUrl,
+    };
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+    console.error('Failed to upload offer banner:', error);
+    return { success: false, message: 'Failed to upload banner. Please try again.' };
+  }
+}

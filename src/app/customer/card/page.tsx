@@ -14,11 +14,14 @@ import {
 } from '@/components/ui';
 import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 import { listActiveOffers } from '@/lib/repositories/offer-repository';
+import { listFeaturedProducts } from '@/lib/repositories/product-repository';
 import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-schema';
 import { isValidExternalUrl } from '@/lib/format/contact-links';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { ShareCardButton } from '@/components/customer/share-card-button';
 import { OfferList } from '@/components/customer/offer-list';
+import { FeaturedProducts } from '@/components/customer/featured-products';
+import { SocialLinks } from '@/components/customer/social-links';
 import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, Sparkles, Star } from 'lucide-react';
 import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import styles from '@/components/customer/digital-card.module.css';
@@ -39,14 +42,16 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
   const parsedQuery = CustomerLandingQuerySchema.safeParse({ source: rawSource });
   const validatedSource = parsedQuery.success ? parsedQuery.data.source : undefined;
 
-  // 2. Fetch ShopSettings and Active Offers in parallel with resilient error handling
+  // 2. Fetch ShopSettings, Active Offers, and Featured Products in parallel with resilient error handling
   let settings;
   let activeOffers = [];
+  let featuredProducts = [];
 
   try {
-    const [settingsResult, offersResult] = await Promise.allSettled([
+    const [settingsResult, offersResult, productsResult] = await Promise.allSettled([
       getShopSettings(),
       listActiveOffers(),
+      listFeaturedProducts(8),
     ]);
 
     if (settingsResult.status === 'rejected') {
@@ -55,6 +60,7 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
 
     settings = settingsResult.value;
     activeOffers = offersResult.status === 'fulfilled' ? offersResult.value : [];
+    featuredProducts = productsResult.status === 'fulfilled' ? productsResult.value : [];
   } catch (error) {
     console.error('Non-fatal: Failed to load shop settings for customer card', error);
     return (
@@ -201,7 +207,13 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
         {/* 4. Active Offers & Collections */}
         <OfferList offers={activeOffers} />
 
-        {/* 5. Direct Rating Link Callout */}
+        {/* 5. Featured Products Showcase */}
+        <FeaturedProducts products={featuredProducts} />
+
+        {/* 6. Social Media Channels */}
+        <SocialLinks socialLinks={settings.socialLinks} />
+
+        {/* 7. Direct Rating Link Callout */}
         <section className={styles.reviewCtaCard} aria-label="Write a Review">
           <div className={styles.reviewCtaContent}>
             <div className={styles.reviewCtaTitleGroup}>

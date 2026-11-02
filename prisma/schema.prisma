@@ -48,20 +48,48 @@ model Feedback {
   @@index([status])
 }
 
-/// Pharmacy Store Offers & Promotional Deals
+/// Boutique Store Offers & Promotional Deals
 model Offer {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  badge       String?   // e.g. "10% OFF", "SENIOR CITIZEN", "SPECIAL"
-  validUntil  DateTime? // Nullable expiration date
-  isActive    Boolean   @default(true)
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  badge        String?   // e.g. "10% OFF", "FESTIVE SALE", "SPECIAL"
+  imageUrl     String?   // Banner or promotional image
+  discountInfo String?   // e.g. "Flat 30% Off", "Buy 1 Get 1"
+  startDate    DateTime? // Optional scheduled start date
+  validUntil   DateTime? // Expiration date / end date
+  terms        String?   // Optional terms and conditions
+  offerUrl     String?   // Optional external link
+  isActive     Boolean   @default(true)
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([isActive, sortOrder])
   @@index([validUntil])
+  @@index([startDate])
+}
+
+/// Clothing Store Featured & Catalog Products
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  imageUrl      String?
+  category      String   @default("General") // e.g. "Women's Wear", "Men's Wear", "Traditional Wear", "Ethnic Wear", "Accessories"
+  price         Float?
+  originalPrice Float?
+  sizes         String   @default("[]") // JSON array string e.g. ["S", "M", "L", "XL"]
+  colors        String   @default("[]") // JSON array string e.g. ["Beige", "Noir", "Camel"]
+  isFeatured    Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  productUrl    String?  // Optional external link or product detail URL
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, isFeatured, sortOrder])
+  @@index([category])
 }
 
 /// Privacy-Preserving Analytics Events (Tracking Google Review Clicks, NOT Confirmed Reviews)

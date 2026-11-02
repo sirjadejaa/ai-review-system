@@ -48,11 +48,44 @@ export interface DomainOffer {
   title: string;
   description: string | null;
   badge: string | null;
+  imageUrl: string | null;
+  discountInfo: string | null;
+  startDate: Date | null;
   validUntil: Date | null;
+  terms: string | null;
+  offerUrl: string | null;
   isActive: boolean;
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface DomainProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  imageUrl: string | null;
+  category: string;
+  price: number | null;
+  originalPrice: number | null;
+  sizes: string[];
+  colors: string[];
+  isFeatured: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  productUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type SocialPlatform = 'instagram' | 'facebook' | 'whatsapp' | 'youtube' | 'pinterest' | 'custom';
+
+export interface SocialMediaLinkConfig {
+  platform: SocialPlatform;
+  label: string;
+  url: string;
+  isEnabled: boolean;
+  sortOrder: number;
 }
 
 export type AnalyticsEventType =

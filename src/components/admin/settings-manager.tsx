@@ -55,6 +55,84 @@ const PALETTE_PRESETS = [
   },
 ];
 
+interface ManagedSocialLink {
+  platform: 'instagram' | 'facebook' | 'whatsapp' | 'youtube' | 'pinterest' | 'custom';
+  url: string;
+  isEnabled: boolean;
+  order: number;
+}
+
+function parseInitialSocialLinks(links: string[]): ManagedSocialLink[] {
+  const baseChannels: Record<string, ManagedSocialLink> = {
+    instagram: { platform: 'instagram', url: '', isEnabled: true, order: 0 },
+    facebook: { platform: 'facebook', url: '', isEnabled: true, order: 1 },
+    whatsapp: { platform: 'whatsapp', url: '', isEnabled: true, order: 2 },
+    youtube: { platform: 'youtube', url: '', isEnabled: false, order: 3 },
+    pinterest: { platform: 'pinterest', url: '', isEnabled: false, order: 4 },
+  };
+
+  const customLinks: ManagedSocialLink[] = [];
+
+  if (Array.isArray(links)) {
+    links.forEach((item, idx) => {
+      if (!item) return;
+      const trimmed = item.trim();
+      if (!trimmed) return;
+
+      if (trimmed.startsWith('{')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          const plat = parsed.platform || 'custom';
+          if (baseChannels[plat]) {
+            baseChannels[plat].url = parsed.url || '';
+            baseChannels[plat].isEnabled = parsed.isEnabled !== false;
+            if (typeof parsed.order === 'number') baseChannels[plat].order = parsed.order;
+          } else {
+            customLinks.push({
+              platform: 'custom',
+              url: parsed.url || '',
+              isEnabled: parsed.isEnabled !== false,
+              order: parsed.order ?? 5 + idx,
+            });
+          }
+          return;
+        } catch {
+          // ignore error and fallback
+        }
+      }
+
+      const lower = trimmed.toLowerCase();
+      if (lower.includes('instagram.com') || trimmed.startsWith('@')) {
+        baseChannels.instagram.url = trimmed.startsWith('@')
+          ? `https://instagram.com/${trimmed.slice(1)}`
+          : trimmed;
+        baseChannels.instagram.isEnabled = true;
+      } else if (lower.includes('facebook.com') || lower.includes('fb.com')) {
+        baseChannels.facebook.url = trimmed;
+        baseChannels.facebook.isEnabled = true;
+      } else if (lower.includes('wa.me') || lower.includes('whatsapp.com')) {
+        baseChannels.whatsapp.url = trimmed;
+        baseChannels.whatsapp.isEnabled = true;
+      } else if (lower.includes('youtube.com') || lower.includes('youtu.be')) {
+        baseChannels.youtube.url = trimmed;
+        baseChannels.youtube.isEnabled = true;
+      } else if (lower.includes('pinterest.com')) {
+        baseChannels.pinterest.url = trimmed;
+        baseChannels.pinterest.isEnabled = true;
+      } else {
+        customLinks.push({
+          platform: 'custom',
+          url: trimmed,
+          isEnabled: true,
+          order: 5 + idx,
+        });
+      }
+    });
+  }
+
+  return [...Object.values(baseChannels), ...customLinks].sort((a, b) => a.order - b.order);
+}
+
 export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSettings }) => {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -80,8 +158,10 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
   const [googleMapsUrl, setGoogleMapsUrl] = useState(initialSettings.googleMapsUrl ?? '');
   const [googleReviewUrl, setGoogleReviewUrl] = useState(initialSettings.googleReviewUrl ?? '');
   const [websiteUrl, setWebsiteUrl] = useState(initialSettings.websiteUrl ?? '');
-  const [socialLinksText, setSocialLinksText] = useState(
-    Array.isArray(initialSettings.socialLinks) ? initialSettings.socialLinks.join(', ') : ''
+  
+  // Structured Social Media Channels
+  const [socialChannels, setSocialChannels] = useState(() =>
+    parseInitialSocialLinks(initialSettings.socialLinks)
   );
 
   const [openingHours, setOpeningHours] = useState<OpeningHourSlot[]>(
@@ -212,11 +292,22 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     // Filter out completely empty rows
     const cleanedHours = openingHours.filter((slot) => slot.days.trim() && slot.hours.trim());
 
-    // Parse social links from comma-separated string
-    const socialLinksArray = socialLinksText
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    // Format social links as JSON strings preserving order, enabled status, and platform
+    const socialLinksArray = socialChannels
+      .filter((c) => c.url && c.url.trim())
+      .sort((a, b) => a.order - b.order)
+      .map((c) => {
+        let finalUrl = c.url.trim();
+        if (c.platform === 'instagram' && finalUrl.startsWith('@')) {
+          finalUrl = `https://instagram.com/${finalUrl.slice(1)}`;
+        }
+        return JSON.stringify({
+          platform: c.platform,
+          url: finalUrl,
+          isEnabled: c.isEnabled,
+          order: c.order,
+        });
+      });
 
     const payload = {
       shopName: shopName.trim(),
@@ -556,14 +647,14 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
           <CardHeader>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Globe size={18} style={{ color: 'var(--color-accent)' }} />
-              <CardTitle>Web &amp; Social Links</CardTitle>
+              <CardTitle>Web &amp; Social Channels</CardTitle>
             </div>
             <CardDescription>
-              Add your website or Instagram handles to connect with customers.
+              Configure Instagram, Facebook, WhatsApp, YouTube, and Pinterest links. Use the enable checkboxes and display order numbers to control what appears on your customer landing page and privilege card.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className={styles.sectionGrid}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <Input
                 label="Official Website URL"
                 type="url"
@@ -574,13 +665,108 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                 onChange={(e) => setWebsiteUrl(e.target.value)}
               />
 
-              <Input
-                label="Instagram / Social Links"
-                value={socialLinksText}
-                helpText="Comma-separated URLs or handles (e.g. @maisonandthread, https://instagram.com/...)"
-                placeholder="@yourboutique, https://instagram.com/..."
-                onChange={(e) => setSocialLinksText(e.target.value)}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <label style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Social Media Links &amp; Display Order
+                </label>
+
+                {socialChannels.map((channel, idx) => (
+                  <div
+                    key={`${channel.platform}-${idx}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-3)',
+                      padding: 'var(--space-3)',
+                      backgroundColor: 'var(--color-bg-surface-subtle)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-md)',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', minWidth: '120px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={channel.isEnabled}
+                        onChange={(e) => {
+                          const updated = [...socialChannels];
+                          updated[idx].isEnabled = e.target.checked;
+                          setSocialChannels(updated);
+                        }}
+                      />
+                      <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, textTransform: 'capitalize' }}>
+                        {channel.platform}
+                      </span>
+                    </label>
+
+                    <div style={{ flex: 1, minWidth: '220px' }}>
+                      <Input
+                        value={channel.url}
+                        placeholder={
+                          channel.platform === 'instagram'
+                            ? '@yourboutique or https://instagram.com/...'
+                            : channel.platform === 'whatsapp'
+                            ? 'https://wa.me/919876543210'
+                            : `https://${channel.platform}.com/...`
+                        }
+                        onChange={(e) => {
+                          const updated = [...socialChannels];
+                          updated[idx].url = e.target.value;
+                          setSocialChannels(updated);
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ width: '80px' }}>
+                      <Input
+                        type="number"
+                        title="Display Order"
+                        value={String(channel.order)}
+                        onChange={(e) => {
+                          const updated = [...socialChannels];
+                          updated[idx].order = parseInt(e.target.value, 10) || 0;
+                          setSocialChannels(updated);
+                        }}
+                      />
+                    </div>
+
+                    {channel.platform === 'custom' && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        style={{ color: 'var(--color-danger)' }}
+                        onClick={() => {
+                          setSocialChannels(socialChannels.filter((_, i) => i !== idx));
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                ))}
+
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSocialChannels([
+                        ...socialChannels,
+                        {
+                          platform: 'custom',
+                          url: '',
+                          isEnabled: true,
+                          order: socialChannels.length,
+                        },
+                      ]);
+                    }}
+                  >
+                    + Add Custom Link
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

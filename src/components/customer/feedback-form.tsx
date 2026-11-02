@@ -15,15 +15,9 @@ import {
 import { submitCustomerFeedbackAction } from '@/lib/actions/feedback-actions';
 import { AIReviewAssistant } from './ai-review-assistant';
 import { BoutiqueLogo } from '@/components/brand/boutique-logo';
-import { Check, Plus, Sparkles, ArrowLeft } from 'lucide-react';
-
-const RATING_LABELS: Record<number, string> = {
-  1: '1 Star — Needs Improvement',
-  2: '2 Stars — Fair Experience',
-  3: '3 Stars — Good Experience',
-  4: '4 Stars — Very Good Experience',
-  5: '5 Stars — Exceptional Boutique Experience',
-};
+import { AnimatedRatingBackground } from './animated-rating-background';
+import { useLanguage } from '@/lib/i18n/context';
+import { Check, Plus, ArrowLeft } from 'lucide-react';
 
 export interface FeedbackFormProps {
   shopName?: string;
@@ -38,6 +32,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
   googleReviewUrl,
   source,
 }) => {
+  const { t, language, tagTranslations } = useLanguage();
   const [rating, setRating] = useState<number | null>(null);
   const [selectedTags, setSelectedTags] = useState<PredefinedFeedbackTag[]>([]);
   const [notes, setNotes] = useState('');
@@ -50,6 +45,24 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
     notes?: string;
     customerContact?: string;
   }>({});
+
+  const getRatingHint = (r: number | null) => {
+    if (!r) return t.ratingHintDefault;
+    switch (r) {
+      case 1:
+        return t.rating1;
+      case 2:
+        return t.rating2;
+      case 3:
+        return t.rating3;
+      case 4:
+        return t.rating4;
+      case 5:
+        return t.rating5;
+      default:
+        return t.ratingHintDefault;
+    }
+  };
 
   const handleRatingChange = (val: number) => {
     setRating(val);
@@ -67,7 +80,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
     e.preventDefault();
 
     if (!rating) {
-      setFieldErrors((prev) => ({ ...prev, rating: 'Please select a rating' }));
+      setFieldErrors((prev) => ({ ...prev, rating: t.selectRatingError }));
       return;
     }
 
@@ -109,10 +122,9 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           <Badge variant="success" size="md">
             Feedback Received
           </Badge>
-          <h1 className={styles.successTitle}>Thank you for visiting us!</h1>
+          <h1 className={styles.successTitle}>{t.thankYouTitle}</h1>
           <p className={styles.successMessage}>
-            We appreciate you taking the time to share your feedback with {shopName}.
-            Your thoughts help us continuously refine our curated collections, fitting, and customer service.
+            {t.thankYouMessage}
           </p>
           <div className={styles.successActions}>
             <Link
@@ -120,7 +132,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
               style={{ textDecoration: 'none', width: '100%' }}
             >
               <Button variant="primary" size="lg" fullWidth>
-                Back to Boutique Home
+                {t.backToHome}
               </Button>
             </Link>
             <Link
@@ -128,7 +140,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
               style={{ textDecoration: 'none', width: '100%' }}
             >
               <Button variant="outline" size="lg" fullWidth>
-                View Boutique Privilege Card
+                {t.viewPrivilegeCardCta}
               </Button>
             </Link>
           </div>
@@ -143,7 +155,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 'var(--space-2)' }}>
         <Link href={source ? `/?source=${encodeURIComponent(source)}` : '/'} className={styles.backLink}>
           <ArrowLeft size={16} aria-hidden="true" style={{ marginRight: 'var(--space-1)' }} />
-          <span>Return to Boutique</span>
+          <span>{t.backToHome}</span>
         </Link>
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -162,10 +174,10 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           {shopName}
         </div>
         <h1 className="editorial-title" style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
-          How was your shopping visit?
+          {t.ratingHeading}
         </h1>
         <p className={styles.pageDescription} style={{ color: 'var(--color-text-secondary)', margin: 0 }}>
-          Tap a rating below to share your experience and generate a natural Google review.
+          {t.ratingSubtitle}
         </p>
       </section>
 
@@ -176,22 +188,25 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           </div>
         )}
 
-        {/* 1. Star Rating Section (Mandatory) */}
+        {/* 1. Star Rating Section with Animated Rating Background */}
         <fieldset className={styles.section} style={{ border: 'none', padding: 0, margin: 0 }}>
           <legend className={styles.sectionTitle}>
-            <span>Select Your Rating</span>
+            <span>{t.ratingLabel}</span>
             <span style={{ color: 'var(--color-danger)' }} aria-hidden="true">*</span>
           </legend>
           <div className={styles.ratingContainer}>
-            <Rating
-              value={rating ?? 0}
-              size="lg"
-              onChange={handleRatingChange}
-              label={rating ? `${rating} of 5 stars` : 'Rate from 1 to 5 stars'}
-            />
-            <span className={styles.ratingHint}>
-              {rating ? RATING_LABELS[rating] : 'Tap a star to begin'}
-            </span>
+            <AnimatedRatingBackground currentRating={rating ?? 0} />
+            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <Rating
+                value={rating ?? 0}
+                size="lg"
+                onChange={handleRatingChange}
+                label={rating ? `${rating} of 5 stars` : 'Rate from 1 to 5 stars'}
+              />
+              <span className={styles.ratingHint}>
+                {getRatingHint(rating)}
+              </span>
+            </div>
           </div>
           {fieldErrors.rating && (
             <p className={styles.ratingError} role="alert">
@@ -200,21 +215,23 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           )}
         </fieldset>
 
-        {/* 2. Fashion Experience Tags Section (PraiseUp Style Chips) */}
+        {/* 2. Fashion Experience Tags Section (Multilingual Gujarati/Gujlish/English) */}
         <fieldset className={styles.section} style={{ border: 'none', padding: 0, margin: 0 }}>
           <legend className={styles.sectionTitle}>
-            <span>What stood out most?</span>
-            <span className={styles.sectionSubtitle}>(Optional highlights)</span>
+            <span>{t.highlightsLabel}</span>
+            <span className={styles.sectionSubtitle}>({t.highlightsSubtitle})</span>
           </legend>
           <div className={styles.tagGrid} role="group" aria-label="Fashion Experience Highlights">
-            {FASHION_FEEDBACK_TAGS.map((tag) => {
-              const isSelected = selectedTags.includes(tag);
+            {tagTranslations.map((tag) => {
+              const tagKey = tag.id as PredefinedFeedbackTag;
+              const isSelected = selectedTags.includes(tagKey);
+              const tagLabel = tag[language] || tag.en;
               return (
                 <button
-                  key={tag}
+                  key={tag.id}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => handleTagToggle(tag)}
+                  onClick={() => handleTagToggle(tagKey)}
                   className={`${styles.tagButton} ${isSelected ? styles.tagSelected : ''}`}
                 >
                   {isSelected ? (
@@ -222,7 +239,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                   ) : (
                     <Plus size={14} aria-hidden="true" style={{ opacity: 0.6 }} />
                   )}
-                  <span>{tag}</span>
+                  <span>{tagLabel}</span>
                 </button>
               );
             })}
@@ -232,17 +249,17 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
         {/* 3. Customer Notes Section (Optional) */}
         <div className={styles.section}>
           <Textarea
-            label="Additional thoughts or specific items? (Optional)"
-            placeholder="e.g. Loved the linen shirts, fabric quality was super premium, or the fitting room staff was very helpful..."
+            label={t.notesLabel}
+            placeholder={t.notesPlaceholder}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             maxLength={1000}
             rows={3}
             error={fieldErrors.notes}
-            helpText="Mention any specific collection, garment fit, or staff member who assisted you."
+            helpText={t.privacyNotice}
           />
           <div className={styles.charCount}>
-            <span>{notes.length} / 1000</span>
+            <span>{notes.length} / 1000 {t.charCount}</span>
           </div>
         </div>
 
@@ -277,7 +294,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 margin: 0,
               }}
             >
-              Send Direct Note to Boutique Owner
+              {t.submitPrivateFeedback}
             </h3>
             <p
               style={{
@@ -286,19 +303,18 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 margin: 0,
               }}
             >
-              Private to store management only. Great for special requests, alteration feedback, or personal service notes.
+              {t.privacyNotice}
             </p>
           </div>
 
           <Input
-            label="Phone number for personal follow-up (Optional)"
-            placeholder="e.g. 98765 43210"
+            label={t.contactOptionalLabel}
+            placeholder={t.contactPlaceholder}
             type="tel"
             value={customerContact}
             onChange={(e) => setCustomerContact(e.target.value)}
             maxLength={100}
             error={fieldErrors.customerContact}
-            helpText="Optional: Leave a phone or WhatsApp number if you would like our store manager to reach out."
           />
 
           <Button
@@ -309,7 +325,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
             disabled={!rating || isSubmitting}
             isLoading={isSubmitting}
           >
-            Submit Private Store Feedback
+            {isSubmitting ? t.submitting : t.submitPrivateFeedback}
           </Button>
         </div>
       </form>

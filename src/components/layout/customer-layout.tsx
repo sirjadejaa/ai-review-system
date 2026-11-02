@@ -3,6 +3,8 @@ import Link from 'next/link';
 import styles from './customer-layout.module.css';
 import { Badge } from '@/components/ui';
 import { BoutiqueLogo } from '@/components/brand/boutique-logo';
+import { LanguageProvider } from '@/lib/i18n/context';
+import { LanguageSelector } from '@/components/ui/language-selector';
 
 export interface CustomerLayoutProps {
   children: React.ReactNode;
@@ -20,52 +22,49 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
   isEmergencyOpen = false,
 }) => {
   return (
-    <div className={styles.wrapper}>
-      <header className={styles.header}>
-        <div className={`container-customer ${styles.headerContent}`}>
-          <Link href="/" className={styles.brandLink}>
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={logoUrl}
-                alt={`${shopName} logo`}
-                className={styles.brandLogo}
-              />
-            ) : (
-              <BoutiqueLogo size="sm" variant="mark" shopName={shopName} />
-            )}
-            <div className={styles.brandText}>
-              <span className={styles.shopName} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.1rem', letterSpacing: '-0.02em', fontWeight: 600 }}>
-                {shopName}
-              </span>
-              <span className={styles.shopCategory}>
-                {tagline || 'Curated Contemporary Apparel & Studio'}
-              </span>
+    <LanguageProvider>
+      <div className={styles.wrapper}>
+        <header className={styles.header}>
+          <div className={`container-customer ${styles.headerContent}`}>
+            <Link href="/" className={styles.brandLink}>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoUrl}
+                  alt={`${shopName} logo`}
+                  className={styles.brandLogo}
+                />
+              ) : (
+                <BoutiqueLogo size="sm" variant="mark" shopName={shopName} />
+              )}
+              <div className={styles.brandText}>
+                <span className={styles.shopName} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.1rem', letterSpacing: '-0.02em', fontWeight: 600 }}>
+                  {shopName}
+                </span>
+                <span className={styles.shopCategory}>
+                  {tagline || 'Curated Contemporary Apparel & Studio'}
+                </span>
+              </div>
+            </Link>
+
+            <div className={styles.headerActions}>
+              <LanguageSelector />
             </div>
-          </Link>
-          {isEmergencyOpen ? (
-            <Badge variant="warning" size="sm" hasDot>
-              Extended Hours
-            </Badge>
-          ) : (
-            <Badge variant="success" size="sm" hasDot>
-              Open Today
-            </Badge>
-          )}
-        </div>
-      </header>
+          </div>
+        </header>
 
-      <main className={`container-customer ${styles.main}`}>{children}</main>
+        <main className={`container-customer ${styles.main}`}>{children}</main>
 
-      <footer className={styles.footer}>
-        <div className="container-customer">
-          <p className={styles.footerText}>
-            © {new Date().getFullYear()} {shopName}
-            {tagline ? ` • ${tagline}` : ' • Curated Contemporary Apparel & Studio'}
-          </p>
-        </div>
-      </footer>
-    </div>
+        <footer className={styles.footer}>
+          <div className="container-customer">
+            <p className={styles.footerText}>
+              © {new Date().getFullYear()} {shopName}
+              {tagline ? ` • ${tagline}` : ' • Curated Contemporary Apparel & Studio'}
+            </p>
+          </div>
+        </footer>
+      </div>
+    </LanguageProvider>
   );
 };
 

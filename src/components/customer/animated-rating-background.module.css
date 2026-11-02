@@ -1,0 +1,120 @@
+.backgroundContainer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle at 50% 30%,
+    rgba(212, 155, 68, 0.08) 0%,
+    rgba(168, 139, 100, 0.04) 50%,
+    transparent 80%
+  );
+}
+
+.auroraGlow {
+  position: absolute;
+  top: -40%;
+  left: 20%;
+  width: 160%;
+  height: 180%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(168, 139, 100, 0.07) 0%,
+    rgba(212, 155, 68, 0.03) 45%,
+    transparent 70%
+  );
+  animation: gentleDrift 18s ease-in-out infinite alternate;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: var(--color-accent, #a88b64);
+  opacity: 0.25;
+  animation: floatParticle 8s ease-in-out infinite alternate;
+}
+
+.starSparkle {
+  position: absolute;
+  color: #d49b44;
+  opacity: 0.3;
+  animation: sparkleTwinkle 6s ease-in-out infinite;
+}
+
+/* Dynamic sparkle burst on rating selection */
+.selectionBurst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(212, 155, 68, 0.28) 0%,
+    rgba(168, 139, 100, 0.12) 40%,
+    transparent 70%
+  );
+  animation: burstRing 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes gentleDrift {
+  0% {
+    transform: translate(-10%, -5%) scale(0.95);
+  }
+  50% {
+    transform: translate(5%, 5%) scale(1.05);
+  }
+  100% {
+    transform: translate(-5%, -2%) scale(1);
+  }
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0px) scale(0.8);
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-18px) scale(1.2);
+    opacity: 0.2;
+  }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.15) rotate(180deg);
+  }
+}
+
+@keyframes burstRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auroraGlow,
+  .particle,
+  .starSparkle,
+  .selectionBurst {
+    animation: none !important;
+    opacity: 0.15 !important;
+  }
+}

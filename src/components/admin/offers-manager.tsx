@@ -8,6 +8,7 @@ import {
   updateOfferAction,
   toggleOfferActiveAction,
   deleteOfferAction,
+  uploadOfferBannerAction,
 } from '@/lib/actions/offer-actions';
 import { parseOfferExpiryDate } from '@/lib/validation/offer-schema';
 import {
@@ -18,7 +19,7 @@ import {
   Modal,
   EmptyState,
 } from '@/components/ui';
-import { Plus } from 'lucide-react';
+import { Plus, Upload, ExternalLink, Image as ImageIcon } from 'lucide-react';
 import styles from './offers-manager.module.css';
 
 interface OffersManagerProps {
@@ -29,7 +30,12 @@ interface OfferFormData {
   title: string;
   description: string;
   badge: string;
+  imageUrl: string;
+  discountInfo: string;
+  startDate: string; // YYYY-MM-DD
   validUntil: string; // YYYY-MM-DD
+  terms: string;
+  offerUrl: string;
   sortOrder: number;
   isActive: boolean;
 }
@@ -38,7 +44,12 @@ const DEFAULT_FORM: OfferFormData = {
   title: '',
   description: '',
   badge: '',
+  imageUrl: '',
+  discountInfo: '',
+  startDate: '',
   validUntil: '',
+  terms: '',
+  offerUrl: '',
   sortOrder: 0,
   isActive: true,
 };
@@ -55,6 +66,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
   const [formData, setFormData] = useState<OfferFormData>(DEFAULT_FORM);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
@@ -86,17 +98,58 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
       const d = new Date(offer.validUntil);
       dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
+    let startStr = '';
+    if (offer.startDate) {
+      const sd = new Date(offer.startDate);
+      startStr = `${sd.getFullYear()}-${String(sd.getMonth() + 1).padStart(2, '0')}-${String(sd.getDate()).padStart(2, '0')}`;
+    }
 
     setFormData({
       title: offer.title,
       description: offer.description ?? '',
       badge: offer.badge ?? '',
+      imageUrl: offer.imageUrl ?? '',
+      discountInfo: offer.discountInfo ?? '',
+      startDate: startStr,
       validUntil: dateStr,
+      terms: offer.terms ?? '',
+      offerUrl: offer.offerUrl ?? '',
       sortOrder: offer.sortOrder,
       isActive: offer.isActive,
     });
     setFieldErrors({});
     setEditingOffer(offer);
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showNotification('error', 'Please choose an image file (PNG, JPG, WebP)');
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      showNotification('error', 'Image size must be under 4MB');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      const res = await uploadOfferBannerAction(data);
+      if (res.success && res.bannerUrl) {
+        setFormData((prev) => ({ ...prev, imageUrl: res.bannerUrl! }));
+        showNotification('success', 'Banner image uploaded');
+      } else {
+        showNotification('error', res.message || 'Failed to upload banner');
+      }
+    } catch {
+      showNotification('error', 'Banner upload failed');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleCloseModals = () => {
@@ -116,7 +169,12 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
       title: formData.title,
       description: formData.description.trim() ? formData.description : null,
       badge: formData.badge.trim() ? formData.badge : null,
+      imageUrl: formData.imageUrl.trim() ? formData.imageUrl : null,
+      discountInfo: formData.discountInfo.trim() ? formData.discountInfo : null,
+      startDate: formData.startDate ? parseOfferExpiryDate(formData.startDate) ?? null : null,
       validUntil: formData.validUntil ? parseOfferExpiryDate(formData.validUntil) ?? null : null,
+      terms: formData.terms.trim() ? formData.terms : null,
+      offerUrl: formData.offerUrl.trim() ? formData.offerUrl : null,
       sortOrder: Number(formData.sortOrder) || 0,
       isActive: formData.isActive,
     };
@@ -273,6 +331,11 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
                           {offer.badge}
                         </Badge>
                       )}
+                      {offer.discountInfo && (
+                        <Badge variant="warning" size="sm">
+                          {offer.discountInfo}
+                        </Badge>
+                      )}
                     </div>
 
                     <div className={styles.statusBadges}>
@@ -328,14 +391,60 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
                   </div>
                 </div>
 
+                {offer.imageUrl && (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '120px',
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      backgroundColor: 'var(--color-bg-surface-subtle)',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={offer.imageUrl}
+                      alt={offer.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
+
                 {offer.description && (
                   <p className={styles.description}>{offer.description}</p>
                 )}
 
+                {offer.terms && (
+                  <p
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-tertiary)',
+                      margin: 0,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    Terms: {offer.terms}
+                  </p>
+                )}
+
                 <div className={styles.metaGrid}>
                   <span className={styles.metaItem}>
-                    Sort Order: <strong>{offer.sortOrder}</strong> (Lower = higher priority)
+                    Sort Order: <strong>{offer.sortOrder}</strong>
                   </span>
+
+                  {offer.startDate && (
+                    <span className={styles.metaItem}>
+                      Starts:{' '}
+                      <strong>
+                        {new Date(offer.startDate).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </strong>
+                    </span>
+                  )}
 
                   <span className={styles.metaItem}>
                     Valid Until:{' '}
@@ -346,9 +455,28 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
                             month: 'short',
                             day: 'numeric',
                           })
-                        : 'No Expiration'}
+                        : 'Ongoing'}
                     </strong>
                   </span>
+
+                  {offer.offerUrl && (
+                    <span className={styles.metaItem}>
+                      <a
+                        href={offer.offerUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: 'var(--color-accent)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 3,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        Claim Link <ExternalLink size={11} />
+                      </a>
+                    </span>
+                  )}
                 </div>
               </div>
             );
@@ -413,12 +541,96 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
           <div className={styles.formGrid}>
             <Input
               label="Highlight Badge (Optional)"
-              placeholder="e.g. 15% OFF, NEW SEASON, VIP ONLY"
+              placeholder="e.g. FESTIVE SPECIAL, VIP ONLY"
               value={formData.badge}
               error={fieldErrors.badge}
-              helpText="Short badge displayed next to the offer."
+              helpText="Short tag displayed above the offer."
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, badge: e.target.value }))
+              }
+            />
+
+            <Input
+              label="Discount Info (Optional)"
+              placeholder="e.g. Flat 30% OFF, Buy 2 Get 1"
+              value={formData.discountInfo}
+              error={fieldErrors.discountInfo}
+              helpText="Special pricing or discount callout."
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, discountInfo: e.target.value }))
+              }
+            />
+          </div>
+
+          {/* Banner Image Upload & Preview */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <label style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase' }}>
+              Promotional Banner Image (Optional)
+            </label>
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <Input
+                placeholder="Banner Image URL or upload below..."
+                value={formData.imageUrl}
+                onChange={(e) => setFormData((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                style={{ flex: 1 }}
+                disabled={isSubmitting || isUploading}
+              />
+              <label
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: 'var(--space-2) var(--space-3)',
+                  backgroundColor: 'var(--color-bg-surface-subtle)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: isUploading ? 'not-allowed' : 'pointer',
+                  fontSize: 'var(--font-size-xs)',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <Upload size={14} />
+                <span>{isUploading ? 'Uploading...' : 'Upload'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBannerUpload}
+                  style={{ display: 'none' }}
+                  disabled={isSubmitting || isUploading}
+                />
+              </label>
+            </div>
+            {formData.imageUrl && (
+              <div
+                style={{
+                  width: '100%',
+                  height: '110px',
+                  borderRadius: 'var(--radius-md)',
+                  overflow: 'hidden',
+                  border: '1px dashed var(--color-border)',
+                  backgroundColor: 'var(--color-bg-surface-subtle)',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={formData.imageUrl}
+                  alt="Banner preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className={styles.formGrid}>
+            <Input
+              type="date"
+              label="Start Date (Optional)"
+              value={formData.startDate}
+              error={fieldErrors.startDate}
+              helpText="Leave blank if offer is active immediately."
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, startDate: e.target.value }))
               }
             />
 
@@ -433,6 +645,28 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
               }
             />
           </div>
+
+          <Textarea
+            label="Terms & Conditions (Optional)"
+            placeholder="e.g. Valid in-store only. Cannot be combined with other promotional coupons."
+            value={formData.terms}
+            error={fieldErrors.terms}
+            rows={2}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, terms: e.target.value }))
+            }
+          />
+
+          <Input
+            label="Claim / External Offer URL (Optional)"
+            placeholder="e.g. https://instagram.com/... or WhatsApp offer claim link"
+            value={formData.offerUrl}
+            error={fieldErrors.offerUrl}
+            helpText="Optional link where customers can claim or view promo."
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, offerUrl: e.target.value }))
+            }
+          />
 
           <div className={styles.formGrid}>
             <Input

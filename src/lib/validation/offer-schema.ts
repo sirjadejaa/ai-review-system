@@ -38,6 +38,26 @@ export const CreateOfferInputSchema = z.object({
       (val) => (val === '' || val === null || val === undefined ? null : val),
       z.string().trim().max(30, 'Offer badge cannot exceed 30 characters').nullable().optional()
     ),
+  imageUrl: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().nullable().optional()
+    ),
+  discountInfo: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(60, 'Discount info cannot exceed 60 characters').nullable().optional()
+    ),
+  startDate: z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val.trim())) {
+        return new Date(`${val.trim()}T00:00:00.000Z`);
+      }
+      return val;
+    },
+    z.coerce.date().nullable().optional()
+  ),
   validUntil: z.preprocess(
     (val) => {
       if (val === '' || val === null || val === undefined) return null;
@@ -48,6 +68,16 @@ export const CreateOfferInputSchema = z.object({
     },
     z.coerce.date().nullable().optional()
   ),
+  terms: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(1000, 'Terms cannot exceed 1000 characters').nullable().optional()
+    ),
+  offerUrl: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().nullable().optional()
+    ),
   isActive: z.coerce.boolean().default(true),
   sortOrder: z.coerce.number().int('Sort order must be an integer').default(0),
 });
@@ -69,6 +99,26 @@ export const UpdateOfferInputSchema = z.object({
       (val) => (val === '' || val === null || val === undefined ? null : val),
       z.string().trim().max(30, 'Offer badge cannot exceed 30 characters').nullable().optional()
     ),
+  imageUrl: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().nullable().optional()
+    ),
+  discountInfo: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(60, 'Discount info cannot exceed 60 characters').nullable().optional()
+    ),
+  startDate: z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val.trim())) {
+        return new Date(`${val.trim()}T00:00:00.000Z`);
+      }
+      return val;
+    },
+    z.coerce.date().nullable().optional()
+  ),
   validUntil: z.preprocess(
     (val) => {
       if (val === '' || val === null || val === undefined) return null;
@@ -79,6 +129,16 @@ export const UpdateOfferInputSchema = z.object({
     },
     z.coerce.date().nullable().optional()
   ),
+  terms: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(1000, 'Terms cannot exceed 1000 characters').nullable().optional()
+    ),
+  offerUrl: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().nullable().optional()
+    ),
   isActive: z.coerce.boolean().optional(),
   sortOrder: z.coerce.number().int('Sort order must be an integer').optional(),
 });

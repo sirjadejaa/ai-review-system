@@ -1,0 +1,81 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8) 0 var(--space-4);
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  max-width: 360px;
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.iconRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.iconLink {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  text-decoration: none;
+}
+
+.iconLink:hover {
+  transform: translateY(-3px) scale(1.08);
+  border-color: var(--color-accent, #a88b64);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--color-bg-surface-subtle);
+}
+
+.iconLink:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.instagram:hover {
+  color: #e1306c;
+}
+
+.facebook:hover {
+  color: #1877f2;
+}
+
+.whatsapp:hover {
+  color: #25d366;
+}
+
+.youtube:hover {
+  color: #ff0000;
+}
+
+.pinterest:hover {
+  color: #e60023;
+}

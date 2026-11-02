@@ -12,6 +12,8 @@ import { trackGoogleReviewClickAction } from '@/lib/actions/customer-actions';
 import { isValidExternalUrl } from '@/lib/format/contact-links';
 import { Check, ShieldCheck, Info, ExternalLink } from 'lucide-react';
 
+import { useLanguage } from '@/lib/i18n/context';
+
 export interface AIReviewAssistantProps {
   rating: number | null;
   selectedTags: PredefinedFeedbackTag[];
@@ -23,8 +25,8 @@ export interface AIReviewAssistantProps {
 
 const LANGUAGES: { code: LanguageCode; label: string; scriptHint: string }[] = [
   { code: 'en', label: 'English', scriptHint: 'Standard English' },
-  { code: 'hi', label: 'हिंदी', scriptHint: 'Devanagari script' },
-  { code: 'hinglish', label: 'Hinglish', scriptHint: 'Hindi in English letters' },
+  { code: 'gu', label: 'ગુજરાતી', scriptHint: 'Gujarati Unicode' },
+  { code: 'gujlish', label: 'Gujlish', scriptHint: 'Gujarati in English letters' },
 ];
 
 const DRAFT_STYLE_LABELS = ['Recommended', 'Short', 'Detailed'];
@@ -37,7 +39,17 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
   googleReviewUrl,
   source,
 }) => {
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const { language: globalLang } = useLanguage();
+  const [language, setLanguage] = useState<LanguageCode>(
+    globalLang === 'gu' || globalLang === 'gujlish' ? globalLang : 'en'
+  );
+
+  // Synchronize with global language selector
+  useEffect(() => {
+    if (globalLang === 'en' || globalLang === 'gu' || globalLang === 'gujlish') {
+      setLanguage(globalLang);
+    }
+  }, [globalLang]);
   const [drafts, setDrafts] = useState<ReviewDraft[]>([]);
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
   const [editedReview, setEditedReview] = useState('');

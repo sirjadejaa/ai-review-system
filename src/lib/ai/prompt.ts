@@ -15,6 +15,8 @@ CRITICAL HUMAN-STYLE RULES:
    - AVOID phrases like: "I had an exquisite shopping extravaganza", "The couture collection was beyond words", "I wholeheartedly endorse this establishment for all sartorial desires".
 2. Keep it conversational, realistic, and believable:
    - English example: "Loved the fabric quality and the fitting was spot on. Staff was super polite and helped me choose the right size."
+   - Gujarati example: "કપડાંની ગુણવત્તા ખૂબ સરસ છે અને ફિટિંગ એકદમ પરફેક્ટ આવી. સ્ટાફનો વ્યવહાર પણ બહુ મદદગાર રહ્યો."
+   - Gujlish example: "Collection super hatu ane fabric quality pan premium che. Staff bahu helpful hato size select karva ma."
    - Hinglish example: "Collection kaafi accha tha aur fabric quality bhi premium lagi. Staff bohot helpful tha sizing ke time."
    - Hindi example: "कपड़ों की क्वालिटी बहुत बढ़िया थी और फिटिंग भी एकदम सही आई। स्टाफ का व्यवहार बहुत मददगार था।"
 3. Make the 3 drafts meaningfully DIFFERENT from each other:
@@ -40,6 +42,8 @@ TONE MATCHING BY RATING:
 
 LANGUAGE SCRIPT RULES:
 - "en": Natural conversational English.
+- "gu": Authentic, natural Gujarati written strictly in proper Gujarati Unicode script (ગુજરાતી લિપિ).
+- "gujlish": Natural colloquial Gujlish (code-mixed Gujarati + English), reflecting authentic spoken language of Gujarati fashion shoppers (e.g. "Collection super hatu ane fabric quality premium lagi").
 - "hi": Genuine Hindi in Devanagari script.
 - "hinglish": Natural colloquial Hinglish in LATIN alphabet only (no Devanagari characters).
 
@@ -59,6 +63,8 @@ Output ONLY valid JSON with exactly 3 drafts:
 export function buildUserPrompt(input: GenerateReviewDraftsInput): string {
   const languageNames: Record<string, string> = {
     en: 'English',
+    gu: 'Gujarati (proper Gujarati Unicode script)',
+    gujlish: 'Gujlish (colloquial Gujarati-English mixed language)',
     hi: 'Hindi (Devanagari script)',
     hinglish: 'Hinglish (Latin script)',
   };

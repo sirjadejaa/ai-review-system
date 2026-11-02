@@ -14,10 +14,13 @@ import {
 } from '@/components/ui';
 import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 import { listActiveOffers } from '@/lib/repositories/offer-repository';
+import { listFeaturedProducts } from '@/lib/repositories/product-repository';
 import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-schema';
 import { QrScanTracker } from '@/components/customer/qr-scan-tracker';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { OfferList } from '@/components/customer/offer-list';
+import { FeaturedProducts } from '@/components/customer/featured-products';
+import { SocialLinks } from '@/components/customer/social-links';
 import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import { Star, CreditCard, Sparkles, MapPin, Clock } from 'lucide-react';
 
@@ -37,14 +40,16 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
   const parsedQuery = CustomerLandingQuerySchema.safeParse({ source: rawSource });
   const validatedSource = parsedQuery.success ? parsedQuery.data.source : undefined;
 
-  // 2. Retrieve ShopSettings & active offers from database
+  // 2. Retrieve ShopSettings, active offers & featured products from database
   let settings;
   let activeOffers = [];
+  let featuredProducts = [];
 
   try {
-    const [settingsResult, offersResult] = await Promise.allSettled([
+    const [settingsResult, offersResult, productsResult] = await Promise.allSettled([
       getShopSettings(),
       listActiveOffers(),
+      listFeaturedProducts(12),
     ]);
 
     if (settingsResult.status === 'rejected') {
@@ -53,6 +58,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
 
     settings = settingsResult.value;
     activeOffers = offersResult.status === 'fulfilled' ? offersResult.value : [];
+    featuredProducts = productsResult.status === 'fulfilled' ? productsResult.value : [];
   } catch (err) {
     console.error('Non-fatal: Failed to load shop settings for customer landing', err);
     return (
@@ -379,6 +385,12 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
 
         {/* Active Offers & Promotions */}
         <OfferList offers={activeOffers} />
+
+        {/* Featured Clothing Products Showcase */}
+        <FeaturedProducts products={featuredProducts} />
+
+        {/* Social Media Links */}
+        <SocialLinks socialLinks={settings.socialLinks} />
       </div>
     </CustomerLayout>
   );

@@ -3,7 +3,7 @@
  * Strictly single-tenant. No SaaS or multi-tenancy constructs.
  */
 
-export type LanguageCode = 'en' | 'hi' | 'hinglish';
+export type LanguageCode = 'en' | 'gu' | 'gujlish' | 'hi' | 'hinglish';
 
 export interface ShopSettings {
   shopName: string;
@@ -18,6 +18,22 @@ export interface ShopSettings {
     hours: string;
   }[];
   emergencyAvailable?: boolean;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  category: string;
+  price?: number;
+  originalPrice?: number;
+  sizes: string[];
+  colors: string[];
+  isFeatured: boolean;
+  isActive: boolean;
+  sortOrder: number;
+  productUrl?: string;
 }
 
 export interface ReviewDraftInput {
@@ -46,10 +62,16 @@ export interface InternalFeedback {
 export interface Offer {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   badge?: string;
+  imageUrl?: string;
+  discountInfo?: string;
+  startDate?: string;
   validUntil?: string;
+  terms?: string;
+  offerUrl?: string;
   isActive: boolean;
+  sortOrder: number;
 }
 
 export interface QRAnalyticsEvent {
