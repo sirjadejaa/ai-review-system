@@ -5,8 +5,8 @@ import type { GenerateOwnerReplyInput } from './prompt';
  * Deterministic Mock AI Provider for clothing boutique reviews and owner replies.
  * Supports exactly three languages:
  *  - English ('en')
- *  - Hindi ('hi' in proper Devanagari script)
- *  - Gujarati ('gu' in proper Gujarati Unicode script)
+ *  - Gujlish ('gujlish': Gujarati + English conversational mix)
+ *  - Hinglish ('hinglish': Hindi + English conversational mix in Roman script)
  */
 export class MockAIProvider implements AIServiceProvider {
   readonly name = 'mock';
@@ -16,44 +16,44 @@ export class MockAIProvider implements AIServiceProvider {
     const hasNote = Boolean(customerNote && customerNote.trim());
     const noteSummary = hasNote ? customerNote!.trim() : '';
 
-    if (language === 'gu') {
-      return this.generateGujaratiDrafts(rating, selectedTags, noteSummary);
+    if (language === 'gujlish') {
+      return this.generateGujlishDrafts(rating, selectedTags, noteSummary);
     }
 
-    if (language === 'hi') {
-      return this.generateHindiDrafts(rating, selectedTags, noteSummary);
+    if (language === 'hinglish') {
+      return this.generateHinglishDrafts(rating, selectedTags, noteSummary);
     }
 
     return this.generateEnglishDrafts(rating, selectedTags, noteSummary);
   }
 
   /**
-   * Generates owner replies for Google Business Profile reviews.
+   * Generates owner replies for Google Business Profile reviews in en, gujlish, and hinglish.
    */
   async generateOwnerReplyDraft(input: GenerateOwnerReplyInput): Promise<string> {
     const name = input.reviewerName ? input.reviewerName.trim() : '';
-    const nameGreeting = name ? name : (input.language === 'hi' ? 'प्रिय ग्राहक' : input.language === 'gu' ? 'માનવંતા ગ્રાહક' : 'Valued Customer');
+    const nameGreeting = name || 'Valued Customer';
     const shop = input.shopName || 'our boutique';
     const hasComment = Boolean(input.reviewText && input.reviewText.trim());
 
-    if (input.language === 'hi') {
+    if (input.language === 'gujlish') {
       if (input.rating >= 4) {
-        return `${nameGreeting}, हमारी दुकान से खरीदारी करने और आपकी सकारात्मक समीक्षा के लिए बहुत-बहुत धन्यवाद! ${hasComment ? 'आपके विचारों की हम सराहना करते हैं। ' : ''}हमें बेहद खुशी है कि आपको हमारा कलेक्शन पसंद आया। ${shop} में आपका दोबारा स्वागत करने के लिए हम उत्सुक हैं!`;
+        return `Thank you so much ${nameGreeting}! ${hasComment ? 'તમારો honest review અને feedback share કરવા બદલ આભાર. ' : ''}અમને ખૂબ આનંદ થયો કે તમને અમારું collection અને shopping experience પસંદ આવ્યું. We look forward to welcoming you back to ${shop}!`;
       }
       if (input.rating === 3) {
-        return `${nameGreeting}, आपके सुझाव और समीक्षा के लिए धन्यवाद। हम अपने कपड़ों की विविधता और सेवा को निरंतर बेहतर बनाने का प्रयास कर रहे हैं। आशा है कि अगली बार ${shop} में आपका अनुभव और भी शानदार रहेगा।`;
+        return `Thank you for your visit and feedback, ${nameGreeting}. અમે અમારા collection, sizing options અને customer service ને continuously upgrade કરી રહ્યા છીએ. Hope your next visit to ${shop} is even better!`;
       }
-      return `नमस्ते ${nameGreeting}, अपनी समीक्षा साझा करने के लिए धन्यवाद। हमें बेहद खेद है कि आपकी यात्रा आपकी अपेक्षाओं के अनुरूप नहीं रही। हम ग्राहक संतुष्टि को प्राथमिकता देते हैं। कृपया स्टोर से संपर्क करें ताकि हम अगली बार आपको बेहतर सेवा प्रदान कर सकें।`;
+      return `Hello ${nameGreeting}, thank you for sharing your feedback. We are really sorry કે તમારો experience expected standard મુજબ ના રહ્યો. Customer satisfaction અમારી top priority છે. Please contact our team so we can make this right on your next visit to ${shop}.`;
     }
 
-    if (input.language === 'gu') {
+    if (input.language === 'hinglish') {
       if (input.rating >= 4) {
-        return `${nameGreeting}, અમારી દુકાનમાંથી ખરીદી કરવા અને તમારો સુંદર અભિપ્રાય આપવા બદલ ખૂબ ખૂબ આભાર! ${hasComment ? 'આપના પ્રતિભાવની અમે કદર કરીએ છીએ. ' : ''}આપને અમારું કલેક્શન ગમ્યું તે જાણીને આનંદ થયો. ${shop} ખાતે આપનું ફરી સ્વાગત કરવા અમે આતુર છીએ!`;
+        return `Thank you so much ${nameGreeting}! ${hasComment ? 'Aapka honest review aur feedback share karne ke liye shukriya. ' : ''}Humein bohot khushi hui ki aapko hamara collection aur shopping experience pasand aaya. Looking forward to welcoming you again at ${shop}!`;
       }
       if (input.rating === 3) {
-        return `${nameGreeting}, આપના કિંમતી પ્રતિભાવ અને મુલાકાત બદલ આભાર. અમે અમારા કલેક્શન, ફિટિંગ અને સર્વિસને વધુ ઉત્કૃષ્ટ બનાવવા સતત પ્રયત્નશીલ છીએ. આશા છે કે આગામી મુલાકાતમાં ${shop} ખાતે આપને શ્રેષ્ઠ અનુભવ મળશે.`;
+        return `Thank you aapke visit aur feedback ke liye, ${nameGreeting}. Hum collection variety aur sizing options ko continuously improve kar rahe hain. Next visit par hum aapko aur behtar experience dene ki poori koshish karenge!`;
       }
-      return `નમસ્તે ${nameGreeting}, તમારો સ્પષ્ટ પ્રતિભાવ જણાવવા બદલ આભાર. અમને ખૂબ ખેદ છે કે તમારી મુલાકાત તમારી અપેક્ષા મુજબ ન રહી. અમે ગ્રાહક સેવાને સર્વોચ્ચ મહત્વ આપીએ છીએ. કૃપા કરીને અમારી ટીમનો સંપર્ક કરો જેથી અમે આનું નિરાકરણ લાવી શકીએ.`;
+      return `Hello ${nameGreeting}, aapka feedback share karne ke liye shukriya. We are truly sorry ki aapka experience hamare standards ke mutabik nahi raha. Customer satisfaction hamari priority hai, kripya boutique team se contact karein taaki hum ise improve kar sakein.`;
     }
 
     // Default: English
@@ -138,7 +138,7 @@ export class MockAIProvider implements AIServiceProvider {
     ];
   }
 
-  private generateHindiDrafts(
+  private generateGujlishDrafts(
     rating: number,
     tags: string[],
     note: string
@@ -150,19 +150,19 @@ export class MockAIProvider implements AIServiceProvider {
         {
           id: 'draft-1',
           text: note
-            ? `${note} कपड़ों की क्वालिटी और डिजाइन बहुत बढ़िया है।`
-            : `स्टोर का कलेक्शन और कपड़ों की क्वालिटी बहुत अच्छी लगी। स्टाफ का व्यवहार भी बहुत मददगार था।`,
-          language: 'hi',
+            ? `${note} અહીં shopping કરવાનો experience ખૂબ જ awesome રહ્યો! Collection અને fabric quality super છે.`
+            : `Loved shopping here! Clothing ની quality અને fitting એકદમ perfect આવી. Staff પણ બહુ polite અને helpful હતો.`,
+          language: 'gujlish',
         },
         {
           id: 'draft-2',
-          text: `कपड़ों की फिटिंग और फैब्रिक क्वालिटी दोनों शानदार हैं। स्टोर का माहौल भी बहुत खूबसूरत और साफ-सुथरा है।${noteText}`,
-          language: 'hi',
+          text: `અહીંનું latest collection બહુ stylish છે. Fabric quality superb છે અને store નું ambience પણ બહુ clean છે.${noteText}`,
+          language: 'gujlish',
         },
         {
           id: 'draft-3',
-          text: `शॉपिंग का बहुत अच्छा अनुभव रहा। लेटेस्ट डिजाइन और बहुत बेहतरीन सर्विस मिली।`,
-          language: 'hi',
+          text: `Great shopping experience! Trendy designs અને comfortable fitting મળ્યા. Will definitely visit again!`,
+          language: 'gujlish',
         },
       ];
     }
@@ -171,18 +171,18 @@ export class MockAIProvider implements AIServiceProvider {
       return [
         {
           id: 'draft-1',
-          text: `स्टोर पर शॉपिंग का अनुभव ठीक-ठाक रहा।${noteText} कलेक्शन सामान्य था।`,
-          language: 'hi',
+          text: `Shopping experience overall average રહ્યો.${noteText} Collection decent હતું.`,
+          language: 'gujlish',
         },
         {
           id: 'draft-2',
-          text: `कपड़े ठीक थे लेकिन साइजिंग और वैरायटी में थोड़ा सुधार हो सकता है।`,
-          language: 'hi',
+          text: `Designs સારા છે પણ size availability અને fitting options માં થોડો improvement જરૂરી છે.`,
+          language: 'gujlish',
         },
         {
           id: 'draft-3',
-          text: `औसत अनुभव रहा। स्टाफ ठीक था लेकिन चयन सीमित था।`,
-          language: 'hi',
+          text: `Staff helpful હતો પણ ചില collection limited લાગી. Overall okayish visit.${noteText}`,
+          language: 'gujlish',
         },
       ];
     }
@@ -191,23 +191,23 @@ export class MockAIProvider implements AIServiceProvider {
     return [
       {
         id: 'draft-1',
-        text: `आज का शॉपिंग अनुभव निराशाजनक रहा।${noteText}`,
-        language: 'hi',
+        text: `આજ નો shopping experience disappointed રહ્યો.${noteText}`,
+        language: 'gujlish',
       },
       {
         id: 'draft-2',
-        text: `सर्विस और कपड़ों की वैरायटी उम्मीद के मुताबिक नहीं थी। सुधार की जरूरत है।`,
-        language: 'hi',
+        text: `Customer service અને size options expected standard મુજબ ન હતા. Needs improvement.`,
+        language: 'gujlish',
       },
       {
         id: 'draft-3',
-        text: `अनुभव अच्छा नहीं रहा।${noteText ? ` समस्या: ${note}` : ''}`,
-        language: 'hi',
+        text: `Store visit થી satisfied નથી. Quality અને service expectations meet ના થઈ.${noteText ? ` Issue: ${note}` : ''}`,
+        language: 'gujlish',
       },
     ];
   }
 
-  private generateGujaratiDrafts(
+  private generateHinglishDrafts(
     rating: number,
     tags: string[],
     note: string
@@ -219,19 +219,19 @@ export class MockAIProvider implements AIServiceProvider {
         {
           id: 'draft-1',
           text: note
-            ? `${note} કપડાંની ગુણવત્તા અને કલેક્શન ખૂબ જ ઉત્તમ છે.`
-            : `અહીં ખરીદી કરવાનો અનુભવ અદ્ભુત રહ્યો. ફેબ્રિક ક્વોલિટી અને ફિટિંગ એકદમ સરસ છે, અને સ્ટાફ ખૂબ સહાયક હતો.`,
-          language: 'gu',
+            ? `${note} Yahan shopping karke maza aa gaya! Collection aur fabric quality dono super hain.`
+            : `Boutique ka collection bohot stylish hai aur fitting bilkul perfect aayi. Staff bhi kaafi helpful aur polite tha.`,
+          language: 'hinglish',
         },
         {
           id: 'draft-2',
-          text: `ટ્રેન્ડિંગ ડિઝાઇન્સ અને આકર્ષક કલેક્શન જોવા મળ્યું. સ્ટોરનું વાતાવરણ પણ ખૂબ પ્રીમિયમ છે.${noteText}`,
-          language: 'gu',
+          text: `Superb shopping experience! Clothes ki quality aur modern designs dono lajawab hain. Store ka ambience bhi premium hai.${noteText}`,
+          language: 'hinglish',
         },
         {
           id: 'draft-3',
-          text: `ખૂબ સંતોષકારક ખરીદી! યોગ્ય કિંમતે ઉત્તમ કપડાં અને સરસ સર્વિસ મળી. ફરીથી મુલાકાત લઈશું.`,
-          language: 'gu',
+          text: `Loved the collection! Sizing aur fitting options best hain aur reasonable pricing hai. Definitely recommending to friends!`,
+          language: 'hinglish',
         },
       ];
     }
@@ -240,18 +240,18 @@ export class MockAIProvider implements AIServiceProvider {
       return [
         {
           id: 'draft-1',
-          text: `ખરીદીનો અનુભવ સામાન્ય રહ્યો.${noteText} કલેક્શન સરેરાશ હતું.`,
-          language: 'gu',
+          text: `Shopping experience theek thaak raha.${noteText} Collection average tha.`,
+          language: 'hinglish',
         },
         {
           id: 'draft-2',
-          text: `મુલાકાત સામાન્ય રહી. ડિઝાઇન સારી હતી પણ સાઇઝ અને ફિટિંગના વિકલ્પોમાં સુધારાની જરૂર છે.`,
-          language: 'gu',
+          text: `Designs acche hain par size availability aur trial room wait time me thoda improvement chahiye.`,
+          language: 'hinglish',
         },
         {
           id: 'draft-3',
-          text: `સ્ટાફ સારો હતો પણ કલેક્શન મર્યાદિત લાગ્યું. એકંદરે ઠીકઠીક અનુભવ.${noteText}`,
-          language: 'gu',
+          text: `Staff polite tha par kuch items me pricing thodi high lagi. Overall fair visit.${noteText}`,
+          language: 'hinglish',
         },
       ];
     }
@@ -260,18 +260,18 @@ export class MockAIProvider implements AIServiceProvider {
     return [
       {
         id: 'draft-1',
-        text: `આજની મુલાકાતમાં ખરીદીનો અનુભવ અપેક્ષા મુજબ ન રહ્યો.${noteText}`,
-        language: 'gu',
+        text: `Aaj ka shopping experience kafi disappointing raha.${noteText}`,
+        language: 'hinglish',
       },
       {
         id: 'draft-2',
-        text: `સર્વિસ અને ફિટિંગમાં સુધારાની ઘણી જરૂર છે.`,
-        language: 'gu',
+        text: `Customer service aur sizing options expectations ke mutabik nahi the. Improvement ki zarurat hai.`,
+        language: 'hinglish',
       },
       {
         id: 'draft-3',
-        text: `અનુભવ સારો ન રહ્યો. ગુણવત્તા અને સ્ટાફ સર્વિસ બંને વધુ સારી હોવી જોઈએ.${noteText}`,
-        language: 'gu',
+        text: `Visit se satisfied nahi hoon. Fabric quality aur assistance better honi chahiye thi.${noteText ? ` Issue: ${note}` : ''}`,
+        language: 'hinglish',
       },
     ];
   }

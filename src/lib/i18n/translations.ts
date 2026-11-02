@@ -2,97 +2,108 @@
  * Multi-Language Internationalization Dictionary
  * Exactly three supported languages:
  *  - 'en': English (Natural, professional English)
- *  - 'hi': हिन्दी (Proper Devanagari Script)
- *  - 'gu': ગુજરાતી (Proper Gujarati Unicode Script)
+ *  - 'gujlish': ગુજરાતી + English (Natural conversational mix of Gujarati & English)
+ *  - 'hinglish': हिंदी + English (Natural conversational mix of Hindi & English in Roman script)
  */
 
-export type SupportedLanguage = 'en' | 'hi' | 'gu';
+export type SupportedLanguage = 'en' | 'gujlish' | 'hinglish';
 
 export interface LanguageOption {
   code: SupportedLanguage;
   label: string;
   nativeLabel: string;
+  subLabel?: string;
 }
 
 export const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { code: 'en', label: 'English', nativeLabel: 'English' },
-  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
-  { code: 'gu', label: 'Gujarati', nativeLabel: 'ગુજરાતી' },
+  { code: 'en', label: 'English', nativeLabel: 'English', subLabel: 'English' },
+  {
+    code: 'gujlish',
+    label: 'Gujlish',
+    nativeLabel: 'ગુજરાતી + English (Gujlish)',
+    subLabel: 'Gujarati + English',
+  },
+  {
+    code: 'hinglish',
+    label: 'Hinglish',
+    nativeLabel: 'हिंदी + English (Hinglish)',
+    subLabel: 'Hindi + English',
+  },
 ];
 
 export interface TagTranslation {
   id: string;
   en: string;
-  hi: string;
-  gu: string;
+  gujlish: string;
+  hinglish: string;
 }
 
 export const FASHION_TAG_TRANSLATIONS: TagTranslation[] = [
   {
     id: 'Clothing Quality',
     en: 'Clothing Quality',
-    hi: 'कपड़ों की गुणवत्ता',
-    gu: 'કપડાંની ગુણવત્તા',
+    gujlish: 'Clothing ની Quality',
+    hinglish: 'Clothes ki Quality',
   },
   {
     id: 'Fabric Quality',
     en: 'Fabric Quality',
-    hi: 'कपड़े का फैब्रिक',
-    gu: 'ફેબ્રિક',
+    gujlish: 'Fabric & Material',
+    hinglish: 'Fabric & Kapda Quality',
   },
   {
     id: 'Fitting & Sizing',
     en: 'Fitting & Sizing',
-    hi: 'फिटिंग और साइज',
-    gu: 'ફિટિંગ અને સાઇઝ',
+    gujlish: 'Fitting & Size Options',
+    hinglish: 'Fitting aur Sizing',
   },
   {
     id: 'Design & Collection',
     en: 'Design & Collection',
-    hi: 'डिज़ाइन और कलेक्शन',
-    gu: 'ડિઝાઇન',
+    gujlish: 'Latest Design & Collection',
+    hinglish: 'Design aur Collection',
   },
   {
     id: 'Comfort',
     en: 'Comfort',
-    hi: 'आराम और कम्फर्ट',
-    gu: 'આરામ',
+    gujlish: 'Comfortable Wear',
+    hinglish: 'Comfortable Fitting',
   },
   {
     id: 'Pricing & Value',
     en: 'Pricing & Value',
-    hi: 'उचित मूल्य',
-    gu: 'કિંમત',
+    gujlish: 'Reasonable Price & Value',
+    hinglish: 'Value for Money Price',
   },
   {
     id: 'Staff Behaviour',
     en: 'Staff Behaviour',
-    hi: 'स्टाफ का व्यवहार',
-    gu: 'સ્ટાફનો વ્યવહાર',
+    gujlish: 'Polite & Helpful Staff',
+    hinglish: 'Polite Staff Behaviour',
   },
   {
     id: 'Collection',
     en: 'Collection',
-    hi: 'नया कलेक्शन',
-    gu: 'કલેક્શન',
+    gujlish: 'New Arrival Collection',
+    hinglish: 'Fresh Stock Collection',
   },
   {
     id: 'Shopping Experience',
     en: 'Shopping Experience',
-    hi: 'खरीदारी का अनुभव',
-    gu: 'ખરીદીનો અનુભવ',
+    gujlish: 'Great Shopping Experience',
+    hinglish: 'Smooth Shopping Experience',
   },
   {
     id: 'Store Ambience',
     en: 'Store Ambience',
-    hi: 'स्टोर का माहौल',
-    gu: 'સ્ટોરનું વાતાવરણ',
+    gujlish: 'Store નું Ambience',
+    hinglish: 'Store ka Ambience',
   },
   {
     id: 'Variety & Availability',
     en: 'Variety & Availability',
-    hi: 'विविधता और उपलब्धता',
-    gu: 'વિવિધતા',
+    gujlish: 'Variety & Stock Options',
+    hinglish: 'Variety aur Options',
   },
 ];
 
@@ -178,166 +189,166 @@ export const TRANSLATIONS = {
     footerCopyright: 'All rights reserved. Luxury Retail Experience.',
   },
 
-  hi: {
+  gujlish: {
     // Nav & General
-    shopCategory: 'लक्ज़री वस्त्र बुटीक',
-    privilegePass: 'प्रिविलेज पास',
-    rateVisit: 'अपनी रेटिंग दें',
-    viewCard: 'वीआईपी पास',
-    backToHome: 'बुटीक होम',
+    shopCategory: 'Luxury Clothing Boutique',
+    privilegePass: 'Privilege Pass',
+    rateVisit: 'Visit ને Rate કરો',
+    viewCard: 'VIP Pass જુઓ',
+    backToHome: 'Boutique Home પર પાછા જાઓ',
 
     // Hero Section
-    heroBadge: 'नया सीज़नल कलेक्शन',
-    heroTitle: 'अपनी स्टाइल दर्शाएं और अपना अनुभव साझा करें',
+    heroBadge: 'New Seasonal Collection',
+    heroTitle: 'તમારી Style દર્શાવો અને Shopping Experience share કરો',
     heroSubtitle:
-      'हम बेहतरीन और आधुनिक फैशन तैयार करते हैं। आपकी राय हमारे कलेक्शन को और बेहतर बनाने में मदद करती है।',
-    rateExperienceCta: 'खरीदारी की समीक्षा दें',
-    viewCollectionCta: 'कलेक्शन देखें',
+      'અમે modern અને contemporary fashion design કરીએ છીએ. તમારો feedback અમારું collection enhance કરવામાં help કરે છે.',
+    rateExperienceCta: 'Rate & Review Your Visit',
+    viewCollectionCta: 'Featured Collection જુઓ',
 
     // Rating & Feedback Form
-    ratingHeading: 'आपकी खरीदारी का अनुभव कैसा रहा?',
-    ratingSubtitle: 'समीक्षा शुरू करने के लिए अपनी रेटिंग चुनें',
-    ratingLabel: 'अपनी रेटिंग चुनें',
-    ratingHintDefault: 'रेटिंग देने के लिए स्टार पर टैप करें',
-    rating1: '1 स्टार — निराशाजनक अनुभव',
-    rating2: '2 स्टार — सुधार की आवश्यकता है',
-    rating3: '3 स्टार — सामान्य खरीदारी अनुभव',
-    rating4: '4 स्टार — कलेक्शन से बहुत प्रसन्न',
-    rating5: '5 स्टार — शानदार कलेक्शन और उत्कृष्ट सेवा!',
-    selectRatingError: 'कृपया पहले रेटिंग चुनें।',
+    ratingHeading: 'તમારો shopping experience કેવો રહ્યો?',
+    ratingSubtitle: 'Review customize કરવા માટે rating select કરો',
+    ratingLabel: 'તમારું rating પસંદ કરો',
+    ratingHintDefault: 'Rating આપવા માટે star પર click કરો',
+    rating1: '1 Star — Disappointing experience',
+    rating2: '2 Stars — Improvement ની જરૂર છે',
+    rating3: '3 Stars — Average shopping experience',
+    rating4: '4 Stars — Collection ખૂબ જ પસંદ આવ્યું',
+    rating5: '5 Stars — Amazing collection & great staff service!',
+    selectRatingError: 'કૃપા કરીને પહેલાં rating પસંદ કરો.',
 
     // Tags
-    highlightsLabel: 'आपको क्या सबसे अधिक पसंद आया?',
-    highlightsSubtitle: 'अपने अनुभव से संबंधित सभी विकल्प चुनें',
+    highlightsLabel: 'તમને શું સૌથી વધારે ગમ્યું?',
+    highlightsSubtitle: 'તમારા visit સાથે match થતાં tags select કરો',
 
     // Feedback notes
-    notesLabel: 'अतिरिक्त टिप्पणी (वैकल्पिक)',
-    notesPlaceholder: 'कपड़ों, फिटिंग या स्टोर सेवा के बारे में कुछ खास लिखें...',
-    charCount: 'अक्षर शेष',
+    notesLabel: 'Additional Comments (Optional)',
+    notesPlaceholder: 'Fabric, fitting અથવા store service વિશે કંઈક લખો...',
+    charCount: 'characters બાકી',
 
     // Contact
-    contactOptionalLabel: 'फ़ोन नंबर या ईमेल (वैकल्पिक)',
-    contactPlaceholder: 'ऑर्डर या फिटिंग सहायता के लिए...',
+    contactOptionalLabel: 'Phone Number અથવા Email (Optional)',
+    contactPlaceholder: 'Orders અથવા alteration updates માટે...',
     privacyNotice:
-      'आपकी गोपनीयता सुरक्षित है। आपकी निजी राय केवल स्टोर प्रबंधन तक सीमित रहेगी।',
+      'તમારી privacy safe છે. Private feedback માત્ર store owner જોશે. AI suggestions Google Reviews માટે છે.',
 
     // Actions
-    generateReview: 'रिव्यू बनाएं',
-    generatingReview: 'आपके लिए समीक्षा तैयार हो रही है...',
-    submitPrivateFeedback: 'स्टोर को निजी फीडबैक भेजें',
-    submitting: 'सुरक्षित किया जा रहा है...',
-    reviewReadyTitle: 'आपकी समीक्षा सुझाव तैयार हैं',
-    reviewReadySubtitle: 'नीचे से कोई भी समीक्षा चुनें, चाहें तो संपादित करें और Google पर पोस्ट करें।',
+    generateReview: 'Review બનાવો',
+    generatingReview: 'Personalized drafts generate થઈ રહ્યાં છે...',
+    submitPrivateFeedback: 'Boutique ને Private Feedback મોકલો',
+    submitting: 'Saving...',
+    reviewReadyTitle: 'તમારા AI Review Suggestions Ready છે',
+    reviewReadySubtitle: 'નીચેથી કોઈપણ review select કરો, જરૂર હોય તો edit કરો અને 1-click માં Google Reviews પર copy કરો.',
 
     // Success State
-    thankYouTitle: 'आपकी प्रतिक्रिया के लिए धन्यवाद!',
+    thankYouTitle: 'તમારા feedback માટે Thank You!',
     thankYouMessage:
-      'आपकी राय हमारे फैब्रिक, फिटिंग और ग्राहक सेवा को और बेहतर बनाने में मदद करती है।',
-    copyToGoogleCta: 'कॉपी करें और Google Reviews पर पोस्ट करें',
-    viewPrivilegeCardCta: 'अपना वीआईपी पास देखें',
+      'તમારો feedback અમારા fabric selection, styling અને customer service ને improve કરવામાં help કરશે.',
+    copyToGoogleCta: 'Copy કરી Google Reviews પર Post કરો',
+    viewPrivilegeCardCta: 'તમારો VIP Privilege Pass જુઓ',
 
     // Products Section
-    featuredProductsTitle: 'विशेष कलेक्शन',
-    featuredProductsSubtitle: 'नवीनतम डिज़ाइन, पारंपरिक कला और प्रीमियम वस्त्र।',
-    allCategories: 'सभी',
-    viewDetails: 'विवरण देखें',
-    sizeLabel: 'साइज:',
-    colorLabel: 'रंग:',
-    noProductsFound: 'इस श्रेणी में अभी कोई उत्पाद उपलब्ध नहीं है।',
+    featuredProductsTitle: 'Featured Collection',
+    featuredProductsSubtitle: 'Handpicked designs, trending outfits અને designer collection.',
+    allCategories: 'All Collections',
+    viewDetails: 'Garment Details',
+    sizeLabel: 'Sizes:',
+    colorLabel: 'Colors:',
+    noProductsFound: 'આ category માં હાલ કોઈ products available નથી.',
 
     // Offers Section
-    specialOffersTitle: 'विशेष स्टोर ऑफ़र',
-    specialOffersSubtitle: 'सीज़नल डिस्काउंट, त्योहारों की छूट और वीआईपी सुविधाएं।',
-    validTill: 'वैधता:',
-    offerTerms: 'नियम एवं शर्तें',
-    claimOffer: 'स्टोर पर प्राप्त करें',
-    noOffersFound: 'वर्तमान में कोई सक्रिय ऑफ़र उपलब्ध नहीं है।',
+    specialOffersTitle: 'Exclusive Boutique Offers',
+    specialOffersSubtitle: 'Seasonal discounts, festival offers અને VIP shopping perks.',
+    validTill: 'Valid till:',
+    offerTerms: 'Terms & Conditions',
+    claimOffer: 'Store પર Claim કરો',
+    noOffersFound: 'હાલ કોઈ active offers નથી. Seasonal sales માટે જલ્દી check કરો!',
 
     // Social & Footer
-    connectTitle: 'हमारे सोशल मीडिया से जुड़ें',
-    connectSubtitle: 'नए आगमन और लुकबुक के लिए हमें फॉलो करें।',
-    footerCopyright: 'सर्वाधिकार सुरक्षित। लक्ज़री रिटेल अनुभव।',
+    connectTitle: 'અમારા Social Media સાથે Connect થાઓ',
+    connectSubtitle: 'New arrivals અને fashion lookbooks માટે અમને follow કરો.',
+    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
   },
 
-  gu: {
+  hinglish: {
     // Nav & General
-    shopCategory: 'લક્ઝરી કપડાંનું બુટીક',
-    privilegePass: 'પ્રિવિલેજ પાસ',
-    rateVisit: 'તમારો રિવ્યૂ આપો',
-    viewCard: 'વીઆઈપી પાસ',
-    backToHome: 'બુટીક પર પાછા જાઓ',
+    shopCategory: 'Luxury Clothing Boutique',
+    privilegePass: 'Privilege Pass',
+    rateVisit: 'Visit ko Rate karein',
+    viewCard: 'VIP Pass dekhein',
+    backToHome: 'Boutique Home par wapas jayein',
 
     // Hero Section
-    heroBadge: 'નવું સીઝનલ કલેક્શન',
-    heroTitle: 'તમારી સ્ટાઇલ દર્શાવો અને તમારો અનુભવ જણાવો',
+    heroBadge: 'New Seasonal Collection',
+    heroTitle: 'Apni Style show karein aur Experience share karein',
     heroSubtitle:
-      'અમે શ્રેષ્ઠ અને આધુનિક ફેશન રજૂ કરીએ છીએ. તમારો પ્રતિભાવ અમારા કલેક્શનને વધુ સારું બનાવવામાં મદદ કરે છે.',
-    rateExperienceCta: 'ખરીદીનો રિવ્યૂ આપો',
-    viewCollectionCta: 'પ્રોડક્ટ્સ જુઓ',
+      'Hum contemporary elegance aur modern outfits design karte hain. Aapka feedback hamari collections ko improve karne me help karta hai.',
+    rateExperienceCta: 'Rate & Review Your Visit',
+    viewCollectionCta: 'Featured Collection dekhein',
 
     // Rating & Feedback Form
-    ratingHeading: 'તમારો ખરીદીનો અનુભવ કેવો રહ્યો?',
-    ratingSubtitle: 'તમારો રિવ્યૂ તૈયાર કરવા માટે રેટિંગ પસંદ કરો',
-    ratingLabel: 'તમારું રેટિંગ પસંદ કરો',
-    ratingHintDefault: 'રેટિંગ આપવા માટે સ્ટાર પર ક્લિક કરો',
-    rating1: '૧ સ્ટાર — અપેક્ષા મુજબ ન હતું',
-    rating2: '૨ સ્ટાર — સુધારાની જરૂર છે',
-    rating3: '૩ સ્ટાર — સામાન્ય અનુભવ',
-    rating4: '૪ સ્ટાર — કલેક્શન ખૂબ સરસ લાગ્યું',
-    rating5: '૫ સ્ટાર — અદ્ભુત કલેક્શન અને ઉત્તમ સર્વિસ!',
-    selectRatingError: 'કૃપા કરીને પહેલાં રેટિંગ પસંદ કરો.',
+    ratingHeading: 'Aapka shopping experience kaisa raha?',
+    ratingSubtitle: 'Review customize karne ke liye rating select karein',
+    ratingLabel: 'Apna rating choose karein',
+    ratingHintDefault: 'Rating dene ke liye star par tap karein',
+    rating1: '1 Star — Disappointing experience',
+    rating2: '2 Stars — Improvement ki zarurat hai',
+    rating3: '3 Stars — Average shopping experience',
+    rating4: '4 Stars — Collection kaafi acchi lagi',
+    rating5: '5 Stars — Amazing collection & superb staff service!',
+    selectRatingError: 'Kripya pehle rating select karein.',
 
     // Tags
-    highlightsLabel: 'તમને શું સૌથી વધુ ગમ્યું?',
-    highlightsSubtitle: 'તમારા અનુભવ મુજબ યોગ્ય વિકલ્પો પસંદ કરો',
+    highlightsLabel: 'Aapko store me sabse accha kya laga?',
+    highlightsSubtitle: 'Apne shopping experience se related tags choose karein',
 
     // Feedback notes
-    notesLabel: 'વધારાની વિગતો (મરજિયાત)',
-    notesPlaceholder: 'કપડાં, ફિટિંગ અથવા સ્ટાફ વિશે કોઈ ખાસ વાત જણાવો...',
-    charCount: 'અક્ષરો બાકી',
+    notesLabel: 'Additional Comments (Optional)',
+    notesPlaceholder: 'Fabric, fitting, ya store service ke baare me likhein...',
+    charCount: 'characters remaining',
 
     // Contact
-    contactOptionalLabel: 'મોબાઇલ નંબર અથવા ઇમેઇલ (મરજિયાત)',
-    contactPlaceholder: 'ઓર્ડર અથવા ફિટિંગ સંબંધી સંપર્ક માટે...',
+    contactOptionalLabel: 'Phone Number ya Email (Optional)',
+    contactPlaceholder: 'Orders ya alteration updates ke liye...',
     privacyNotice:
-      'તમારી ગોપનીયતા સુરક્ષિત છે. તમારો અંગત અભિપ્રાય માત્ર સ્ટોર મેનેજમેન્ટ જોઈ શકે છે.',
+      'Aapki privacy 100% safe hai. Private feedback sirf store management ke paas jayega.',
 
     // Actions
-    generateReview: 'રિવ્યૂ બનાવો',
-    generatingReview: 'તમારા માટે રિવ્યૂ તૈયાર થઈ રહ્યો છે...',
-    submitPrivateFeedback: 'સ્ટોરને અભિપ્રાય મોકલો',
-    submitting: 'સાચવી રહ્યા છીએ...',
-    reviewReadyTitle: 'તમારા રિવ્યૂ તૈયાર છે',
-    reviewReadySubtitle: 'નીચેનામાંથી કોઈપણ રિવ્યૂ પસંદ કરો, જરૂર મુજબ બદલો અને Google પર પોસ્ટ કરો.',
+    generateReview: 'Review generate karein',
+    generatingReview: 'Personalized drafts generate ho rahe hain...',
+    submitPrivateFeedback: 'Store ko Private Feedback bhejein',
+    submitting: 'Saving...',
+    reviewReadyTitle: 'Aapke AI Review Suggestions Ready hain',
+    reviewReadySubtitle: 'Neeche diye gaye kisi bhi draft ko select karein, edit karein aur 1-click me Google Reviews par copy karein.',
 
     // Success State
-    thankYouTitle: 'તમારા પ્રતિભાવ બદલ ખૂબ ખૂબ આભાર!',
+    thankYouTitle: 'Aapke feedback ke liye Thank You!',
     thankYouMessage:
-      'તમારો અભિપ્રાય અમારા ફેબ્રિક, ફિટિંગ અને ગ્રાહક સેવાને વધુ ઉત્કૃષ્ટ બનાવવામાં મદદરૂપ થશે.',
-    copyToGoogleCta: 'કોપી કરો અને Google પર રિવ્યૂ આપો',
-    viewPrivilegeCardCta: 'તમારો વીઆઈપી પાસ જુઓ',
+      'Aapka honest feedback hamare fabric, fitting aur customer service ko elevate karne me madad karega.',
+    copyToGoogleCta: 'Copy karein aur Google Reviews par Continue karein',
+    viewPrivilegeCardCta: 'Apna VIP Privilege Pass dekhein',
 
     // Products Section
-    featuredProductsTitle: 'ખાસ પ્રોડક્ટ્સ',
-    featuredProductsSubtitle: 'નવા આગમન, ટ્રેન્ડિંગ ડિઝાઇન્સ અને પ્રીમિયમ કલેક્શન.',
-    allCategories: 'બધાં',
-    viewDetails: 'વિગત જુઓ',
-    sizeLabel: 'સાઇઝ:',
-    colorLabel: 'કલર્સ:',
-    noProductsFound: 'આ કેટેગરીમાં હાલ કોઈ પ્રોડક્ટ ઉપલબ્ધ નથી.',
+    featuredProductsTitle: 'Featured Collection',
+    featuredProductsSubtitle: 'Handpicked trending designs, seasonal drops aur designer wear.',
+    allCategories: 'All',
+    viewDetails: 'Details dekhein',
+    sizeLabel: 'Sizes:',
+    colorLabel: 'Colors:',
+    noProductsFound: 'Is category me abhi koi products available nahi hain.',
 
     // Offers Section
-    specialOffersTitle: 'ખાસ ઑફર્સ અને ડિસ્કાઉન્ટ',
-    specialOffersSubtitle: 'સીઝનલ ઑફર્સ, ઉત્સવની છૂટછાટ અને વિશેષ ગ્રાહક લાભ.',
-    validTill: 'વૈધતા:',
-    offerTerms: 'નિયમો અને શરતો',
-    claimOffer: 'સ્ટોર પર મેળવો',
-    noOffersFound: 'હાલમાં કોઈ સક્રિય ઑફર ઉપલબ્ધ નથી.',
+    specialOffersTitle: 'Exclusive Boutique Offers',
+    specialOffersSubtitle: 'Seasonal discounts, festive sales aur VIP privileges.',
+    validTill: 'Valid till:',
+    offerTerms: 'Terms & Conditions',
+    claimOffer: 'Store par Claim karein',
+    noOffersFound: 'Filhaal koi active offers nahi hain. Jald hi new offers check karein!',
 
     // Social & Footer
-    connectTitle: 'અમારા સોશિયલ મીડિયા સાથે જોડાવો',
-    connectSubtitle: 'નવા આગમન અને કલેક્શન માટે અમને ફોલો કરો.',
-    footerCopyright: 'સર્વાધિકાર સુરક્ષિત. લક્ઝરી રિટેલ અનુભવ.',
+    connectTitle: 'Hamare Social Media se Judein',
+    connectSubtitle: 'New arrivals aur latest styling lookbooks ke liye follow karein.',
+    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
   },
 };
 

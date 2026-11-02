@@ -12,7 +12,7 @@ export interface GenerateReviewDraftsInput {
   rating: number; // 1 to 5
   selectedTags: string[]; // Controlled whitelist tags
   customerNote?: string; // Optional user note (max 1000 characters)
-  language: LanguageCode; // 'en' | 'hi' | 'hinglish'
+  language: LanguageCode; // 'en' | 'gujlish' | 'hinglish'
   shopName?: string; // Single boutique branding
 }
 

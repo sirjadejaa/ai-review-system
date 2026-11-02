@@ -33,7 +33,7 @@ export function LanguageProvider({
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem(STORAGE_KEY);
-      if (stored && (stored === 'en' || stored === 'hi' || stored === 'gu')) {
+      if (stored && (stored === 'en' || stored === 'gujlish' || stored === 'hinglish')) {
         setLanguageState(stored as SupportedLanguage);
       }
     } catch {

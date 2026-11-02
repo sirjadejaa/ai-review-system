@@ -380,7 +380,7 @@ export async function getGoogleReviewById(id: string) {
 export async function saveGoogleReviewDraft(params: {
   reviewId: string;
   draftText: string;
-  language: 'en' | 'hi' | 'gu';
+  language: 'en' | 'gujlish' | 'hinglish';
 }) {
   const draft = await prisma.googleReviewReplyDraft.create({
     data: {

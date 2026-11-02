@@ -4,8 +4,8 @@ import type { GenerateReviewDraftsInput } from './types';
  * System prompt for clothing boutique review generation.
  * Supports exactly three languages:
  *  - English ('en')
- *  - Hindi ('hi' in Devanagari script)
- *  - Gujarati ('gu' in Gujarati Unicode script)
+ *  - Gujlish ('gujlish': natural Gujarati + English code-mixed conversation)
+ *  - Hinglish ('hinglish': natural Hindi + English code-mixed conversation in Roman script)
  * Enforces strict non-fabrication, prompt injection defense,
  * rating-based tone matching, and structured 3-draft output.
  */
@@ -19,8 +19,8 @@ CRITICAL HUMAN-STYLE RULES:
    - AVOID phrases like: "I had an exquisite shopping extravaganza", "The couture collection was beyond words", "I wholeheartedly endorse this establishment for all sartorial desires".
 2. Keep it conversational, realistic, and believable:
    - English example: "Loved the fabric quality and the fitting was spot on. Staff was super polite and helped me choose the right size."
-   - Hindi example: "कपड़ों की क्वालिटी बहुत बढ़िया थी और फिटिंग भी एकदम सही आई। स्टाफ का व्यवहार बहुत मददगार था।"
-   - Gujarati example: "કપડાંની ગુણવત્તા ખૂબ સરસ છે અને ફિટિંગ એકદમ પરફેક્ટ આવી. સ્ટાફનો વ્યવહાર પણ બહુ મદદગાર રહ્યો."
+   - Gujlish example: "Collection ખૂબ જ સરસ હતું અને fabric quality એકદમ super છે. Staff પણ બહુ polite અને helpful હતો."
+   - Hinglish example: "Boutique ka collection bohot stylish tha aur fabric quality bhi super thi. Staff ka behaviour bohot polite tha."
 3. Make the 3 drafts meaningfully DIFFERENT from each other:
    - Draft 1 (Short & Casual): 1 quick natural sentence.
    - Draft 2 (Warm & Natural): 2 conversational sentences focusing on the visit.
@@ -42,10 +42,10 @@ TONE MATCHING BY RATING:
 - 2 Stars: Sizing or service issues, disappointed, polite.
 - 1 Star: Frank, frustrated with quality/service/experience, factual.
 
-LANGUAGE SCRIPT RULES:
-- "en": Natural conversational English.
-- "hi": Genuine Hindi in proper Devanagari script (हिन्दी).
-- "gu": Authentic, natural Gujarati written strictly in proper Gujarati Unicode script (ગુજરાતી લિપિ).
+LANGUAGE SCRIPT & MIXING RULES:
+- "en": Natural, fluent conversational English.
+- "gujlish": Natural Gujarati + English code-mixed conversation. Use conversational Gujarati with commonly used English words (e.g. collection, fabric, quality, fitting, size, staff, shopping experience).
+- "hinglish": Natural Hindi + English code-mixed conversation written in natural Roman/Latin script (e.g. "Aapka shopping experience kaisa raha?", "Hamari collection aapko kaisi lagi?").
 
 OUTPUT SPECIFICATION:
 Output ONLY valid JSON with exactly 3 drafts:
@@ -63,8 +63,8 @@ Output ONLY valid JSON with exactly 3 drafts:
 export function buildUserPrompt(input: GenerateReviewDraftsInput): string {
   const languageNames: Record<string, string> = {
     en: 'English',
-    hi: 'Hindi (Devanagari script)',
-    gu: 'Gujarati (proper Gujarati Unicode script)',
+    gujlish: 'Gujlish (natural Gujarati-English code-mixed conversation)',
+    hinglish: 'Hinglish (natural Hindi-English code-mixed conversation in Roman script)',
   };
 
   const safeTags = input.selectedTags.length > 0 ? input.selectedTags.join(', ') : 'None selected';
@@ -92,7 +92,7 @@ export interface GenerateOwnerReplyInput {
   rating: number; // 1 to 5
   reviewText?: string | null;
   shopName: string;
-  language: 'en' | 'hi' | 'gu';
+  language: 'en' | 'gujlish' | 'hinglish';
 }
 
 /**
@@ -112,10 +112,10 @@ CORE REPLY PRINCIPLES:
    - Do NOT offer specific monetary discounts, coupon codes, or unverified refunds.
    - Do NOT disclose private customer information.
 4. Concise: 2 to 4 sentences maximum. Respect the customer's reading time.
-5. Language Scripts:
+5. Language Scripts & Styles:
    - English ("en"): Professional, warm, and natural English.
-   - Hindi ("hi"): Proper Devanagari script (हिन्दी), polite and welcoming (using 'आप', 'धन्यवाद').
-   - Gujarati ("gu"): Authentic Gujarati in proper Gujarati Unicode script (ગુજરાતી), respectful (using 'આપ', 'આભાર').
+   - Gujlish ("gujlish"): Natural Gujarati-English conversational mix. Warm, polite, respectful (e.g., "Thank you so much aapna feedback maate! We are delighted ke tamne collection ane fabric quality pasand aavya.").
+   - Hinglish ("hinglish"): Natural Hindi-English conversational mix written in Roman script (e.g., "Thank you so much aapke feedback ke liye! Humein bohot khushi hui ki aapko hamara collection aur fitting pasand aayi.").
 
 OUTPUT FORMAT:
 Return ONLY the reply text string, without quotation marks, markdown headings, or explanation.`;
@@ -126,8 +126,8 @@ Return ONLY the reply text string, without quotation marks, markdown headings, o
 export function buildOwnerReplyUserPrompt(input: GenerateOwnerReplyInput): string {
   const languageLabels: Record<string, string> = {
     en: 'English',
-    hi: 'Hindi (Devanagari script)',
-    gu: 'Gujarati (proper Gujarati Unicode script)',
+    gujlish: 'Gujlish (natural Gujarati-English code-mixed conversation)',
+    hinglish: 'Hinglish (natural Hindi-English conversational mix in Roman script)',
   };
 
   const reviewContent = input.reviewText && input.reviewText.trim()

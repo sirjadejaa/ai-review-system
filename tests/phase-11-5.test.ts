@@ -151,29 +151,28 @@ describe('Phase 11.5: Product UI Transformation, Real Data & Production UX Tests
       }
     });
 
-    it('generates authentic Gujarati and Hindi reviews naturally', async () => {
-      const gujaratiDrafts = await generator.generateReviewDrafts({
+    it('generates authentic Gujlish and Hinglish reviews naturally', async () => {
+      const gujlishDrafts = await generator.generateReviewDrafts({
         rating: 5,
         selectedTags: ['Clothing Quality'],
         customerNote: '',
-        language: 'gu',
+        language: 'gujlish',
         shopName: 'Aura Boutique',
       });
 
-      expect(gujaratiDrafts).toHaveLength(3);
-      expect(/[\u0A80-\u0AFF]/.test(gujaratiDrafts[0].text)).toBe(true);
+      expect(gujlishDrafts).toHaveLength(3);
+      expect(/[\u0A80-\u0AFF]/.test(gujlishDrafts[0].text)).toBe(true);
 
-      const hindiDrafts = await generator.generateReviewDrafts({
+      const hinglishDrafts = await generator.generateReviewDrafts({
         rating: 5,
         selectedTags: ['Fabric Quality'],
         customerNote: '',
-        language: 'hi',
+        language: 'hinglish',
         shopName: 'Aura Boutique',
       });
 
-      expect(hindiDrafts).toHaveLength(3);
-      const hasDevanagari = /[\u0900-\u097F]/.test(hindiDrafts[0].text);
-      expect(hasDevanagari).toBe(true);
+      expect(hinglishDrafts).toHaveLength(3);
+      expect(hinglishDrafts[0].text.length).toBeGreaterThan(15);
     });
 
     it('strictly preserves non-fabrication rules in system prompt and user prompt', () => {

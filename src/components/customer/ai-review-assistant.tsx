@@ -25,8 +25,8 @@ export interface AIReviewAssistantProps {
 
 const LANGUAGES: { code: LanguageCode; label: string; scriptHint: string }[] = [
   { code: 'en', label: 'English', scriptHint: 'Standard English' },
-  { code: 'hi', label: 'हिन्दी', scriptHint: 'Devanagari' },
-  { code: 'gu', label: 'ગુજરાતી', scriptHint: 'Gujarati Unicode' },
+  { code: 'gujlish', label: 'ગુજરાતી + English (Gujlish)', scriptHint: 'Gujlish' },
+  { code: 'hinglish', label: 'हिंदी + English (Hinglish)', scriptHint: 'Hinglish' },
 ];
 
 const DRAFT_STYLE_LABELS = ['Recommended', 'Short', 'Detailed'];
@@ -41,12 +41,12 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
 }) => {
   const { language: globalLang } = useLanguage();
   const [language, setLanguage] = useState<LanguageCode>(
-    globalLang === 'gu' || globalLang === 'hi' ? globalLang : 'en'
+    globalLang === 'gujlish' || globalLang === 'hinglish' ? globalLang : 'en'
   );
 
   // Synchronize with global language selector
   useEffect(() => {
-    if (globalLang === 'en' || globalLang === 'hi' || globalLang === 'gu') {
+    if (globalLang === 'en' || globalLang === 'gujlish' || globalLang === 'hinglish') {
       setLanguage(globalLang);
     }
   }, [globalLang]);

@@ -41,8 +41,8 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       }
     });
 
-    it('accepts all three supported languages (en, hi, gu)', () => {
-      ['en', 'hi', 'gu'].forEach((lang) => {
+    it('accepts all three supported languages (en, gujlish, hinglish)', () => {
+      ['en', 'gujlish', 'hinglish'].forEach((lang) => {
         const result = GenerateReviewDraftsInputSchema.safeParse({
           rating: 4,
           language: lang,
@@ -106,34 +106,47 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       });
     });
 
-    it('generates Hindi drafts in Devanagari script', async () => {
-      const provider = new MockAIProvider();
-      const drafts = await provider.generateReviewDrafts({
-        rating: 5,
-        selectedTags: ['Medicines in Stock'],
-        language: 'hi',
-      });
-
-      expect(drafts).toHaveLength(3);
-      // Verify Devanagari characters presence
-      const hasDevanagari = drafts.some((d) => /[\u0900-\u097F]/.test(d.text));
-      expect(hasDevanagari).toBe(true);
-    });
-
-    it('generates Gujarati drafts in authentic Gujarati Unicode script', async () => {
+    it('generates Hinglish drafts in natural conversational Roman script', async () => {
       const provider = new MockAIProvider();
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
         selectedTags: ['Clothing Quality'],
-        language: 'gu',
+        language: 'hinglish',
       });
 
       expect(drafts).toHaveLength(3);
       drafts.forEach((d) => {
-        expect(d.language).toBe('gu');
+        expect(d.language).toBe('hinglish');
+        expect(d.text.length).toBeGreaterThan(15);
+      });
+      const combined = drafts.map((d) => d.text).join(' ');
+      expect(
+        combined.toLowerCase().includes('collection') ||
+          combined.toLowerCase().includes('quality') ||
+          combined.toLowerCase().includes('shopping')
+      ).toBe(true);
+    });
+
+    it('generates Gujlish drafts with Gujarati Unicode script and English terms', async () => {
+      const provider = new MockAIProvider();
+      const drafts = await provider.generateReviewDrafts({
+        rating: 5,
+        selectedTags: ['Clothing Quality'],
+        language: 'gujlish',
+      });
+
+      expect(drafts).toHaveLength(3);
+      drafts.forEach((d) => {
+        expect(d.language).toBe('gujlish');
         // Must contain Gujarati characters
         expect(/[\u0A80-\u0AFF]/.test(d.text)).toBe(true);
       });
+      const combined = drafts.map((d) => d.text).join(' ');
+      expect(
+        combined.toLowerCase().includes('collection') ||
+          combined.toLowerCase().includes('quality') ||
+          combined.toLowerCase().includes('shopping')
+      ).toBe(true);
     });
   });
 

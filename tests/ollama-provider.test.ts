@@ -179,17 +179,15 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
       const provider = new OllamaProvider('test-key', 'gemma4:31b');
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Medicines in Stock'],
-        language: 'hi',
+        selectedTags: ['Clothing Quality'],
+        language: 'hinglish',
       });
 
       expect(drafts).toHaveLength(3);
-      expect(drafts[0].language).toBe('hi');
-      const hasDevanagari = drafts.some((d) => /[\u0900-\u097F]/.test(d.text));
-      expect(hasDevanagari).toBe(true);
+      expect(drafts[0].language).toBe('hinglish');
     });
 
-    it('generates Gujarati drafts in authentic Gujarati Unicode script', async () => {
+    it('generates Gujlish drafts in natural Gujarati script with English terms', async () => {
       globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
@@ -198,9 +196,9 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
               message: {
                 content: JSON.stringify({
                   drafts: [
-                    { id: 'draft-1', text: 'સ્ટાફનો વ્યવહાર ખૂબ સરસ હતો અને કલેક્શન ઉત્તમ છે.' },
-                    { id: 'draft-2', text: 'કપડાંની ગુણવત્તા અને ફિટિંગ એકદમ પરફેક્ટ છે.' },
-                    { id: 'draft-3', text: 'ખરીદીનો સારો અનુભવ રહ્યો.' },
+                    { id: 'draft-1', text: 'Loved the collection! Staff નો behaviour super હતો.' },
+                    { id: 'draft-2', text: 'Fabric quality અને fitting એકદમ perfect છે.' },
+                    { id: 'draft-3', text: 'Awesome shopping experience રહ્યો.' },
                   ],
                 }),
               },
@@ -213,12 +211,12 @@ describe('Ollama Cloud Provider (OpenAI-compatible Chat Completions)', () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
         selectedTags: ['Clothing Quality'],
-        language: 'gu',
+        language: 'gujlish',
       });
 
       expect(drafts).toHaveLength(3);
       drafts.forEach((d) => {
-        expect(d.language).toBe('gu');
+        expect(d.language).toBe('gujlish');
         expect(/[\u0A80-\u0AFF]/.test(d.text)).toBe(true);
       });
     });

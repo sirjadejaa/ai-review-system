@@ -44,7 +44,7 @@ export async function syncGoogleReviewsAction(): Promise<{
  */
 export async function generateAIReplyAction(params: {
   reviewId: string;
-  language: 'en' | 'hi' | 'gu';
+  language: 'en' | 'gujlish' | 'hinglish';
 }): Promise<{
   success: boolean;
   message: string;
@@ -110,7 +110,7 @@ export async function generateAIReplyAction(params: {
 export async function saveReplyDraftAction(params: {
   reviewId: string;
   draftText: string;
-  language: 'en' | 'hi' | 'gu';
+  language: 'en' | 'gujlish' | 'hinglish';
 }): Promise<{ success: boolean; message: string; draftId?: string }> {
   await requireAdmin('/admin/google-reviews');
 

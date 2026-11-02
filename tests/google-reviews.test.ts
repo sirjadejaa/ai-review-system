@@ -91,7 +91,7 @@ describe('Google Business Profile & AI Review Management System', () => {
       expect(AI_OWNER_REPLY_SYSTEM_PROMPT).toContain('Concise: 2 to 4 sentences maximum');
     });
 
-    it('builds owner reply prompt for English, Hindi, and Gujarati', () => {
+    it('builds owner reply prompt for English, Gujlish, and Hinglish', () => {
       const promptEn = buildOwnerReplyUserPrompt({
         reviewerName: 'Ananya Roy',
         rating: 5,
@@ -105,31 +105,31 @@ describe('Google Business Profile & AI Review Management System', () => {
       expect(promptEn).toContain('5 / 5 stars');
       expect(promptEn).toContain('English');
 
-      const promptHi = buildOwnerReplyUserPrompt({
+      const promptHinglish = buildOwnerReplyUserPrompt({
         reviewerName: 'Manish Verma',
         rating: 2,
         reviewText: 'Fabric was rough and size exchange was slow.',
         shopName: 'Heritage Threads',
-        language: 'hi',
+        language: 'hinglish',
       });
 
-      expect(promptHi).toContain('Hindi (Devanagari script)');
-      expect(promptHi).toContain('2 / 5 stars');
+      expect(promptHinglish).toContain('Hinglish');
+      expect(promptHinglish).toContain('2 / 5 stars');
 
-      const promptGu = buildOwnerReplyUserPrompt({
+      const promptGujlish = buildOwnerReplyUserPrompt({
         reviewerName: 'Bhavna Ben',
         rating: 4,
         reviewText: 'Saree designs are great.',
         shopName: 'Heritage Threads',
-        language: 'gu',
+        language: 'gujlish',
       });
 
-      expect(promptGu).toContain('Gujarati (proper Gujarati Unicode script)');
-      expect(promptGu).toContain('Bhavna Ben');
+      expect(promptGujlish).toContain('Gujlish');
+      expect(promptGujlish).toContain('Bhavna Ben');
     });
   });
 
-  describe('4. AI Owner Reply Draft Generation in 3 Languages', () => {
+  describe('4. AI Owner Reply Draft Generation in 3 Languages (en, gujlish, hinglish)', () => {
     const provider = new MockAIProvider();
 
     it('generates warm, personal 5-star owner reply in English acknowledging customer', async () => {
@@ -146,34 +146,34 @@ describe('Google Business Profile & AI Review Management System', () => {
       expect(reply.length).toBeGreaterThan(30);
     });
 
-    it('generates respectful Hindi owner reply in Devanagari script', async () => {
+    it('generates natural Hinglish owner reply in conversational Roman script', async () => {
       const reply = await provider.generateOwnerReplyDraft({
         reviewerName: 'Rajesh Kumar',
         rating: 5,
         reviewText: 'Bahut achhi fitting aur kapda hai.',
         shopName: 'Aura Boutique',
-        language: 'hi',
+        language: 'hinglish',
       });
 
-      // Must be in Devanagari Unicode
-      expect(/[\u0900-\u097F]/.test(reply)).toBe(true);
-      expect(reply).toContain('धन्यवाद');
+      expect(reply).toContain('Rajesh');
       expect(reply).toContain('Aura Boutique');
+      expect(reply.toLowerCase()).toContain('feedback');
+      expect(reply.toLowerCase()).toContain('collection');
     });
 
-    it('generates respectful Gujarati owner reply in Gujarati Unicode script', async () => {
+    it('generates natural Gujlish owner reply with conversational Gujarati-English mix', async () => {
       const reply = await provider.generateOwnerReplyDraft({
         reviewerName: 'Pooja Ben',
         rating: 4,
         reviewText: 'Saras kapda ane fitting.',
         shopName: 'Aura Boutique',
-        language: 'gu',
+        language: 'gujlish',
       });
 
-      // Must be in Gujarati Unicode
-      expect(/[\u0A80-\u0AFF]/.test(reply)).toBe(true);
-      expect(reply).toContain('આભાર');
+      expect(reply).toContain('Pooja');
       expect(reply).toContain('Aura Boutique');
+      expect(/[\u0A80-\u0AFF]/.test(reply)).toBe(true);
+      expect(reply.toLowerCase()).toContain('thank you');
     });
 
     it('generates empathetic, non-defensive reply for 1-star negative review', async () => {
@@ -188,17 +188,17 @@ describe('Google Business Profile & AI Review Management System', () => {
       expect(replyEn.toLowerCase()).toContain('sorry');
       expect(replyEn).toContain('Vikas');
 
-      const replyGu = await provider.generateOwnerReplyDraft({
+      const replyGujlish = await provider.generateOwnerReplyDraft({
         reviewerName: 'Vikas Shah',
         rating: 1,
         reviewText: 'Stock na hatho.',
         shopName: 'Aura Boutique',
-        language: 'gu',
+        language: 'gujlish',
       });
 
-      // Gujarati apology / regret
-      expect(/[\u0A80-\u0AFF]/.test(replyGu)).toBe(true);
-      expect(replyGu).toContain('ખેદ');
+      expect(replyGujlish).toContain('Vikas');
+      expect(replyGujlish.toLowerCase()).toContain('sorry');
+      expect(/[\u0A80-\u0AFF]/.test(replyGujlish)).toBe(true);
     });
   });
 });

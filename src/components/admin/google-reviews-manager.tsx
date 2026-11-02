@@ -97,7 +97,7 @@ export const GoogleReviewsManager: React.FC<GoogleReviewsManagerProps> = ({
 
   // Active Reply Modal State
   const [activeReview, setActiveReview] = useState<GoogleReviewWithDrafts | null>(null);
-  const [replyLanguage, setReplyLanguage] = useState<'en' | 'hi' | 'gu'>('en');
+  const [replyLanguage, setReplyLanguage] = useState<'en' | 'gujlish' | 'hinglish'>('en');
   const [replyText, setReplyText] = useState('');
   const [activeDraftId, setActiveDraftId] = useState<string | undefined>(undefined);
   const [isCopied, setIsCopied] = useState(false);
@@ -181,7 +181,7 @@ export const GoogleReviewsManager: React.FC<GoogleReviewsManagerProps> = ({
     if (review.drafts && review.drafts.length > 0) {
       const latest = review.drafts[0];
       setReplyText(latest.draftText);
-      setReplyLanguage((latest.language as 'en' | 'hi' | 'gu') || 'en');
+      setReplyLanguage((latest.language as 'en' | 'gujlish' | 'hinglish') || 'en');
       setActiveDraftId(latest.id);
       return;
     }
@@ -207,7 +207,7 @@ export const GoogleReviewsManager: React.FC<GoogleReviewsManagerProps> = ({
   };
 
   // Regenerate Draft with Selected Language
-  const handleRegenerateDraft = async (lang: 'en' | 'hi' | 'gu') => {
+  const handleRegenerateDraft = async (lang: 'en' | 'gujlish' | 'hinglish') => {
     if (!activeReview) return;
     setReplyLanguage(lang);
     setIsGenerating(true);
@@ -780,7 +780,7 @@ export const GoogleReviewsManager: React.FC<GoogleReviewsManagerProps> = ({
                   className={styles.selectInput}
                   value={replyLanguage}
                   onChange={(e) => {
-                    const l = e.target.value as 'en' | 'hi' | 'gu';
+                    const l = e.target.value as 'en' | 'gujlish' | 'hinglish';
                     setReplyLanguage(l);
                     handleRegenerateDraft(l);
                   }}
@@ -788,8 +788,8 @@ export const GoogleReviewsManager: React.FC<GoogleReviewsManagerProps> = ({
                   aria-label="Select reply language"
                 >
                   <option value="en">English</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
-                  <option value="gu">ગુજરાતી (Gujarati)</option>
+                  <option value="gujlish">ગુજરાતી + English (Gujlish)</option>
+                  <option value="hinglish">हिंदी + English (Hinglish)</option>
                 </select>
 
                 <Button

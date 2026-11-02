@@ -6,11 +6,11 @@ import {
 } from '@/lib/i18n/translations';
 import type { SupportedLanguage } from '@/lib/i18n/translations';
 
-describe('Multilingual i18n System (Strictly 3 Languages: English, Hindi, Gujarati)', () => {
-  const supportedLanguages: SupportedLanguage[] = ['en', 'hi', 'gu'];
+describe('Multilingual i18n System (Exact 3 Languages: English, Gujlish, Hinglish)', () => {
+  const supportedLanguages: SupportedLanguage[] = ['en', 'gujlish', 'hinglish'];
 
-  it('supports exactly three languages: en, hi, gu and no more', () => {
-    expect(LANGUAGE_OPTIONS.map((o) => o.code)).toEqual(['en', 'hi', 'gu']);
+  it('supports exactly three languages: en, gujlish, hinglish and no more', () => {
+    expect(LANGUAGE_OPTIONS.map((o) => o.code)).toEqual(['en', 'gujlish', 'hinglish']);
     expect(LANGUAGE_OPTIONS).toHaveLength(3);
 
     for (const lang of supportedLanguages) {
@@ -22,67 +22,57 @@ describe('Multilingual i18n System (Strictly 3 Languages: English, Hindi, Gujara
     }
   });
 
-  it('uses authentic Gujarati Unicode characters (U+0A80 to U+0AFF) in Gujarati (gu)', () => {
-    const gujDict = TRANSLATIONS.gu;
-    const gujRegex = /[\u0A80-\u0AFF]/;
-
-    expect(gujRegex.test(gujDict.ratingHeading)).toBe(true);
-    expect(gujRegex.test(gujDict.ratingLabel)).toBe(true);
-    expect(gujRegex.test(gujDict.generateReview)).toBe(true);
-    expect(gujRegex.test(gujDict.copyToGoogleCta)).toBe(true);
-    expect(gujRegex.test(gujDict.notesLabel)).toBe(true);
-
-    // Exact matches with specification
-    expect(gujDict.ratingHeading).toBe('તમારો ખરીદીનો અનુભવ કેવો રહ્યો?');
-    expect(gujDict.ratingLabel).toBe('તમારું રેટિંગ પસંદ કરો');
-    expect(gujDict.generateReview).toBe('રિવ્યૂ બનાવો');
+  it('renders exact language selector labels required by the specification', () => {
+    const labels = LANGUAGE_OPTIONS.map((o) => o.nativeLabel);
+    expect(labels).toContain('English');
+    expect(labels).toContain('ગુજરાતી + English (Gujlish)');
+    expect(labels).toContain('हिंदी + English (Hinglish)');
   });
 
-  it('uses authentic Hindi Devanagari characters (U+0900 to U+097F) in Hindi (hi)', () => {
-    const hiDict = TRANSLATIONS.hi;
-    const hiRegex = /[\u0900-\u097F]/;
+  it('uses natural code-mixed Gujarati-English phrasing in Gujlish', () => {
+    const gujlishDict = TRANSLATIONS.gujlish;
 
-    expect(hiRegex.test(hiDict.ratingHeading)).toBe(true);
-    expect(hiRegex.test(hiDict.ratingLabel)).toBe(true);
-    expect(hiRegex.test(hiDict.generateReview)).toBe(true);
-    expect(hiRegex.test(hiDict.copyToGoogleCta)).toBe(true);
-    expect(hiRegex.test(hiDict.notesLabel)).toBe(true);
-
-    expect(hiDict.ratingHeading).toBe('आपकी खरीदारी का अनुभव कैसा रहा?');
-    expect(hiDict.ratingLabel).toBe('अपनी रेटिंग चुनें');
-    expect(hiDict.generateReview).toBe('रिव्यू बनाएं');
+    // Gujlish mixes conversational English terms with Gujarati script
+    expect(gujlishDict.ratingHeading).toBe('તમારો shopping experience કેવો રહ્યો?');
+    expect(gujlishDict.ratingLabel).toBe('તમારું rating પસંદ કરો');
+    expect(gujlishDict.generateReview).toBe('Review બનાવો');
+    expect(gujlishDict.copyToGoogleCta).toContain('Google Reviews');
+    expect(/[\u0A80-\u0AFF]/.test(gujlishDict.ratingHeading)).toBe(true);
+    expect(gujlishDict.ratingHeading.toLowerCase()).toContain('shopping experience');
   });
 
-  it('provides translations for all 11 clothing-specific review tags in en, hi, and gu', () => {
+  it('uses natural conversational Hindi-English phrasing in Hinglish', () => {
+    const hinglishDict = TRANSLATIONS.hinglish;
+
+    // Hinglish mixes conversational Hindi with common English words
+    expect(hinglishDict.ratingHeading).toBe('Aapka shopping experience kaisa raha?');
+    expect(hinglishDict.ratingLabel).toBe('Apna rating choose karein');
+    expect(hinglishDict.generateReview).toBe('Review generate karein');
+    expect(hinglishDict.ratingHeading.toLowerCase()).toContain('shopping experience');
+    expect(hinglishDict.ratingHeading.toLowerCase()).toContain('aapka');
+  });
+
+  it('provides translations for all 11 clothing-specific review tags in en, gujlish, and hinglish', () => {
     expect(FASHION_TAG_TRANSLATIONS).toHaveLength(11);
-
-    const gujRegex = /[\u0A80-\u0AFF]/;
-    const devanagariRegex = /[\u0900-\u097F]/;
 
     for (const tag of FASHION_TAG_TRANSLATIONS) {
       expect(tag.id).toBeTruthy();
       expect(tag.en).toBeTruthy();
-      expect(tag.hi).toBeTruthy();
-      expect(tag.gu).toBeTruthy();
-
-      // Gujarati tag must contain proper Gujarati script
-      expect(gujRegex.test(tag.gu)).toBe(true);
-      // Hindi tag must contain proper Devanagari script
-      expect(devanagariRegex.test(tag.hi)).toBe(true);
+      expect(tag.gujlish).toBeTruthy();
+      expect(tag.hinglish).toBeTruthy();
     }
   });
 
-  it('renders accurate Gujarati translations for key clothing tags matching the specification', () => {
+  it('renders accurate Gujlish and Hinglish translations for key clothing tags', () => {
     const tagMap = new Map(FASHION_TAG_TRANSLATIONS.map((t) => [t.id, t]));
 
-    expect(tagMap.get('Clothing Quality')?.gu).toBe('કપડાંની ગુણવત્તા');
-    expect(tagMap.get('Fabric Quality')?.gu).toBe('ફેબ્રિક');
-    expect(tagMap.get('Fitting & Sizing')?.gu).toBe('ફિટિંગ અને સાઇઝ');
-    expect(tagMap.get('Design & Collection')?.gu).toBe('ડિઝાઇન');
-    expect(tagMap.get('Comfort')?.gu).toBe('આરામ');
-    expect(tagMap.get('Pricing & Value')?.gu).toBe('કિંમત');
-    expect(tagMap.get('Staff Behaviour')?.gu).toBe('સ્ટાફનો વ્યવહાર');
-    expect(tagMap.get('Collection')?.gu).toBe('કલેક્શન');
-    expect(tagMap.get('Shopping Experience')?.gu).toBe('ખરીદીનો અનુભવ');
+    expect(tagMap.get('Clothing Quality')?.gujlish).toBe('Clothing ની Quality');
+    expect(tagMap.get('Clothing Quality')?.hinglish).toBe('Clothes ki Quality');
+    expect(tagMap.get('Fabric Quality')?.gujlish).toBe('Fabric & Material');
+    expect(tagMap.get('Fabric Quality')?.hinglish).toBe('Fabric & Kapda Quality');
+    expect(tagMap.get('Fitting & Sizing')?.gujlish).toBe('Fitting & Size Options');
+    expect(tagMap.get('Fitting & Sizing')?.hinglish).toBe('Fitting aur Sizing');
+    expect(tagMap.get('Shopping Experience')?.gujlish).toBe('Great Shopping Experience');
+    expect(tagMap.get('Shopping Experience')?.hinglish).toBe('Smooth Shopping Experience');
   });
 });
