@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import type { Offer as PrismaOffer, Prisma } from '@prisma/client';
 import type { DomainOffer } from '@/lib/domain/types';
 import {
   CreateOfferInputSchema,
@@ -7,33 +8,18 @@ import {
   type UpdateOfferInput,
 } from '@/lib/validation/offer-schema';
 
-function toDomain(record: {
-  id: string;
-  title: string;
-  description: string | null;
-  badge: string | null;
-  imageUrl?: string | null;
-  discountInfo?: string | null;
-  startDate?: Date | null;
-  validUntil: Date | null;
-  terms?: string | null;
-  offerUrl?: string | null;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: Date;
-  updatedAt: Date;
-}): DomainOffer {
+function toDomain(record: PrismaOffer): DomainOffer {
   return {
     id: record.id,
     title: record.title,
     description: record.description,
     badge: record.badge,
-    imageUrl: record.imageUrl ?? null,
-    discountInfo: record.discountInfo ?? null,
-    startDate: record.startDate ?? null,
+    imageUrl: record.imageUrl,
+    discountInfo: record.discountInfo,
+    startDate: record.startDate,
     validUntil: record.validUntil,
-    terms: record.terms ?? null,
-    offerUrl: record.offerUrl ?? null,
+    terms: record.terms,
+    offerUrl: record.offerUrl,
     isActive: record.isActive,
     sortOrder: record.sortOrder,
     createdAt: record.createdAt,
@@ -132,7 +118,7 @@ export async function listAllOffers(): Promise<DomainOffer[]> {
 export async function updateOffer(id: string, input: UpdateOfferInput): Promise<DomainOffer | null> {
   const validated = UpdateOfferInputSchema.parse(input);
 
-  const data: Record<string, unknown> = {};
+  const data: Prisma.OfferUpdateInput = {};
   if (validated.title !== undefined) data.title = validated.title;
   if (validated.description !== undefined) data.description = validated.description;
   if (validated.badge !== undefined) data.badge = validated.badge;
