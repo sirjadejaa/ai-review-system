@@ -3,10 +3,40 @@ import { z } from 'zod';
 export const FeedbackStatusSchema = z.enum(['NEW', 'REVIEWED', 'RESOLVED']);
 
 /**
- * Predefined customer experience tags based on the approved product blueprint.
- * Arbitrary user-generated tags are strictly rejected to ensure clean data.
+ * Fashion boutique customer experience tags.
+ * Designed for premium clothing stores, bespoke studios, and apparel retail.
+ */
+export const FASHION_FEEDBACK_TAGS = [
+  'Clothing Quality',
+  'Fabric Quality',
+  'Fitting & Sizing',
+  'Design & Collection',
+  'Comfort',
+  'Pricing & Value',
+  'Staff Behaviour',
+  'Customer Service',
+  'Store Ambience',
+  'Variety & Availability',
+  'Overall Shopping Experience',
+] as const;
+
+/**
+ * Whitelist of all accepted feedback tags including legacy tags for backward compatibility.
  */
 export const PREDEFINED_FEEDBACK_TAGS = [
+  // Premium clothing store tags
+  'Clothing Quality',
+  'Fabric Quality',
+  'Fitting & Sizing',
+  'Design & Collection',
+  'Comfort',
+  'Pricing & Value',
+  'Staff Behaviour',
+  'Customer Service',
+  'Store Ambience',
+  'Variety & Availability',
+  'Overall Shopping Experience',
+  // Legacy backward-compatibility tags
   'Quick Service',
   'Medicines in Stock',
   'Polite Staff',
@@ -16,6 +46,7 @@ export const PREDEFINED_FEEDBACK_TAGS = [
 ] as const;
 
 export type PredefinedFeedbackTag = (typeof PREDEFINED_FEEDBACK_TAGS)[number];
+export type FashionFeedbackTag = (typeof FASHION_FEEDBACK_TAGS)[number];
 
 export const FeedbackTagSchema = z.enum(PREDEFINED_FEEDBACK_TAGS);
 
@@ -30,7 +61,7 @@ export const CreateFeedbackInputSchema = z.object({
     .max(5, 'Rating cannot exceed 5 stars'),
   tags: z
     .array(z.string().trim().min(1, 'Tag cannot be empty'))
-    .max(10, 'Maximum 10 tags allowed')
+    .max(15, 'Maximum 15 tags allowed')
     .default([]),
   notes: z
     .string()

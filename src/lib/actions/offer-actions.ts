@@ -25,7 +25,7 @@ export interface OfferActionResult {
 
 /**
  * Server action to create a new promotional offer.
- * Strictly requires authenticated pharmacy admin session.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function createOfferAction(input: CreateOfferInput): Promise<OfferActionResult> {
   await requireAdmin('/admin/offers');
@@ -70,7 +70,7 @@ export async function createOfferAction(input: CreateOfferInput): Promise<OfferA
 
 /**
  * Server action to update an existing promotional offer.
- * Strictly requires authenticated pharmacy admin session.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function updateOfferAction(
   id: string,
@@ -129,7 +129,7 @@ export async function updateOfferAction(
 
 /**
  * Server action to toggle offer active state (Active <-> Inactive).
- * Strictly requires authenticated pharmacy admin session.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function toggleOfferActiveAction(id: string): Promise<OfferActionResult> {
   await requireAdmin('/admin/offers');
@@ -171,7 +171,7 @@ export async function toggleOfferActiveAction(id: string): Promise<OfferActionRe
 
 /**
  * Server action to permanently delete a promotional offer.
- * Strictly requires authenticated pharmacy admin session.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function deleteOfferAction(id: string): Promise<OfferActionResult> {
   await requireAdmin('/admin/offers');

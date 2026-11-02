@@ -60,7 +60,7 @@ export const ReviewFunnelCard: React.FC<ReviewFunnelCardProps> = ({
 
       <p className={styles.disclaimer}>
         <Info size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} aria-hidden="true" />
-        <strong>Handoff note:</strong> This rate measures customers who reached and clicked the Google handoff CTA. The pharmacy application does not control or scrape Google&apos;s interface to confirm whether reviews were posted.
+        <strong>Handoff note:</strong> This rate measures customers who reached and clicked the Google handoff CTA. The boutique application does not control or scrape Google&apos;s interface to confirm whether reviews were posted.
       </p>
     </div>
   );

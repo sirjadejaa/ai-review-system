@@ -33,7 +33,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
   rating,
   selectedTags,
   customerNote,
-  shopName = 'Pharmacy',
+  shopName = 'Maison & Thread',
   googleReviewUrl,
   source,
 }) => {
@@ -250,10 +250,10 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
         <div className={styles.titleGroup}>
           <h2 className={styles.title} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.2rem', fontWeight: 600 }}>
             <span>Review Suggestions</span>
-            <Badge variant="primary" size="sm">Natural Drafts</Badge>
+            <Badge variant="primary" size="sm">AI Generated</Badge>
           </h2>
           <p className={styles.subtitle}>
-            We created a few natural suggestions based on your rating and feedback.
+            Natural, ready-to-post review drafts tailored to your boutique experience.
           </p>
         </div>
       </div>
@@ -450,7 +450,7 @@ export const AIReviewAssistant: React.FC<AIReviewAssistantProps> = ({
               </div>
             ) : (
               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 'var(--space-2) 0 0' }}>
-                Google Reviews page has not been configured by the pharmacy yet.
+                Google Reviews page has not been configured by the store yet.
               </p>
             )}
             <button

@@ -23,7 +23,7 @@ export default async function AdminOffersPage() {
     return (
       <AdminLayout
         title="Promotional Offers"
-        subtitle="Manage offers shown to pharmacy customers."
+        subtitle="Manage boutique promotions, seasonal collections & store offers."
         shopName={settings?.shopName}
         logoUrl={settings?.logoUrl}
       >
@@ -35,7 +35,7 @@ export default async function AdminOffersPage() {
     return (
       <AdminLayout
         title="Promotional Offers"
-        subtitle="Manage offers shown to pharmacy customers."
+        subtitle="Manage boutique promotions, seasonal collections & store offers."
       >
         <div style={{ padding: 'var(--space-6) 0' }}>
           <ErrorState

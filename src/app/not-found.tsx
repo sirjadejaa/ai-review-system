@@ -42,7 +42,7 @@ export default function NotFound() {
           marginBottom: 'var(--space-6)',
         }}
       >
-        The pharmacy page or QR destination you are looking for does not exist or has been moved.
+        The boutique page or QR destination you are looking for does not exist or has been moved.
       </p>
       <Link href="/">
         <Button variant="primary">Return Home</Button>

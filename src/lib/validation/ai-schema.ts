@@ -44,7 +44,7 @@ const FORBIDDEN_FABRICATIONS = [
   /\bdr\.\s+[a-z]+/i,
   /\bdoctor\s+recommended/i,
   /\bdiscount\s+\d+%/i,
-  /\bfree\s+(medicines|drugs|consultation)/i,
+  /\bfree\s+(medicines|drugs|consultation|clothes|garments)/i,
 ];
 
 /**
@@ -66,7 +66,7 @@ export function validateAndSanitizeAIDrafts(
     // Check forbidden fabrication / HTML injections
     for (const pattern of FORBIDDEN_FABRICATIONS) {
       if (pattern.test(item.text)) {
-        throw new Error('AI output contained disallowed promotional or medical claims.');
+        throw new Error('AI output contained disallowed promotional or unverified claims.');
       }
     }
 

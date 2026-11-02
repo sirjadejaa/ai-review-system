@@ -1,6 +1,6 @@
 /**
  * Core Domain Types
- * Single Medical Shop / Pharmacy AI Review & Digital Customer Card System
+ * Premium Clothing Store / Fashion Boutique AI Review & Digital Customer Card System
  */
 
 export interface OpeningHourSlot {

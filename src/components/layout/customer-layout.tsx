@@ -2,8 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styles from './customer-layout.module.css';
 import { Badge } from '@/components/ui';
-
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 
 export interface CustomerLayoutProps {
   children: React.ReactNode;
@@ -15,8 +14,8 @@ export interface CustomerLayoutProps {
 
 export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
   children,
-  shopName = 'Arogya Pharmacy',
-  tagline = 'Better Health. Brighter Tomorrow.',
+  shopName = 'Maison & Thread',
+  tagline = 'Curated Contemporary Apparel & Studio',
   logoUrl,
   isEmergencyOpen = false,
 }) => {
@@ -33,24 +32,24 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
                 className={styles.brandLogo}
               />
             ) : (
-              <PharmacyLogo size="md" variant="mark" />
+              <BoutiqueLogo size="sm" variant="mark" shopName={shopName} />
             )}
             <div className={styles.brandText}>
-              <span className={styles.shopName} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.05rem', letterSpacing: '-0.02em' }}>
+              <span className={styles.shopName} style={{ fontFamily: 'var(--font-family-serif)', fontSize: '1.1rem', letterSpacing: '-0.02em', fontWeight: 600 }}>
                 {shopName}
               </span>
               <span className={styles.shopCategory}>
-                {tagline || 'Better Health. Brighter Tomorrow.'}
+                {tagline || 'Curated Contemporary Apparel & Studio'}
               </span>
             </div>
           </Link>
           {isEmergencyOpen ? (
             <Badge variant="warning" size="sm" hasDot>
-              Emergency Open
+              Extended Hours
             </Badge>
           ) : (
             <Badge variant="success" size="sm" hasDot>
-              Open Now
+              Open Today
             </Badge>
           )}
         </div>
@@ -62,7 +61,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
         <div className="container-customer">
           <p className={styles.footerText}>
             © {new Date().getFullYear()} {shopName}
-            {tagline ? ` • ${tagline}` : ' • Better Health. Brighter Tomorrow.'}
+            {tagline ? ` • ${tagline}` : ' • Curated Contemporary Apparel & Studio'}
           </p>
         </div>
       </footer>

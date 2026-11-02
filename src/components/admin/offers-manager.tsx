@@ -245,7 +245,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
       {offers.length === 0 ? (
         <EmptyState
           title="No Store Offers Configured"
-          description="Create promotional discounts, senior citizen perks, or seasonal health announcements. Active offers appear automatically on your Digital Customer Card."
+          description="Create promotional deals, seasonal collection previews, or VIP styling perks. Active offers appear automatically on your customer privilege card."
           action={
             <Button variant="primary" size="sm" onClick={handleOpenAdd}>
               <Plus size={15} style={{ marginRight: '4px' }} aria-hidden="true" />
@@ -361,7 +361,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
         isOpen={isAddModalOpen || editingOffer !== null}
         onClose={handleCloseModals}
         title={editingOffer ? 'Edit Offer' : 'Add Store Offer'}
-        description="Configure promotional details shown on the pharmacy's Digital Customer Card."
+        description="Configure promotional details shown on the boutique's Customer Privilege Card."
         footer={
           <div className={styles.modalFooter}>
             <Button
@@ -391,7 +391,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
           <Input
             label="Offer Title"
             required
-            placeholder="e.g. 10% Discount on First Aid & Wellness"
+            placeholder="e.g. 15% Off Autumn / Winter Outerwear"
             value={formData.title}
             error={fieldErrors.title}
             onChange={(e) =>
@@ -401,7 +401,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
 
           <Textarea
             label="Description (Optional)"
-            placeholder="e.g. Applicable on all non-prescription wellness items and general essentials."
+            placeholder="e.g. Applicable on all knitwear, tailored jackets, and bespoke fitting sessions."
             value={formData.description}
             error={fieldErrors.description}
             rows={3}
@@ -413,7 +413,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
           <div className={styles.formGrid}>
             <Input
               label="Highlight Badge (Optional)"
-              placeholder="e.g. SPECIAL, 10% OFF, SENIOR"
+              placeholder="e.g. 15% OFF, NEW SEASON, VIP ONLY"
               value={formData.badge}
               error={fieldErrors.badge}
               helpText="Short badge displayed next to the offer."
@@ -502,7 +502,7 @@ export const OffersManager: React.FC<OffersManagerProps> = ({ initialOffers }) =
         {deletingOffer && (
           <div className={styles.deleteWarning}>
             <p>
-              Are you sure you want to delete this promotional offer? It will be permanently removed from your pharmacy records and will no longer appear on your Digital Customer Card.
+              Are you sure you want to delete this promotional offer? It will be permanently removed from your boutique records and will no longer appear on your Digital Customer Card.
             </p>
             <div className={styles.deleteHighlight}>
               {deletingOffer.title}

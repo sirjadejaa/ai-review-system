@@ -1,9 +1,9 @@
 /**
- * Centralized Healthcare Branding & Dynamic Color Palette Generator
- * Single Medical Shop / Pharmacy AI Review & Digital Customer Card System
+ * Centralized Boutique Branding & Dynamic Color Palette Generator
+ * Premium Clothing Store / Fashion Boutique AI Review & Digital Customer Card System
  */
 
-export interface HealthcareColorPreset {
+export interface BoutiqueColorPreset {
   id: string;
   name: string;
   description: string;
@@ -12,52 +12,44 @@ export interface HealthcareColorPreset {
   accent: string;
 }
 
-export const HEALTHCARE_COLOR_PRESETS: HealthcareColorPreset[] = [
+export const BOUTIQUE_COLOR_PRESETS: BoutiqueColorPreset[] = [
   {
-    id: 'arogya_forest',
-    name: 'Arogya Forest (Default)',
-    description: 'Deep Forest Green, Muted Sage, and Botanical Mint. Clinical authority & natural healing.',
-    primary: '#123e35',
-    secondary: '#4a6b61',
-    accent: '#92bfa9',
+    id: 'noir_atelier_gold',
+    name: 'Noir & Atelier Gold (Default)',
+    description: 'Luxury Noir, Tailored Charcoal, and Warm Champagne Gold. Editorial high-fashion aesthetic.',
+    primary: '#171717',
+    secondary: '#3a3a3a',
+    accent: '#a88b64',
   },
   {
-    id: 'classic_apothecary',
-    name: 'Classic Apothecary',
-    description: 'Apothecary Dark Pine, Herbal Sage, and Warm Gold. Traditional pharmaceutical heritage.',
-    primary: '#1e3a2f',
-    secondary: '#3d5a4c',
-    accent: '#c2a649',
+    id: 'cashmere_sand',
+    name: 'Cashmere & Sand',
+    description: 'Warm Espresso, Soft Cashmere, and Sandstone Beige. Relaxed luxury & minimalist chic.',
+    primary: '#2b2621',
+    secondary: '#544b43',
+    accent: '#c2a68c',
   },
   {
-    id: 'modern_teal',
-    name: 'Modern Clinical Teal',
-    description: 'Deep Medical Teal, Slate Ocean, and Soft Cyan. Clean contemporary healthcare.',
-    primary: '#0f4c5c',
-    secondary: '#3b7a8c',
-    accent: '#7bc4c4',
+    id: 'midnight_silk',
+    name: 'Midnight & Silk',
+    description: 'Deep Midnight Navy, Slate Steel, and Silk Ice Blue. Modern eveningwear & refined tailoring.',
+    primary: '#161b26',
+    secondary: '#323b4e',
+    accent: '#8b9eb7',
   },
   {
-    id: 'care_emerald',
-    name: 'Care Emerald',
-    description: 'Emerald Care, Pine Green, and Fresh Mint. Vibrant, approachable wellness.',
-    primary: '#164e43',
-    secondary: '#2d6a5d',
-    accent: '#52b788',
-  },
-  {
-    id: 'royal_navy',
-    name: 'Royal Navy Healthcare',
-    description: 'Midnight Navy, Slate Indigo, and Soft Sky Blue. Premium, institutional trust.',
-    primary: '#172a45',
-    secondary: '#31486b',
-    accent: '#6d94c7',
+    id: 'atelier_olive',
+    name: 'Atelier Olive',
+    description: 'Rich Botanical Olive, Earth Sage, and Burnished Brass. Sustainable couture & heritage fabrics.',
+    primary: '#1c2419',
+    secondary: '#3b4535',
+    accent: '#9a8758',
   },
 ];
 
-export const DEFAULT_PRIMARY_COLOR = '#123e35';
-export const DEFAULT_SECONDARY_COLOR = '#4a6b61';
-export const DEFAULT_ACCENT_COLOR = '#92bfa9';
+export const DEFAULT_PRIMARY_COLOR = '#171717';
+export const DEFAULT_SECONDARY_COLOR = '#3a3a3a';
+export const DEFAULT_ACCENT_COLOR = '#a88b64';
 
 /**
  * Parses a hex color string (#rgb or #rrggbb) into numeric RGB components.
@@ -113,7 +105,7 @@ export function adjustBrightness(hex: string, percent: number): string {
  */
 export function hexToRgba(hex: string, alpha: number): string {
   const rgb = hexToRgb(hex);
-  if (!rgb) return `rgba(18, 62, 53, ${alpha})`;
+  if (!rgb) return `rgba(23, 23, 23, ${alpha})`;
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
 }
 
@@ -124,8 +116,7 @@ export interface ThemeColorOptions {
 }
 
 /**
- * Generates dynamic CSS :root variables for brand colors.
- * Accepts either an options object or positional arguments for flexibility.
+ * Generates dynamic CSS :root variables for boutique brand colors.
  */
 export function generateThemeCss(
   primaryOrOptions?: string | ThemeColorOptions | null,
@@ -150,15 +141,15 @@ export function generateThemeCss(
   const secondary = (secondaryInput && hexToRgb(secondaryInput) ? secondaryInput : DEFAULT_SECONDARY_COLOR).toLowerCase();
   const accent = (accentInput && hexToRgb(accentInput) ? accentInput : DEFAULT_ACCENT_COLOR).toLowerCase();
 
-  const primaryRgb = hexToRgb(primary) || { r: 18, g: 62, b: 53 };
+  const primaryRgb = hexToRgb(primary) || { r: 23, g: 23, b: 23 };
   const primaryHover = adjustBrightness(primary, -15);
   const primaryActive = adjustBrightness(primary, -28);
-  const primarySubtle = hexToRgba(primary, 0.08);
-  const primaryBorder = hexToRgba(primary, 0.25);
+  const primarySubtle = hexToRgba(primary, 0.06);
+  const primaryBorder = hexToRgba(primary, 0.2);
   const primaryText = adjustBrightness(primary, -10);
 
   const secondaryHover = adjustBrightness(secondary, -15);
-  const secondarySubtle = hexToRgba(secondary, 0.08);
+  const secondarySubtle = hexToRgba(secondary, 0.06);
   const secondaryText = adjustBrightness(secondary, -10);
 
   const accentSubtle = hexToRgba(accent, 0.12);

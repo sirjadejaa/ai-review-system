@@ -19,13 +19,13 @@ import { isValidExternalUrl } from '@/lib/format/contact-links';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { ShareCardButton } from '@/components/customer/share-card-button';
 import { OfferList } from '@/components/customer/offer-list';
-import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, AlertTriangle, Star, Globe } from 'lucide-react';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { ArrowLeft, Clock, MapPin, Phone, MessageCircle, Sparkles, Star } from 'lucide-react';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import styles from '@/components/customer/digital-card.module.css';
 
 export const metadata: Metadata = {
-  title: 'Digital Customer Card',
-  description: 'Operating hours, contact channels, location, and medicine offers for our pharmacy.',
+  title: 'Boutique Privilege Card',
+  description: 'Operating hours, stylist contact channels, location, and seasonal offers for our clothing boutique.',
 };
 
 interface CustomerCardPageProps {
@@ -58,68 +58,19 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
   } catch (error) {
     console.error('Non-fatal: Failed to load shop settings for customer card', error);
     return (
-      <CustomerLayout shopName="Arogya Pharmacy">
+      <CustomerLayout shopName="Maison & Thread">
         <div style={{ padding: 'var(--space-8) 0' }}>
           <ErrorState
-            title="Unable to load pharmacy card"
-            message="We're having trouble loading the pharmacy card right now. Please try again shortly."
+            title="Unable to load boutique card"
+            message="We're having trouble loading the boutique card right now. Please try again shortly."
           />
         </div>
       </CustomerLayout>
     );
   }
 
-  // Controlled empty setup state for a brand-new installation without pharmacy profile
-  const isUnconfigured =
-    !settings.shopName ||
-    (settings.shopName === 'Pharmacy' &&
-      !settings.phoneNumber &&
-      !settings.address &&
-      !settings.googleReviewUrl);
-
-  if (isUnconfigured) {
-    return (
-      <CustomerLayout shopName="Pharmacy">
-        <div style={{ padding: 'var(--space-8) 0', textAlign: 'center' }}>
-          <div
-            style={{
-              backgroundColor: 'var(--color-bg-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-xl)',
-              padding: 'var(--space-8) var(--space-6)',
-              maxWidth: '460px',
-              margin: '0 auto',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
-              <PharmacyLogo size="lg" variant="mark" />
-            </div>
-            <h1
-              style={{
-                fontSize: 'var(--font-size-xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--color-text-primary)',
-                margin: '0 0 var(--space-2)',
-              }}
-            >
-              Pharmacy Card Under Setup
-            </h1>
-            <p
-              style={{
-                fontSize: 'var(--font-size-sm)',
-                color: 'var(--color-text-secondary)',
-                lineHeight: 'var(--line-height-normal)',
-                margin: 0,
-              }}
-            >
-              This digital pharmacy card is currently being configured. Please visit our counter or check back soon.
-            </p>
-          </div>
-        </div>
-      </CustomerLayout>
-    );
-  }
+  const displayShopName = settings.shopName === 'Pharmacy' ? 'Maison & Thread' : settings.shopName;
+  const displayTagline = settings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
 
   // 3. Navigation URLs preserving source context
   const homeHref = validatedSource ? `/?source=${validatedSource}` : '/';
@@ -146,12 +97,11 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
   const hasAddress = Boolean(settings.address && settings.address.trim());
   const hasPhone = Boolean(settings.phoneNumber && settings.phoneNumber.trim());
   const hasWhatsApp = Boolean(settings.whatsappNumber && settings.whatsappNumber.trim());
-  const hasWebsite = Boolean(settings.websiteUrl && isValidExternalUrl(settings.websiteUrl));
 
   return (
     <CustomerLayout
-      shopName={settings.shopName}
-      tagline={settings.tagline ?? undefined}
+      shopName={displayShopName}
+      tagline={displayTagline}
       logoUrl={settings.logoUrl}
       isEmergencyOpen={settings.isEmergencyOpen}
     >
@@ -160,60 +110,46 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
         <div className={styles.topNav}>
           <Link href={homeHref} className={styles.backLink}>
             <ArrowLeft size={16} aria-hidden="true" />
-            <span>Pharmacy Home</span>
+            <span>Boutique Home</span>
           </Link>
-          <ShareCardButton shopName={settings.shopName} />
+          <ShareCardButton shopName={displayShopName} />
         </div>
 
-        {/* 1. Pharmacy Hero Identity Card */}
+        {/* 1. Boutique Hero Identity Privilege Card */}
         <section className={styles.heroCard} aria-labelledby="card-shop-name">
           <div className={styles.cardHeaderBadge}>
-            Official Pharmacy Pass
+            Boutique Privilege Pass
           </div>
 
-          <PharmacyLogo
+          <BoutiqueLogo
             logoUrl={settings.logoUrl}
-            shopName={settings.shopName}
+            shopName={displayShopName}
             variant="mark"
             size="lg"
           />
 
           <h1 id="card-shop-name" className={styles.shopName}>
-            {settings.shopName}
+            {displayShopName}
           </h1>
 
-          {settings.tagline && (
-            <p className={styles.tagline}>{settings.tagline}</p>
-          )}
-
-          {/* Emergency Availability Notice */}
-          {settings.isEmergencyOpen && (
-            <div className={styles.emergencyBanner} role="status">
-              <AlertTriangle size={15} aria-hidden="true" />
-              <span>
-                Emergency Availability: Essential medicine support open
-                {settings.emergencyContact ? ` (${settings.emergencyContact})` : ''}
-              </span>
-            </div>
-          )}
+          <p className={styles.tagline}>{displayTagline}</p>
         </section>
 
         {/* 2. Quick Contact & Navigation Actions */}
-        <section aria-label="Pharmacy Quick Actions">
+        <section aria-label="Boutique Quick Actions">
           <CustomerContactActions
             phoneNumber={settings.phoneNumber}
             whatsappNumber={settings.whatsappNumber}
             googleMapsUrl={settings.googleMapsUrl}
-            websiteUrl={settings.websiteUrl}
           />
         </section>
 
         {/* 3. Operating Hours & Physical Location */}
-        {(hasHours || hasAddress || hasPhone || hasWhatsApp || hasWebsite) && (
-          <section className={styles.infoCard} aria-label="Pharmacy Operating Hours and Address">
+        {(hasHours || hasAddress || hasPhone || hasWhatsApp) && (
+          <section className={styles.infoCard} aria-label="Boutique Operating Hours and Address">
             <div className={styles.infoHeader}>
-              <Clock size={16} color="var(--color-secondary)" aria-hidden="true" />
-              <h2 className={styles.infoTitle}>Hours & Store Information</h2>
+              <Clock size={16} color="var(--color-accent)" aria-hidden="true" />
+              <h2 className={styles.infoTitle}>Hours &amp; Location</h2>
             </div>
 
             {/* Operating Hours */}
@@ -228,7 +164,7 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
               </div>
             ) : (
               <p className={styles.hoursUnavailable}>
-                Opening hours currently unavailable.
+                Store hours currently unavailable.
               </p>
             )}
 
@@ -240,8 +176,8 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
               </div>
             )}
 
-            {/* Phone, WhatsApp & Website Display Rows */}
-            {(hasPhone || hasWhatsApp || hasWebsite) && (
+            {/* Phone & WhatsApp Display Numbers */}
+            {(hasPhone || hasWhatsApp) && (
               <div className={styles.contactDetailsRow}>
                 {hasPhone && (
                   <div className={styles.contactDetailItem}>
@@ -252,23 +188,9 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
                 )}
                 {hasWhatsApp && (
                   <div className={styles.contactDetailItem}>
-                    <MessageCircle size={14} color="var(--color-secondary)" aria-hidden="true" />
+                    <MessageCircle size={14} color="var(--color-accent)" aria-hidden="true" />
                     <span className={styles.contactDetailLabel}>WhatsApp:</span>
                     <span>{settings.whatsappNumber}</span>
-                  </div>
-                )}
-                {hasWebsite && (
-                  <div className={styles.contactDetailItem}>
-                    <Globe size={14} color="var(--color-primary)" aria-hidden="true" />
-                    <span className={styles.contactDetailLabel}>Website:</span>
-                    <a
-                      href={settings.websiteUrl!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}
-                    >
-                      {settings.websiteUrl}
-                    </a>
                   </div>
                 )}
               </div>
@@ -276,54 +198,26 @@ export default async function CustomerCardPage({ searchParams }: CustomerCardPag
           </section>
         )}
 
-        {/* 4. Active Store Offers & Promotions (Read-Only) */}
+        {/* 4. Active Offers & Collections */}
         <OfferList offers={activeOffers} />
 
-        {/* 5. Google Review Action (Preserving Source Attribution) */}
-        {hasValidReviewUrl && (
-          <section aria-label="Review Pharmacy">
-            <Card variant="interactive">
-              <CardHeader>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 'var(--space-2)',
-                  }}
-                >
-                  <Badge variant="success" size="sm">
-                    Takes 30 seconds
-                  </Badge>
-                  <Rating value={5} isReadOnly size="sm" />
-                </div>
-                <CardTitle as="h2">Give a Google Review</CardTitle>
-                <CardDescription>
-                  Share your honest experience to help other patients find trusted medicines and caring service.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Link href={reviewHref} style={{ textDecoration: 'none' }}>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 'var(--space-2)',
-                      minHeight: '52px',
-                    }}
-                  >
-                    <Star size={18} fill="#c97a18" stroke="#c97a18" aria-hidden="true" />
-                    <span>Rate &amp; Review on Google</span>
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </section>
-        )}
+        {/* 5. Direct Rating Link Callout */}
+        <section className={styles.reviewCtaCard} aria-label="Write a Review">
+          <div className={styles.reviewCtaContent}>
+            <div className={styles.reviewCtaTitleGroup}>
+              <Star size={20} fill="#d49b44" stroke="#d49b44" aria-hidden="true" />
+              <h2 className={styles.reviewCtaTitle}>Visited our store recently?</h2>
+            </div>
+            <p className={styles.reviewCtaDescription}>
+              Share your thoughts on clothing quality, fitting, and service. It only takes a minute.
+            </p>
+          </div>
+          <Link href={reviewHref} style={{ textDecoration: 'none', width: '100%' }}>
+            <Button variant="primary" size="lg" fullWidth>
+              Write a Review
+            </Button>
+          </Link>
+        </section>
       </div>
     </CustomerLayout>
   );

@@ -17,8 +17,8 @@ export interface SettingsActionResult {
 }
 
 /**
- * Server action to update singleton pharmacy settings.
- * Strictly requires authenticated pharmacy admin session.
+ * Server action to update singleton boutique settings.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function updateShopSettingsAction(
   input: ShopSettingsInput
@@ -53,7 +53,7 @@ export async function updateShopSettingsAction(
 
     return {
       success: true,
-      message: 'Pharmacy information and settings saved successfully.',
+      message: 'Boutique information and settings saved successfully.',
       settings: updated,
     };
   } catch (error) {
@@ -92,10 +92,10 @@ function isValidImageMagicBytes(buffer: Buffer, mimeType: string): boolean {
 }
 
 /**
- * Server action to securely upload and persist the pharmacy business logo.
+ * Server action to securely upload and persist the boutique business logo.
  * Enforces file size limits, MIME type verification, and magic byte checking.
  */
-export async function uploadPharmacyLogoAction(
+export async function uploadBoutiqueLogoAction(
   formData: FormData
 ): Promise<{ success: boolean; message: string; logoUrl?: string }> {
   try {
@@ -177,15 +177,18 @@ export async function uploadPharmacyLogoAction(
     if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       throw error;
     }
-    console.error('Failed to upload pharmacy logo:', error);
+    console.error('Failed to upload boutique logo:', error);
     return { success: false, message: 'Failed to upload logo. Please try again.' };
   }
 }
 
+/** Legacy alias for backwards compatibility */
+export const uploadPharmacyLogoAction = uploadBoutiqueLogoAction;
+
 /**
- * Server action to remove the current pharmacy business logo.
+ * Server action to remove the current boutique business logo.
  */
-export async function removePharmacyLogoAction(): Promise<{ success: boolean; message: string }> {
+export async function removeBoutiqueLogoAction(): Promise<{ success: boolean; message: string }> {
   try {
     await requireAdmin('/admin/settings');
 
@@ -215,12 +218,15 @@ export async function removePharmacyLogoAction(): Promise<{ success: boolean; me
     revalidatePath('/customer/review');
     revalidatePath('/');
 
-    return { success: true, message: 'Pharmacy logo removed successfully.' };
+    return { success: true, message: 'Boutique logo removed successfully.' };
   } catch (error) {
     if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
       throw error;
     }
-    console.error('Failed to remove pharmacy logo:', error);
+    console.error('Failed to remove boutique logo:', error);
     return { success: false, message: 'Failed to remove logo. Please try again.' };
   }
 }
+
+/** Legacy alias for backwards compatibility */
+export const removePharmacyLogoAction = removeBoutiqueLogoAction;

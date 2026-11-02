@@ -21,7 +21,7 @@ export function QrScanTracker({ source }: QrScanTrackerProps) {
     if (hasTriggeredRef.current) return;
     if (!VALID_QR_SOURCES.includes(source as ValidQrSource)) return;
 
-    const storageKey = `pharmacy_qr_scan_${source}`;
+    const storageKey = `boutique_qr_scan_${source}`;
     try {
       if (sessionStorage.getItem(storageKey)) {
         return;

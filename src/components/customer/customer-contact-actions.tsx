@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Phone, MessageCircle, MapPin, Globe } from 'lucide-react';
+import { Phone, MessageCircle, MapPin } from 'lucide-react';
 import styles from './customer-contact-actions.module.css';
 import { trackContactClickAction } from '@/lib/actions/customer-actions';
 import { formatTelHref, formatWhatsAppHref, isValidExternalUrl } from '@/lib/format/contact-links';
@@ -10,27 +10,24 @@ export interface CustomerContactActionsProps {
   phoneNumber?: string | null;
   whatsappNumber?: string | null;
   googleMapsUrl?: string | null;
-  websiteUrl?: string | null;
 }
 
 /**
- * Customer contact and navigation action buttons (Call, WhatsApp, Directions, Website).
+ * Customer contact and navigation action buttons (Call, WhatsApp, Directions).
  * Features touch-friendly targets (>= 48px), accessible labels, and non-blocking analytics.
  */
 export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
   phoneNumber,
   whatsappNumber,
   googleMapsUrl,
-  websiteUrl,
 }) => {
   const telHref = formatTelHref(phoneNumber);
   const whatsAppHref = formatWhatsAppHref(whatsappNumber);
   const hasPhone = Boolean(telHref);
   const hasWhatsApp = Boolean(whatsAppHref);
   const hasDirections = Boolean(googleMapsUrl && isValidExternalUrl(googleMapsUrl));
-  const hasWebsite = Boolean(websiteUrl && isValidExternalUrl(websiteUrl));
 
-  if (!hasPhone && !hasWhatsApp && !hasDirections && !hasWebsite) {
+  if (!hasPhone && !hasWhatsApp && !hasDirections) {
     return null;
   }
 
@@ -48,7 +45,7 @@ export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
             href={telHref}
             onClick={() => handleAction('CALL_CLICK')}
             className={styles.actionButton}
-            aria-label={`Call pharmacy at ${phoneNumber}`}
+            aria-label={`Call boutique at ${phoneNumber}`}
           >
             <Phone size={16} className={styles.actionIcon} />
             <span>Call</span>
@@ -62,7 +59,7 @@ export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
             rel="noopener noreferrer"
             onClick={() => handleAction('WHATSAPP_CLICK')}
             className={styles.actionButton}
-            aria-label={`Chat with pharmacy on WhatsApp at ${whatsappNumber}`}
+            aria-label={`Chat with boutique stylist on WhatsApp at ${whatsappNumber}`}
           >
             <MessageCircle size={16} className={styles.actionIcon} />
             <span>WhatsApp</span>
@@ -76,23 +73,10 @@ export const CustomerContactActions: React.FC<CustomerContactActionsProps> = ({
             rel="noopener noreferrer"
             onClick={() => handleAction('DIRECTIONS_CLICK')}
             className={styles.actionButton}
-            aria-label="Get directions to the pharmacy on Google Maps"
+            aria-label="Get directions to the boutique on Google Maps"
           >
             <MapPin size={16} className={styles.actionIcon} />
             <span>Directions</span>
-          </a>
-        )}
-
-        {hasWebsite && (
-          <a
-            href={websiteUrl!}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.actionButton}
-            aria-label="Visit pharmacy official website"
-          >
-            <Globe size={16} className={styles.actionIcon} />
-            <span>Website</span>
           </a>
         )}
       </div>

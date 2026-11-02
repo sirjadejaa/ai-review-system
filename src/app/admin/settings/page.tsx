@@ -6,7 +6,7 @@ import { SettingsManager } from '@/components/admin/settings-manager';
 import { ErrorState } from '@/components/ui';
 
 export const metadata: Metadata = {
-  title: 'Pharmacy Information & Settings',
+  title: 'Boutique Information & Settings',
   robots: { index: false, follow: false },
 };
 
@@ -18,8 +18,8 @@ export default async function AdminSettingsPage() {
 
     return (
       <AdminLayout
-        title="Pharmacy Settings"
-        subtitle="Manage your pharmacy identity and preferences."
+        title="Boutique Settings"
+        subtitle="Manage your store identity, brand colors, contact details, and retail preferences."
         shopName={settings?.shopName}
         logoUrl={settings?.logoUrl}
       >
@@ -30,13 +30,13 @@ export default async function AdminSettingsPage() {
     console.error('Non-fatal: Failed to load settings for admin', error);
     return (
       <AdminLayout
-        title="Pharmacy Settings"
-        subtitle="Manage your pharmacy identity and preferences."
+        title="Boutique Settings"
+        subtitle="Manage your store identity, brand colors, contact details, and retail preferences."
       >
         <div style={{ padding: 'var(--space-6) 0' }}>
           <ErrorState
-            title="Unable to load pharmacy settings"
-            message="We encountered an issue loading your settings. Please try refreshing."
+            title="Unable to load boutique settings"
+            message="We encountered an issue loading your boutique settings. Please try refreshing."
           />
         </div>
       </AdminLayout>

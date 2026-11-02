@@ -13,7 +13,7 @@ export interface GenerateReviewDraftsInput {
   selectedTags: string[]; // Controlled whitelist tags
   customerNote?: string; // Optional user note (max 1000 characters)
   language: LanguageCode; // 'en' | 'hi' | 'hinglish'
-  shopName?: string; // Single pharmacy branding
+  shopName?: string; // Single boutique branding
 }
 
 /**

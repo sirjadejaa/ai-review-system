@@ -178,26 +178,26 @@ describe('Phase 3: Admin Authentication & Security Tests', () => {
     });
   });
 
-  describe('5. Edge Middleware Redirect Loop Prevention', () => {
+  describe('5. Edge Proxy / Middleware Redirect Loop Prevention', () => {
     it('redirects unauthenticated /admin requests to /admin/login', async () => {
-      const { middleware } = await import('@/middleware');
+      const { proxy } = await import('@/proxy');
       const { NextRequest } = await import('next/server');
 
       const req = new NextRequest('http://localhost:3000/admin');
-      const res = middleware(req);
+      const res = proxy(req);
 
       expect(res.status).toBe(307);
       expect(res.headers.get('location')).toBe('http://localhost:3000/admin/login?returnUrl=%2Fadmin');
     });
 
     it('does NOT blindly redirect from /admin/login back to /admin when cookie is present', async () => {
-      const { middleware } = await import('@/middleware');
+      const { proxy } = await import('@/proxy');
       const { NextRequest } = await import('next/server');
 
       const req = new NextRequest('http://localhost:3000/admin/login', {
         headers: { cookie: 'admin_session=stale_or_expired_token' },
       });
-      const res = middleware(req);
+      const res = proxy(req);
 
       // Must NOT redirect (307/302/308) to /admin, which would cause an infinite ping-pong loop
       expect(res.status).not.toBe(307);
@@ -206,13 +206,13 @@ describe('Phase 3: Admin Authentication & Security Tests', () => {
     });
 
     it('clears stale session cookie on /admin/login when returnUrl is present', async () => {
-      const { middleware } = await import('@/middleware');
+      const { proxy } = await import('@/proxy');
       const { NextRequest } = await import('next/server');
 
       const req = new NextRequest('http://localhost:3000/admin/login?returnUrl=%2Fadmin', {
         headers: { cookie: 'admin_session=stale_or_expired_token' },
       });
-      const res = middleware(req);
+      const res = proxy(req);
 
       const setCookie = res.headers.get('set-cookie');
       expect(setCookie).toBeTruthy();

@@ -34,43 +34,45 @@ interface PlacementOption {
 const PLACEMENTS: PlacementOption[] = [
   {
     id: 'counter',
-    title: 'Billing Counter',
-    locationHint: 'Billing desk & cash counter',
-    description: 'Placed right by the payment terminal. Highest conversion rate while customers wait for their bill.',
+    title: 'Checkout Counter',
+    locationHint: 'Checkout & payment desk',
+    description: 'Placed right where customers complete their purchase or receive their wrapped garments.',
     recommended: true,
   },
   {
     id: 'qr',
     title: 'Store Standee',
-    locationHint: 'Entrance or main showcase',
-    description: 'General store standee or acrylic tent card placed on the central counter or medicine display.',
+    locationHint: 'Entrance showcase or boutique table',
+    description: 'Acrylic tent standee placed on the central styling table, mannequin showcase, or boutique entrance.',
   },
   {
     id: 'table',
-    title: 'Waiting Table',
-    locationHint: 'Patient bench or waiting chairs',
-    description: 'Placed where patients or family members sit while waiting for medicine dispensing.',
+    title: 'Fitting Suite',
+    locationHint: 'Fitting room mirrors & lounge',
+    description: 'Placed near fitting room mirrors or comfortable lounge chairs in the personal styling area.',
   },
   {
     id: 'card',
-    title: 'Pocket Card',
-    locationHint: 'Printed cards in medicine bag',
-    description: 'Mini business card slipped into the customer bag or stapled to the paper invoice.',
+    title: 'Bag Insert Card',
+    locationHint: 'Slip card inside shopping bag',
+    description: 'Curated card placed inside luxury garment bags or attached to bespoke packaging.',
   },
 ];
 
 export const StoreQrModal: React.FC<StoreQrModalProps> = ({
   isOpen,
   onClose,
-  shopName = 'Arogya Pharmacy',
+  shopName = 'Maison & Thread',
   defaultDomain,
 }) => {
   const [activePlacement, setActivePlacement] = useState<'counter' | 'qr' | 'table' | 'card'>('counter');
   const [domain, setDomain] = useState('');
-  const [qrColor, setQrColor] = useState<'#123e35' | '#000000'>('#123e35');
+  const [qrColor, setQrColor] = useState<'#171717' | '#a88b64' | '#000000'>('#171717');
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const displayShopName = shopName === 'Pharmacy' ? 'Maison & Thread' : shopName;
 
   // Initialize domain from browser origin or prop
   useEffect(() => {
@@ -111,9 +113,10 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
     }
   }, [isOpen, updateQr]);
 
-  const handleCopy = async () => {
+  // Handle URL Copy with Toast Feedback
+  const handleCopyUrl = async () => {
     try {
-      if (navigator.clipboard) {
+      if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(targetUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2500);
@@ -123,6 +126,7 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
     }
   };
 
+  // High-Resolution PNG Download
   const handleDownloadPng = async () => {
     try {
       const highResDataUrl = await QRCode.toDataURL(targetUrl, {
@@ -134,95 +138,82 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
         },
         errorCorrectionLevel: 'H',
       });
-      const link = document.createElement('a');
-      link.href = highResDataUrl;
-      link.download = `${shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-qr-${activePlacement}.png`;
-      link.click();
+
+      const a = document.createElement('a');
+      a.href = highResDataUrl;
+      const cleanName = displayShopName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      a.download = `${cleanName}-qr-${activePlacement}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     } catch (err) {
-      console.error('Failed to download PNG QR:', err);
+      console.error('Failed to generate high-res QR for download:', err);
     }
   };
 
-  const handleDownloadSvg = async () => {
-    try {
-      const svgString = await QRCode.toString(targetUrl, {
-        type: 'svg',
-        margin: 2,
-        color: {
-          dark: qrColor,
-          light: '#ffffff',
-        },
-        errorCorrectionLevel: 'H',
-      });
-      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `${shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-qr-${activePlacement}.svg`;
-      link.click();
-      URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      console.error('Failed to download SVG QR:', err);
-    }
-  };
-
+  // Print-Ready Display Standee
   const handlePrintStandee = () => {
-    const printWindow = window.open('', '_blank', 'width=650,height=800');
+    const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${shopName} - Counter QR Standee</title>
+          <title>${displayShopName} - QR Standee (${activeOption.title})</title>
           <style>
-            @page { size: A6 portrait; margin: 12mm; }
+            @page {
+              size: A5 portrait;
+              margin: 15mm;
+            }
             body {
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-              color: #14221d;
-              background: #ffffff;
+              margin: 0;
+              padding: 0;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              min-height: 90vh;
+              min-height: 100vh;
+              background: #FAF9F6;
+              color: #171717;
               text-align: center;
-              padding: 24px;
-              box-sizing: border-box;
             }
             .card {
-              border: 2px solid #123e35;
+              border: 1px solid #E8E5DF;
               border-radius: 16px;
-              padding: 32px 24px;
-              width: 100%;
+              padding: 36px 28px;
               max-width: 380px;
-              box-sizing: border-box;
+              width: 100%;
+              box-shadow: 0 4px 16px rgba(23, 23, 23, 0.06);
+              background: #ffffff;
             }
             .header-label {
               font-size: 11px;
-              letter-spacing: 0.12em;
+              letter-spacing: 0.14em;
               text-transform: uppercase;
-              color: #4a6b61;
+              color: #A88B64;
               font-weight: 600;
               margin-bottom: 6px;
             }
             h1 {
               font-family: Georgia, serif;
-              font-size: 24px;
-              color: #123e35;
+              font-size: 26px;
+              color: #171717;
               margin: 0 0 4px;
             }
             .tagline {
               font-size: 12px;
-              color: #667870;
-              margin: 0 0 20px;
+              color: #5B616E;
+              margin: 0 0 24px;
             }
             .qr-frame {
               background: #ffffff;
-              padding: 12px;
+              padding: 14px;
               border-radius: 12px;
               display: inline-block;
-              box-shadow: 0 2px 8px rgba(18, 62, 53, 0.08);
+              box-shadow: 0 2px 8px rgba(23, 23, 23, 0.06);
+              border: 1px solid #E8E5DF;
             }
             .qr-frame img {
               width: 220px;
@@ -230,27 +221,28 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
               display: block;
             }
             .instructions {
-              margin-top: 18px;
-              font-size: 13px;
-              color: #14221d;
+              margin-top: 20px;
+              font-size: 14px;
+              color: #171717;
               font-weight: 500;
               line-height: 1.4;
             }
             .sub-instructions {
               margin-top: 6px;
               font-size: 11px;
-              color: #667870;
+              color: #8A909C;
             }
             .placement-badge {
               display: inline-block;
-              margin-top: 16px;
-              padding: 4px 10px;
-              background: #edf6f2;
-              color: #164f3c;
+              margin-top: 18px;
+              padding: 4px 12px;
+              background: #FAF6F0;
+              color: #705837;
+              border: 1px solid #E8E5DF;
               border-radius: 12px;
               font-size: 10px;
               font-weight: 600;
-              letter-spacing: 0.04em;
+              letter-spacing: 0.06em;
               text-transform: uppercase;
             }
           </style>
@@ -258,16 +250,16 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
         <body>
           <div class="card">
             <div class="header-label">Welcome To</div>
-            <h1>${shopName}</h1>
-            <p class="tagline">Licensed Pharmacy & Healthcare</p>
+            <h1>${displayShopName}</h1>
+            <p class="tagline">Curated Apparel & Bespoke Studio</p>
             <div class="qr-frame">
-              <img src="${qrDataUrl}" alt="${shopName} QR Code" />
+              <img src="${qrDataUrl}" alt="${displayShopName} QR Code" />
             </div>
             <div class="instructions">
-              Point your phone camera here to review us or save our digital pharmacy card.
+              Point your phone camera here to review your visit or view our boutique collection card.
             </div>
             <div class="sub-instructions">
-              Fast • Private • No app install required
+              Fast • Seamless • No app required
             </div>
             <div class="placement-badge">
               ${activeOption.title}
@@ -288,8 +280,8 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Store QR Codes & Counter Standees"
-      description="Download high-resolution, print-ready QR codes for physical standees and customer cards."
+      title="Store QR Codes & Standees"
+      description="Download high-resolution, print-ready QR codes for physical acrylic standees and bag insert cards."
     >
       <div className={styles.modalContent}>
         {/* Placement Selection Tabs */}
@@ -328,127 +320,120 @@ export const StoreQrModal: React.FC<StoreQrModalProps> = ({
         <div className={styles.previewGrid}>
           {/* Visual QR Card */}
           <div className={styles.qrCard}>
-            {qrDataUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={qrDataUrl}
-                alt={`${shopName} ${activeOption.title} QR Code`}
-                className={styles.qrImage}
-              />
-            ) : (
-              <div style={{ width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
-                Generating...
-              </div>
-            )}
-            <span className={styles.qrCaption}>
-              {shopName} • {activeOption.title}
-            </span>
+            <div className={styles.qrVisualFrame}>
+              {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={qrDataUrl}
+                  alt={`${displayShopName} QR code preview`}
+                  className={styles.qrImage}
+                />
+              ) : (
+                <div className={styles.qrPlaceholder}>
+                  {isGenerating ? 'Rendering QR…' : 'No preview'}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.qrMetaInfo}>
+              <span className={styles.qrTargetPlacement}>{activeOption.locationHint}</span>
+              <span className={styles.qrTrackingNotice}>
+                Attribution tag: <code>source={activePlacement}</code>
+              </span>
+            </div>
           </div>
 
-          {/* Details & Controls */}
-          <div className={styles.detailsCol}>
-            <div className={styles.placementHeader}>
-              <h4 className={styles.placementTitle}>
-                <span>{activeOption.title} Standee</span>
-                <Badge variant="success" size="sm">
-                  Active
-                </Badge>
-              </h4>
-              <p className={styles.placementDesc}>{activeOption.description}</p>
+          {/* Details & Export Actions */}
+          <div className={styles.actionDetailsCol}>
+            <div className={styles.placementExplainer}>
+              <h4 className={styles.placementHeading}>{activeOption.title}</h4>
+              <p className={styles.placementBody}>{activeOption.description}</p>
             </div>
 
-            {/* Target URL Display */}
-            <div className={styles.urlBox}>
-              <span className={styles.urlLabel}>Encoded Destination URL</span>
-              <span className={styles.urlText}>{targetUrl}</span>
-            </div>
-
-            {/* Color Theme Selector */}
-            <div className={styles.optionsRow}>
-              <span className={styles.optionLabel}>QR Color:</span>
-              <div className={styles.colorPicker}>
+            {/* QR Styling Controls */}
+            <div className={styles.colorPickerSection}>
+              <label className={styles.colorPickerLabel}>QR Aesthetic Tint</label>
+              <div className={styles.colorOptions}>
                 <button
                   type="button"
-                  className={`${styles.colorBtn} ${qrColor === '#123e35' ? styles.colorBtnActive : ''}`}
-                  onClick={() => setQrColor('#123e35')}
-                >
-                  <span className={styles.colorSwatch} style={{ backgroundColor: '#123e35' }} />
-                  <span>Pharmacy Green</span>
-                </button>
+                  className={`${styles.colorChip} ${qrColor === '#171717' ? styles.colorChipActive : ''}`}
+                  style={{ backgroundColor: '#171717' }}
+                  onClick={() => setQrColor('#171717')}
+                  title="Tailored Noir"
+                  aria-label="Tailored Noir"
+                />
                 <button
                   type="button"
-                  className={`${styles.colorBtn} ${qrColor === '#000000' ? styles.colorBtnActive : ''}`}
+                  className={`${styles.colorChip} ${qrColor === '#a88b64' ? styles.colorChipActive : ''}`}
+                  style={{ backgroundColor: '#a88b64' }}
+                  onClick={() => setQrColor('#a88b64')}
+                  title="Atelier Champagne Gold"
+                  aria-label="Atelier Champagne Gold"
+                />
+                <button
+                  type="button"
+                  className={`${styles.colorChip} ${qrColor === '#000000' ? styles.colorChipActive : ''}`}
+                  style={{ backgroundColor: '#000000' }}
                   onClick={() => setQrColor('#000000')}
-                >
-                  <span className={styles.colorSwatch} style={{ backgroundColor: '#000000' }} />
-                  <span>Classic Black</span>
-                </button>
+                  title="Classic High Contrast Black"
+                  aria-label="Classic High Contrast Black"
+                />
               </div>
             </div>
 
-            {/* Download & Action Buttons */}
-            <div className={styles.actionsGrid}>
+            {/* Action Buttons */}
+            <div className={styles.exportButtons}>
               <Button
-                type="button"
                 variant="primary"
-                size="sm"
+                size="md"
+                fullWidth
+                onClick={handlePrintStandee}
+                disabled={!qrDataUrl}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                <Printer size={16} />
+                <span>Print Standee (A5 Poster)</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                fullWidth
                 onClick={handleDownloadPng}
-                disabled={isGenerating || !qrDataUrl}
+                disabled={!qrDataUrl}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                <Download size={14} style={{ marginRight: '5px' }} />
-                High-Res PNG
+                <Download size={16} />
+                <span>Download PNG (1024px High-Res)</span>
               </Button>
 
-              <Button
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                onClick={handleDownloadSvg}
-                disabled={isGenerating || !qrDataUrl}
-              >
-                <Download size={14} style={{ marginRight: '5px' }} />
-                Print SVG
-              </Button>
-
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={handleCopy}
+                className={styles.copyLinkBtn}
+                onClick={handleCopyUrl}
               >
                 {copied ? (
                   <>
-                    <Check size={14} style={{ marginRight: '5px', color: 'var(--color-success)' }} />
-                    Copied!
+                    <Check size={14} style={{ color: 'var(--color-success)' }} />
+                    <span style={{ color: 'var(--color-success)' }}>Link copied to clipboard!</span>
                   </>
                 ) : (
                   <>
-                    <Copy size={14} style={{ marginRight: '5px' }} />
-                    Copy Link
+                    <Copy size={14} />
+                    <span>Copy destination link</span>
                   </>
                 )}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handlePrintStandee}
-                disabled={isGenerating || !qrDataUrl}
-              >
-                <Printer size={14} style={{ marginRight: '5px' }} />
-                Print Standee
-              </Button>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Pro Tip Box */}
-        <div className={styles.standeeTip}>
-          <Info size={16} style={{ flexShrink: 0, marginTop: '1px' }} />
-          <div>
-            <strong>Physical Printing Recommendation:</strong> For best durability, print on 300 GSM matte cardstock and display in an acrylic 4×6 inch tent stand at your billing counter.
-          </div>
+        {/* Guidance Footer */}
+        <div className={styles.modalFooterNote}>
+          <Info size={14} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--color-accent)' }} />
+          <span>
+            <strong>Pro Tip:</strong> Place the acrylic standee near checkout counters or styling suites. Customers scan with their phone camera to leave a quick 5-star review.
+          </span>
         </div>
       </div>
     </Modal>

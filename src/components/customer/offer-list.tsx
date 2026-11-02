@@ -27,7 +27,7 @@ function formatValidUntil(date: Date | null): string | null {
 }
 
 /**
- * Read-only display of active pharmacy offers & deals on the Digital Customer Card.
+ * Read-only display of active boutique offers & deals on the Digital Customer Card.
  * Hides completely if no active offers exist.
  * Renders all text safely without dangerous HTML evaluation.
  */
@@ -37,11 +37,11 @@ export const OfferList: React.FC<OfferListProps> = ({ offers }) => {
   }
 
   return (
-    <section className={styles.container} aria-label="Current Pharmacy Offers">
+    <section className={styles.container} aria-label="Current Boutique Offers">
       <div className={styles.header}>
         <h2 className={styles.sectionTitle}>
-          <span aria-hidden="true">🏷️</span>
-          <span>Current Pharmacy Offers</span>
+          <span aria-hidden="true">✨</span>
+          <span>Boutique Offers &amp; Promotions</span>
         </h2>
         <Badge variant="primary" size="sm">
           {offers.length} Active {offers.length === 1 ? 'Offer' : 'Offers'}

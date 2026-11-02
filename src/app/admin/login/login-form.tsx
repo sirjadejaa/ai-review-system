@@ -12,7 +12,7 @@ import {
   Input,
   Button,
 } from '@/components/ui';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import { loginAction, type LoginActionState } from '@/lib/auth/actions';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 
@@ -22,20 +22,22 @@ interface LoginFormProps {
   logoUrl?: string | null;
 }
 
-export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', logoUrl }: LoginFormProps) {
+export function LoginForm({ returnUrl = '/admin', shopName = 'Maison & Thread', logoUrl }: LoginFormProps) {
   const [state, formAction, isPending] = useActionState<LoginActionState | null, FormData>(
     loginAction,
     null
   );
+
+  const displayShopName = shopName === 'Pharmacy' ? 'Maison & Thread' : shopName;
 
   return (
     <div style={{ width: '100%', maxWidth: '420px', margin: '0 auto' }}>
       {/* Centered Brand & Logo */}
       <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ marginBottom: 'var(--space-3)' }}>
-          <PharmacyLogo
+          <BoutiqueLogo
             logoUrl={logoUrl}
-            shopName={shopName}
+            shopName={displayShopName}
             variant="mark"
             size="lg"
           />
@@ -44,24 +46,24 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', 
           style={{
             fontFamily: 'var(--font-family-serif)',
             fontSize: 'var(--font-size-2xl)',
-            fontWeight: 500,
+            fontWeight: 600,
             color: 'var(--color-primary)',
             letterSpacing: '-0.02em',
           }}
         >
-          {shopName}
+          {displayShopName}
         </div>
         <p
           style={{
             fontSize: 'var(--font-size-xs)',
             textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            color: 'var(--color-secondary)',
+            letterSpacing: '0.1em',
+            color: 'var(--color-accent)',
             margin: 'var(--space-1) 0 0',
-            fontWeight: 'var(--font-weight-medium)',
+            fontWeight: 'var(--font-weight-semibold)',
           }}
         >
-          Management Console
+          Boutique Management Console
         </p>
       </div>
 
@@ -71,7 +73,7 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', 
             Welcome Back
           </CardTitle>
           <CardDescription>
-            Secure access for pharmacy management
+            Secure access for boutique owner &amp; store managers
           </CardDescription>
         </CardHeader>
 
@@ -80,16 +82,16 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', 
             <div
               role="alert"
               style={{
-                padding: 'var(--space-3) var(--space-4)',
-                backgroundColor: 'var(--color-danger-bg)',
-                border: '1px solid var(--color-danger-border)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--color-danger-text)',
-                fontSize: 'var(--font-size-sm)',
-                marginBottom: 'var(--space-4)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--space-2)',
+                backgroundColor: 'var(--color-danger-bg)',
+                border: '1px solid var(--color-danger-border)',
+                color: 'var(--color-danger-text)',
+                padding: 'var(--space-3) var(--space-4)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--font-size-sm)',
+                marginBottom: 'var(--space-4)',
               }}
             >
               <AlertCircle size={16} aria-hidden="true" style={{ flexShrink: 0 }} />
@@ -101,68 +103,64 @@ export function LoginForm({ returnUrl = '/admin', shopName = 'Arogya Pharmacy', 
             <input type="hidden" name="returnUrl" value={returnUrl} />
 
             <Input
-              id="admin-username"
-              name="username"
               label="Username"
+              id="username"
+              name="username"
               type="text"
-              placeholder="Enter username"
               required
               autoComplete="username"
+              placeholder="Store Owner"
               disabled={isPending}
             />
 
             <Input
-              id="admin-password"
-              name="password"
               label="Password"
+              id="password"
+              name="password"
               type="password"
-              placeholder="Enter password"
               required
               autoComplete="current-password"
+              placeholder="••••••••••••"
               disabled={isPending}
             />
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              isLoading={isPending}
-            >
-              Login
-            </Button>
+            <div style={{ marginTop: 'var(--space-2)' }}>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                isLoading={isPending}
+              >
+                Sign In to Boutique Console
+              </Button>
+            </div>
           </form>
         </CardContent>
 
-        <CardFooter style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', textAlign: 'center' }}>
-          <p
-            style={{
-              fontSize: 'var(--font-size-xs)',
-              color: 'var(--color-text-muted)',
-              margin: 0,
-              fontStyle: 'italic',
-            }}
-          >
-            Better Health. Brighter Tomorrow.
+        <CardFooter style={{ borderTop: '1px solid var(--color-border)', justifyContent: 'center' }}>
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', margin: 0 }}>
+            Session authenticated with cryptographic cookie verification
           </p>
-          <Link
-            href="/"
-            style={{
-              fontSize: 'var(--font-size-xs)',
-              color: 'var(--color-primary)',
-              textDecoration: 'none',
-              fontWeight: 'var(--font-weight-medium)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'var(--space-1)',
-            }}
-          >
-            <ArrowLeft size={13} aria-hidden="true" />
-            <span>Back to Customer Experience</span>
-          </Link>
         </CardFooter>
       </Card>
+
+      <div style={{ textAlign: 'center', marginTop: 'var(--space-4)' }}>
+        <Link
+          href="/"
+          style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--color-text-secondary)',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 'var(--space-1)',
+          }}
+        >
+          <ArrowLeft size={14} aria-hidden="true" />
+          <span>Return to Store Experience</span>
+        </Link>
+      </div>
     </div>
   );
 }

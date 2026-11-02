@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import './globals.css';
+import '@/styles/globals.css';
 import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 import { BrandThemeStyle } from '@/components/brand/brand-theme-style';
 
@@ -9,28 +9,16 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  try {
-    const settings = await getShopSettings();
-    const shopName = settings.shopName || 'Pharmacy';
-    const tagline = settings.tagline || 'Healthcare & Genuine Medicines';
-    return {
-      title: {
-        default: `${shopName} — ${tagline}`,
-        template: `%s | ${shopName}`,
-      },
-      description: `Customer review and digital pharmacy pass platform for ${shopName}.`,
-    };
-  } catch {
-    return {
-      title: {
-        default: 'Pharmacy — Healthcare & Genuine Medicines',
-        template: '%s | Pharmacy',
-      },
-      description: 'Customer review and digital pharmacy card platform for our independent pharmacy.',
-    };
-  }
-}
+export const metadata: Metadata = {
+  title: {
+    default: 'Maison & Thread — Luxury Clothing Boutique & Customer Experience',
+    template: '%s | Maison & Thread',
+  },
+  description: 'Share your shopping experience and access your digital boutique privilege card with curated seasonal collections.',
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
 
 export default async function RootLayout({
   children,
@@ -41,20 +29,27 @@ export default async function RootLayout({
   try {
     settings = await getShopSettings();
   } catch {
-    // Graceful fallback to default theme tokens
+    // Non-fatal: fallback to default tokens
   }
 
   return (
     <html lang="en">
       <head>
-        <BrandThemeStyle
-          primaryColor={settings?.primaryColor}
-          secondaryColor={settings?.secondaryColor}
-          accentColor={settings?.accentColor}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap"
+          rel="stylesheet"
         />
+        {settings && (
+          <BrandThemeStyle
+            primaryColor={settings.primaryColor}
+            secondaryColor={settings.secondaryColor}
+            accentColor={settings.accentColor}
+          />
+        )}
       </head>
       <body>{children}</body>
     </html>
   );
 }
-

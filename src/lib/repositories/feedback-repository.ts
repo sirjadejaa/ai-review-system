@@ -37,7 +37,7 @@ function toDomain(record: {
 
 /**
  * Creates customer feedback with strict 1-5 rating validation.
- * Never stores sensitive medical or prescription records.
+ * Never stores sensitive personal or customer payment records.
  */
 export async function createFeedback(input: CreateFeedbackInput): Promise<DomainFeedback> {
   const validated = CreateFeedbackInputSchema.parse(input);

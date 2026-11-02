@@ -26,7 +26,7 @@ export function sanitizeReturnUrl(url?: string | null): string {
 }
 
 /**
- * Retrieves the currently authenticated pharmacy admin, or null if unauthenticated.
+ * Retrieves the currently authenticated boutique admin, or null if unauthenticated.
  * Single source of truth for server-side auth status.
  */
 export async function getCurrentAdmin(): Promise<DomainAdminUser | null> {

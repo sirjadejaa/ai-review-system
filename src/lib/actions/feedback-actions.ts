@@ -103,7 +103,7 @@ export async function submitCustomerFeedbackAction(
 
 /**
  * Server action to update feedback status (NEW -> REVIEWED -> RESOLVED).
- * Strictly requires authenticated pharmacy admin session.
+ * Strictly requires authenticated boutique admin session.
  */
 export async function updateFeedbackStatusAction(
   id: string,

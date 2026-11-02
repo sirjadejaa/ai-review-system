@@ -1,7 +1,7 @@
 /**
  * ==============================================================================
  * CENTRALIZED DESIGN TOKENS
- * Single Medical Shop / Pharmacy AI Review & Digital Customer Card System
+ * Premium Clothing Store / Fashion Boutique AI Review & Digital Customer Card System
  * ==============================================================================
  * STRICT RULE: All components and views must consume these tokens.
  * Do not introduce arbitrary colors, spacing, shadows, or radii.
@@ -9,88 +9,90 @@
 
 :root {
   /* ----------------------------------------------------------------------------
-   * 1. AROGYA PHARMACY PREMIUM HEALTHCARE COLOR SYSTEM
-   * Deep Forest Green, Muted Sage, Warm Ivory, Warm White, Deep Charcoal
+   * 1. PREMIUM CLOTHING BOUTIQUE & FASHION ATELIER COLOR SYSTEM
+   * Inspired by PraiseUp design language: Warm Linen, Crisp White, Luxury Noir,
+   * Tailored Charcoal, and Warm Boutique Camel / Champagne Gold Accent.
    * ---------------------------------------------------------------------------- */
 
   /* Base & Surfaces */
-  --color-bg-app: #faf8f5;            /* Warm Ivory / Soft Off-White background */
-  --color-bg-surface: #ffffff;        /* Warm White for cards and elevated panels */
-  --color-bg-surface-subtle: #f3efe8; /* Soft warm ivory / linen panel */
-  --color-bg-surface-hover: #ebe6dc;  /* Refined warm hover surface */
-  --color-bg-inverse: #102621;        /* Deep Forest Charcoal */
+  --color-bg-app: #faf9f6;            /* Warm Linen / Canvas cream background */
+  --color-bg-surface: #ffffff;        /* Crisp White for elevated cards & panels */
+  --color-bg-surface-subtle: #f8f7f4; /* Soft warm ivory / cashmere panel */
+  --color-bg-surface-hover: #f1efea;  /* Refined warm hover surface */
+  --color-bg-inverse: #171717;        /* Luxury Noir / Deep tailored onyx */
   
   /* Text & Content */
-  --color-text-primary: #14221d;      /* Deep Charcoal / Very Dark Green for high contrast & elegance */
-  --color-text-secondary: #3b4d45;    /* Muted Sage Slate for body copy */
-  --color-text-muted: #667870;        /* Restrained Herbal Slate for helper text & captions */
-  --color-text-subtle: #96a59e;       /* Subtle sage for placeholders & inactive icons */
-  --color-text-inverse: #ffffff;      /* Pure white text on dark forest surfaces */
+  --color-text-primary: #171717;      /* Deep Rich Charcoal / Black for high contrast editorial legibility */
+  --color-text-secondary: #5b616e;    /* Refined Muted Slate for descriptions and body copy */
+  --color-text-muted: #8a909c;        /* Subtle slate for helper text, timestamps & captions */
+  --color-text-subtle: #b3b0a8;       /* Warm neutral for placeholders & inactive icons */
+  --color-text-inverse: #ffffff;      /* Pure white text on dark surfaces */
 
-  /* Primary Brand: Deep Forest Green / Dark Teal */
-  --color-primary: #123e35;           /* Deep Forest Green: Clinical authority, premium healthcare */
-  --color-primary-hover: #0c2d27;     /* Deeper forest green hover */
-  --color-primary-active: #08211c;    /* Deep forest active press */
-  --color-primary-subtle: #f0f5f2;    /* Soft tinted sage/mint wash */
-  --color-primary-border: #bfd6cb;    /* Muted mint / sage border */
-  --color-primary-text: #0e3029;      /* Forest green high-contrast text */
+  /* Primary Brand: Luxury Noir */
+  --color-primary: #171717;           /* Deep Luxury Noir: Timeless, sophisticated fashion authority */
+  --color-primary-hover: #2e2e2e;     /* Polished charcoal hover */
+  --color-primary-active: #0a0a0a;    /* Deep onyx press */
+  --color-primary-subtle: #f5f3ef;    /* Soft cashmere wash */
+  --color-primary-border: #e0ded9;    /* Clean tailored border */
+  --color-primary-text: #171717;      /* High-contrast noir text */
 
-  /* Secondary Brand: Muted Sage Green */
-  --color-secondary: #4a6b61;         /* Muted Sage Green */
-  --color-secondary-hover: #3d5950;
-  --color-secondary-subtle: #e9f0ec;
-  --color-secondary-text: #2a4038;
+  /* Secondary Brand: Tailored Charcoal */
+  --color-secondary: #3a3a3a;         /* Tailored Charcoal */
+  --color-secondary-hover: #262626;
+  --color-secondary-subtle: #f1efea;
+  --color-secondary-text: #262626;
 
-  /* Accent: Muted Mint */
-  --color-accent: #92bfa9;            /* Muted Mint */
-  --color-accent-subtle: #e5f2eb;
-  --color-accent-text: #194534;
+  /* Accent: Warm Boutique Camel / Champagne Gold */
+  --color-accent: #a88b64;            /* Warm Boutique Camel / Atelier Champagne Gold */
+  --color-accent-hover: #93774f;
+  --color-accent-subtle: #faf6f0;
+  --color-accent-text: #705837;
 
   /* Semantic Statuses */
-  --color-success: #1f6b52;           /* Botanical emerald green */
-  --color-success-bg: #edf6f2;        /* Subtle green tint */
-  --color-success-border: #bce0d1;
-  --color-success-text: #164f3c;
+  --color-success: #15803d;           /* Emerald / forest green */
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-success-text: #166534;
 
   --color-warning: #b45309;           /* Amber-600 */
   --color-warning-bg: #fdf8ee;
   --color-warning-border: #f8e1ad;
   --color-warning-text: #78350f;
 
-  /* Danger: Restrained Burgundy / Red */
-  --color-danger: #8f2323;            /* Restrained Burgundy / Red */
-  --color-danger-bg: #fcf1f1;
-  --color-danger-border: #f3c2c2;
-  --color-danger-text: #6b1414;
+  /* Danger: Restrained Burgundy */
+  --color-danger: #991b1b;            /* Refined Burgundy / Red */
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #7f1d1d;
 
-  --color-info: #1b5368;              /* Restrained slate teal */
-  --color-info-bg: #eff6f9;
-  --color-info-border: #c3deeb;
-  --color-info-text: #133e4f;
+  --color-info: #1d4ed8;              /* Tailored royal blue */
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
+  --color-info-text: #1e40af;
 
-  /* Review Stars (Warm Pharmacy Gold) */
-  --color-star-active: #c97a18;       /* Refined apothecary amber gold */
-  --color-star-empty: #d8d3c7;        /* Soft linen warm gray */
-  --color-star-hover: #dd8d27;
+  /* Review Stars (Warm Boutique Gold) */
+  --color-star-active: #d49b44;       /* Champagne warm gold */
+  --color-star-empty: #e2ddd5;        /* Soft cashmere warm gray */
+  --color-star-hover: #e0a752;
 
   /* Borders & Dividers */
-  --color-border: #e3ded5;            /* Thin subtle warm ivory/linen border */
-  --color-border-subtle: #ece8df;     /* Soft inner dividers */
-  --color-border-strong: #cac4b7;     /* High-contrast field borders */
-  --color-border-hover: #b8b1a3;
-  --color-border-focus: #123e35;
-  --color-focus-ring: #123e35;        /* Forest green focus ring */
+  --color-border: #e8e5df;            /* Hairline warm linen border */
+  --color-border-subtle: #f0ede8;     /* Soft inner dividers */
+  --color-border-strong: #dedad2;     /* High-contrast borders */
+  --color-border-hover: #cac5bc;
+  --color-border-focus: #171717;
+  --color-focus-ring: #a88b64;        /* Champagne gold focus ring */
   --color-focus-ring-offset: #ffffff;
 
   /* Surface & Brand Aliases */
-  --color-bg-secondary: #f3efe8;
-  --color-primary-light: #f0f5f2;
+  --color-bg-secondary: #f8f7f4;
+  --color-primary-light: #f5f3ef;
 
   /* ----------------------------------------------------------------------------
-   * 2. EDITORIAL HEALTHCARE TYPOGRAPHY SYSTEM
+   * 2. EDITORIAL FASHION TYPOGRAPHY SYSTEM
    * ---------------------------------------------------------------------------- */
-  --font-family-serif: 'Newsreader', 'Playfair Display', 'Cormorant Garamond', 'Georgia', serif;
-  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', 'Noto Sans Devanagari', 'Kohinoor Devanagari', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-family-serif: 'Playfair Display', 'Cormorant Garamond', 'Newsreader', 'Georgia', serif;
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Segoe UI', Roboto, sans-serif;
   
   /* Font Sizes & Responsive Line Heights */
   --font-size-xs: 0.75rem;     /* 12px */
@@ -156,16 +158,16 @@
   --radius-full: 9999px; /* Status badges, circular icons */
 
   /* ----------------------------------------------------------------------------
-   * 5. SOFT WARM SHADOW HIERARCHY
+   * 5. SOFT WARM SHADOW HIERARCHY (PraiseUp & Luxury Fashion Editorial)
    * ---------------------------------------------------------------------------- */
   --shadow-none: none;
-  --shadow-subtle: 0 1px 2px 0 rgba(18, 62, 53, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(18, 62, 53, 0.05);
-  --shadow-card: 0 2px 6px -1px rgba(18, 62, 53, 0.04), 0 1px 2px -1px rgba(18, 62, 53, 0.02);
-  --shadow-medium: 0 4px 12px -2px rgba(18, 62, 53, 0.06);
-  --shadow-md: 0 4px 12px -2px rgba(18, 62, 53, 0.06);
-  --shadow-elevated: 0 12px 24px -4px rgba(18, 62, 53, 0.08);
-  --shadow-modal: 0 24px 32px -8px rgba(18, 62, 53, 0.12);
+  --shadow-subtle: 0 1px 2px 0 rgba(23, 23, 23, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(23, 23, 23, 0.05);
+  --shadow-card: 0 2px 6px -1px rgba(23, 23, 23, 0.04), 0 1px 2px -1px rgba(23, 23, 23, 0.02);
+  --shadow-medium: 0 4px 12px -2px rgba(23, 23, 23, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(23, 23, 23, 0.06);
+  --shadow-elevated: 0 12px 24px -4px rgba(23, 23, 23, 0.08);
+  --shadow-modal: 0 24px 32px -8px rgba(23, 23, 23, 0.12);
 
   /* ----------------------------------------------------------------------------
    * 6. TRANSITIONS & ANIMATIONS

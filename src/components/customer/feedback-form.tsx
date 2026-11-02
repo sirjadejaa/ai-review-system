@@ -9,20 +9,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
-  PREDEFINED_FEEDBACK_TAGS,
+  FASHION_FEEDBACK_TAGS,
   type PredefinedFeedbackTag,
 } from '@/lib/validation/feedback-schema';
 import { submitCustomerFeedbackAction } from '@/lib/actions/feedback-actions';
 import { AIReviewAssistant } from './ai-review-assistant';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
-import { Check, Plus, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
+import { Check, Plus, Sparkles, ArrowLeft } from 'lucide-react';
 
 const RATING_LABELS: Record<number, string> = {
   1: '1 Star — Needs Improvement',
   2: '2 Stars — Fair Experience',
   3: '3 Stars — Good Experience',
   4: '4 Stars — Very Good Experience',
-  5: '5 Stars — Excellent Experience',
+  5: '5 Stars — Exceptional Boutique Experience',
 };
 
 export interface FeedbackFormProps {
@@ -33,7 +33,7 @@ export interface FeedbackFormProps {
 }
 
 export const FeedbackForm: React.FC<FeedbackFormProps> = ({
-  shopName = 'Arogya Pharmacy',
+  shopName = 'Maison & Thread',
   logoUrl,
   googleReviewUrl,
   source,
@@ -109,10 +109,10 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           <Badge variant="success" size="md">
             Feedback Received
           </Badge>
-          <h1 className={styles.successTitle}>Thank you for your feedback!</h1>
+          <h1 className={styles.successTitle}>Thank you for visiting us!</h1>
           <p className={styles.successMessage}>
-            We appreciate you taking the time to share your experience with {shopName}.
-            Your feedback helps us continuously improve our patient care and service.
+            We appreciate you taking the time to share your feedback with {shopName}.
+            Your thoughts help us continuously refine our curated collections, fitting, and customer service.
           </p>
           <div className={styles.successActions}>
             <Link
@@ -120,7 +120,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
               style={{ textDecoration: 'none', width: '100%' }}
             >
               <Button variant="primary" size="lg" fullWidth>
-                Back to Pharmacy Home
+                Back to Boutique Home
               </Button>
             </Link>
             <Link
@@ -128,7 +128,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
               style={{ textDecoration: 'none', width: '100%' }}
             >
               <Button variant="outline" size="lg" fullWidth>
-                View Digital Pharmacy Card
+                View Boutique Privilege Card
               </Button>
             </Link>
           </div>
@@ -143,29 +143,29 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 'var(--space-2)' }}>
         <Link href={source ? `/?source=${encodeURIComponent(source)}` : '/'} className={styles.backLink}>
           <ArrowLeft size={16} aria-hidden="true" style={{ marginRight: 'var(--space-1)' }} />
-          <span>Return to Home</span>
+          <span>Return to Boutique</span>
         </Link>
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoUrl}
             alt={`${shopName} logo`}
-            style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 'var(--radius-sm)' }}
+            style={{ width: 34, height: 34, objectFit: 'contain', borderRadius: 'var(--radius-sm)' }}
           />
         ) : (
-          <PharmacyLogo size="sm" variant="mark" />
+          <BoutiqueLogo size="sm" variant="mark" shopName={shopName} />
         )}
       </div>
 
       <section className={styles.headerSection}>
-        <div style={{ fontSize: '0.6875rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-secondary)', fontWeight: 600 }}>
+        <div style={{ fontSize: '0.6875rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-accent)', fontWeight: 600 }}>
           {shopName}
         </div>
         <h1 className="editorial-title" style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>
-          How was your experience?
+          How was your shopping visit?
         </h1>
         <p className={styles.pageDescription} style={{ color: 'var(--color-text-secondary)', margin: 0 }}>
-          Your feedback helps us serve you better.
+          Tap a rating below to share your experience and generate a natural Google review.
         </p>
       </section>
 
@@ -190,7 +190,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
               label={rating ? `${rating} of 5 stars` : 'Rate from 1 to 5 stars'}
             />
             <span className={styles.ratingHint}>
-              {rating ? RATING_LABELS[rating] : 'Tap a star to rate'}
+              {rating ? RATING_LABELS[rating] : 'Tap a star to begin'}
             </span>
           </div>
           {fieldErrors.rating && (
@@ -200,14 +200,14 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           )}
         </fieldset>
 
-        {/* 2. Experience Tags Section (Optional) */}
+        {/* 2. Fashion Experience Tags Section (PraiseUp Style Chips) */}
         <fieldset className={styles.section} style={{ border: 'none', padding: 0, margin: 0 }}>
           <legend className={styles.sectionTitle}>
-            <span>What went well?</span>
-            <span className={styles.sectionSubtitle}>(Optional)</span>
+            <span>What stood out most?</span>
+            <span className={styles.sectionSubtitle}>(Optional highlights)</span>
           </legend>
-          <div className={styles.tagGrid} role="group" aria-label="Experience Highlights">
-            {PREDEFINED_FEEDBACK_TAGS.map((tag) => {
+          <div className={styles.tagGrid} role="group" aria-label="Fashion Experience Highlights">
+            {FASHION_FEEDBACK_TAGS.map((tag) => {
               const isSelected = selectedTags.includes(tag);
               return (
                 <button
@@ -232,26 +232,18 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
         {/* 3. Customer Notes Section (Optional) */}
         <div className={styles.section}>
           <Textarea
-            label="Anything else you'd like to share? (Optional)"
-            placeholder="Tell us about your experience with our staff, medicines, or service..."
+            label="Additional thoughts or specific items? (Optional)"
+            placeholder="e.g. Loved the linen shirts, fabric quality was super premium, or the fitting room staff was very helpful..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             maxLength={1000}
             rows={3}
             error={fieldErrors.notes}
-            helpText="Please avoid sharing personal medical history or prescription details."
+            helpText="Mention any specific collection, garment fit, or staff member who assisted you."
           />
           <div className={styles.charCount}>
             <span>{notes.length} / 1000</span>
           </div>
-        </div>
-
-        {/* Medical Privacy Guidance Callout */}
-        <div className={styles.privacyNotice} role="note">
-          <ShieldCheck size={16} aria-hidden="true" style={{ color: 'var(--color-primary)', flexShrink: 0, marginTop: '2px' }} />
-          <span>
-            <strong>Privacy Note:</strong> Please avoid sharing sensitive medical history, doctor prescriptions, or health conditions.
-          </span>
         </div>
 
         {/* 4. AI Review Assistant (Integrated) */}
@@ -266,7 +258,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
           />
         </div>
 
-        {/* 5. Optional Direct Pharmacy Feedback Submission */}
+        {/* 5. Optional Direct Boutique Owner Feedback Submission */}
         <div
           style={{
             borderTop: '1px solid var(--color-border)',
@@ -285,7 +277,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 margin: 0,
               }}
             >
-              Send Private Feedback to Store Owner
+              Send Direct Note to Boutique Owner
             </h3>
             <p
               style={{
@@ -294,19 +286,19 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
                 margin: 0,
               }}
             >
-              Optional: Submit your response directly to the pharmacy management.
+              Private to store management only. Great for special requests, alteration feedback, or personal service notes.
             </p>
           </div>
 
           <Input
-            label="Phone number for follow-up (Optional)"
+            label="Phone number for personal follow-up (Optional)"
             placeholder="e.g. 98765 43210"
             type="tel"
             value={customerContact}
             onChange={(e) => setCustomerContact(e.target.value)}
             maxLength={100}
             error={fieldErrors.customerContact}
-            helpText="Optional: Provide a number only if you would like the store owner to follow up."
+            helpText="Optional: Leave a phone or WhatsApp number if you would like our store manager to reach out."
           />
 
           <Button
@@ -317,7 +309,7 @@ export const FeedbackForm: React.FC<FeedbackFormProps> = ({
             disabled={!rating || isSubmitting}
             isLoading={isSubmitting}
           >
-            Submit Private Feedback
+            Submit Private Store Feedback
           </Button>
         </div>
       </form>

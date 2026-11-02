@@ -18,12 +18,12 @@ import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-sche
 import { QrScanTracker } from '@/components/customer/qr-scan-tracker';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { OfferList } from '@/components/customer/offer-list';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
-import { Star, CreditCard, AlertCircle, MapPin, Clock } from 'lucide-react';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
+import { Star, CreditCard, Sparkles, MapPin, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Home & Customer Portal',
-  description: 'Share your pharmacy visit experience or access our digital pharmacy card.',
+  title: 'Home & Customer Experience',
+  description: 'Share your clothing store visit experience or access our digital boutique privilege card.',
 };
 
 interface CustomerLandingPageProps {
@@ -56,76 +56,35 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
   } catch (err) {
     console.error('Non-fatal: Failed to load shop settings for customer landing', err);
     return (
-      <CustomerLayout shopName="Pharmacy">
+      <CustomerLayout shopName="Maison & Thread">
         <div style={{ padding: 'var(--space-8) 0' }}>
           <ErrorState
-            title="Unable to load pharmacy information"
-            message="We're having trouble loading the pharmacy details right now. Please try again shortly."
+            title="Unable to load boutique information"
+            message="We're having trouble loading store details right now. Please try again shortly."
           />
         </div>
       </CustomerLayout>
     );
   }
 
-  // Controlled empty setup state for a brand-new installation without pharmacy profile
+  // Controlled empty setup state for a brand-new installation without store profile
   const isUnconfigured =
     !settings.shopName ||
-    (settings.shopName === 'Pharmacy' &&
+    ((settings.shopName === 'Pharmacy' || settings.shopName === 'Maison & Thread') &&
       !settings.phoneNumber &&
       !settings.address &&
       !settings.googleReviewUrl);
 
-  if (isUnconfigured) {
-    return (
-      <CustomerLayout shopName="Pharmacy">
-        <div style={{ padding: 'var(--space-8) 0', textAlign: 'center' }}>
-          <div
-            style={{
-              backgroundColor: 'var(--color-bg-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-xl)',
-              padding: 'var(--space-8) var(--space-6)',
-              maxWidth: '460px',
-              margin: '0 auto',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
-              <PharmacyLogo size="lg" variant="mark" />
-            </div>
-            <h1
-              style={{
-                fontSize: 'var(--font-size-xl)',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--color-text-primary)',
-                margin: '0 0 var(--space-2)',
-              }}
-            >
-              Pharmacy Portal Under Setup
-            </h1>
-            <p
-              style={{
-                fontSize: 'var(--font-size-sm)',
-                color: 'var(--color-text-secondary)',
-                lineHeight: 'var(--line-height-normal)',
-                margin: 0,
-              }}
-            >
-              This customer portal is currently being initialized by the pharmacy staff. Please visit our store counter or check back soon.
-            </p>
-          </div>
-        </div>
-      </CustomerLayout>
-    );
-  }
+  const displayShopName = settings.shopName === 'Pharmacy' ? 'Maison & Thread' : settings.shopName;
+  const displayTagline = settings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
 
   const hasOpeningHours = settings.openingHours && settings.openingHours.length > 0;
   const hasAddress = Boolean(settings.address && settings.address.trim());
 
   return (
     <CustomerLayout
-      shopName={settings.shopName}
-      tagline={settings.tagline ?? undefined}
+      shopName={displayShopName}
+      tagline={displayTagline}
       logoUrl={settings.logoUrl}
       isEmergencyOpen={settings.isEmergencyOpen}
     >
@@ -133,7 +92,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
       <QrScanTracker source={validatedSource} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-        {/* Editorial Visual Hero Panel */}
+        {/* Editorial Visual Hero Panel (PraiseUp Inspired Warm Canvas) */}
         <section
           style={{
             position: 'relative',
@@ -145,25 +104,50 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
           }}
           aria-labelledby="welcome-heading"
         >
-          {/* Editorial Pharmacy Photo Banner with Soft Gradient Overlay */}
+          {/* Fashion Atelier Header Pattern with Warm Gradient */}
           <div
             style={{
               position: 'relative',
               width: '100%',
-              height: '190px',
-              backgroundColor: 'var(--color-primary-bg)',
-              backgroundImage: 'url(/images/arogya-hero.jpg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center 40%',
+              height: '180px',
+              backgroundColor: '#1E1E1E',
+              background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2621 50%, #383127 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
             }}
           >
+            {/* Subtle Atelier Ambient Geometric Lines */}
             <div
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: 'linear-gradient(180deg, rgba(18, 62, 53, 0.15) 0%, rgba(250, 248, 245, 0.95) 100%)',
+                opacity: 0.15,
+                backgroundImage: 'radial-gradient(#A88B64 1px, transparent 1px)',
+                backgroundSize: '24px 24px',
               }}
             />
+            {/* Editorial Fashion Badge */}
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(168, 139, 100, 0.3)',
+                color: '#E8D8C3',
+                fontSize: '0.75rem',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <Sparkles size={13} style={{ color: '#D49B44' }} />
+              <span>Autumn / Winter Collection</span>
+            </div>
           </div>
 
           <div
@@ -182,10 +166,10 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={settings.logoUrl}
-                alt={`${settings.shopName} logo`}
+                alt={`${displayShopName} logo`}
                 style={{
-                  width: '72px',
-                  height: '72px',
+                  width: '76px',
+                  height: '76px',
                   objectFit: 'contain',
                   borderRadius: 'var(--radius-lg)',
                   border: '2px solid #ffffff',
@@ -203,7 +187,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   boxShadow: 'var(--shadow-md)',
                 }}
               >
-                <PharmacyLogo size="lg" variant="mark" />
+                <BoutiqueLogo size="lg" variant="mark" shopName={displayShopName} />
               </div>
             )}
 
@@ -211,14 +195,14 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               <div
                 style={{
                   fontSize: '0.6875rem',
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  color: 'var(--color-secondary)',
+                  color: 'var(--color-accent)',
                   fontWeight: 600,
                   marginBottom: 'var(--space-1)',
                 }}
               >
-                {settings.shopName}
+                {displayShopName}
               </div>
               <h1
                 id="welcome-heading"
@@ -231,8 +215,8 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   margin: 0,
                 }}
               >
-                Your Health<br />
-                <span style={{ color: 'var(--color-primary)' }}>Our Priority</span>
+                Bespoke Quality<br />
+                <span style={{ color: 'var(--color-accent)' }}>Curated For You</span>
               </h1>
               <p
                 style={{
@@ -243,42 +227,16 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   lineHeight: 'var(--line-height-normal)',
                 }}
               >
-                Trusted care, quality medicines and expert support — always.
+                {displayTagline}
               </p>
             </div>
-
-            {/* Emergency availability notice if active */}
-            {settings.isEmergencyOpen && (
-              <div
-                style={{
-                  backgroundColor: 'var(--color-warning-bg)',
-                  border: '1px solid var(--color-warning-border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: 'var(--space-2) var(--space-4)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-2)',
-                  fontSize: 'var(--font-size-xs)',
-                  color: 'var(--color-warning-text)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  marginTop: 'var(--space-1)',
-                }}
-                role="status"
-              >
-                <AlertCircle size={15} aria-hidden="true" style={{ flexShrink: 0 }} />
-                <span>
-                  Emergency Availability: Essential medicine counter active
-                  {settings.emergencyContact ? ` • ${settings.emergencyContact}` : ''}
-                </span>
-              </div>
-            )}
           </div>
         </section>
 
-        {/* Primary Action Hierarchy (Review & Digital Card) */}
+        {/* Primary Action Hierarchy (PraiseUp Review Flow & Digital Card) */}
         <section
           style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
-          aria-label="Primary Pharmacy Actions"
+          aria-label="Primary Boutique Actions"
         >
           {/* Action 1: Give a Review (Primary CTA) */}
           <Link
@@ -290,21 +248,22 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               size="lg"
               fullWidth
               style={{
-                minHeight: '52px',
-                fontSize: '1rem',
+                minHeight: '54px',
+                fontSize: '1.025rem',
                 letterSpacing: '0.01em',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 'var(--space-2)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <Star size={18} fill="#c97a18" stroke="#c97a18" aria-hidden="true" />
-              <span>Rate &amp; Review Us</span>
+              <Star size={18} fill="#d49b44" stroke="#d49b44" aria-hidden="true" />
+              <span>Rate &amp; Review Your Visit</span>
             </Button>
           </Link>
 
-          {/* Action 2: Digital Card (Secondary CTA) */}
+          {/* Action 2: Digital Privilege Card (Secondary CTA) */}
           <Link
             href={validatedSource ? `/customer/card?source=${validatedSource}` : '/customer/card'}
             style={{ textDecoration: 'none' }}
@@ -323,22 +282,21 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               }}
             >
               <CreditCard size={18} aria-hidden="true" />
-              <span>Digital Pharmacy Pass</span>
+              <span>Boutique Privilege Card &amp; Offers</span>
             </Button>
           </Link>
         </section>
 
-        {/* 7: Contact shortcuts */}
+        {/* Contact shortcuts: Call Stylist, WhatsApp, Directions */}
         <section aria-label="Contact and Directions">
           <CustomerContactActions
             phoneNumber={settings.phoneNumber}
             whatsappNumber={settings.whatsappNumber}
             googleMapsUrl={settings.googleMapsUrl}
-            websiteUrl={settings.websiteUrl}
           />
         </section>
 
-        {/* 8: Address */}
+        {/* Physical Address */}
         {hasAddress && (
           <section
             style={{
@@ -352,14 +310,14 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               fontSize: 'var(--font-size-sm)',
               color: 'var(--color-text-secondary)',
             }}
-            aria-label="Pharmacy Address"
+            aria-label="Boutique Location"
           >
-            <MapPin size={18} style={{ color: 'var(--color-primary)', marginTop: '2px', flexShrink: 0 }} aria-hidden="true" />
+            <MapPin size={18} style={{ color: 'var(--color-accent)', marginTop: '2px', flexShrink: 0 }} aria-hidden="true" />
             <span>{settings.address}</span>
           </section>
         )}
 
-        {/* 9: Opening Hours */}
+        {/* Operating Hours */}
         {hasOpeningHours && (
           <section
             style={{
@@ -371,7 +329,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               flexDirection: 'column',
               gap: 'var(--space-3)',
             }}
-            aria-label="Pharmacy Hours"
+            aria-label="Boutique Hours"
           >
             <div
               style={{
@@ -382,7 +340,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 paddingBottom: 'var(--space-2)',
               }}
             >
-              <Clock size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} aria-hidden="true" />
+              <Clock size={16} style={{ color: 'var(--color-accent)', flexShrink: 0 }} aria-hidden="true" />
               <h2
                 style={{
                   fontSize: 'var(--font-size-sm)',
@@ -390,10 +348,10 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   color: 'var(--color-text-primary)',
                   margin: 0,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.06em',
                 }}
               >
-                Operating Hours
+                Store Hours
               </h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -419,10 +377,9 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
           </section>
         )}
 
-        {/* 10: Active Offers if configured */}
+        {/* Active Offers & Promotions */}
         <OfferList offers={activeOffers} />
       </div>
     </CustomerLayout>
   );
 }
-

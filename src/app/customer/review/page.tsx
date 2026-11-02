@@ -6,8 +6,8 @@ import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-sche
 import { isValidExternalUrl } from '@/lib/format/contact-links';
 
 export const metadata: Metadata = {
-  title: 'Give a Review & Feedback',
-  description: 'Share your visit feedback and compose an AI-assisted Google review for our pharmacy.',
+  title: 'Rate & Review Boutique',
+  description: 'Share your shopping experience and generate a natural, AI-assisted review for our clothing boutique.',
 };
 
 export const maxDuration = 15;
@@ -30,13 +30,16 @@ export default async function CustomerReviewPage({ searchParams }: CustomerRevie
   } catch (error) {
     console.error('Non-fatal: Failed to load shop settings for review page', error);
     settings = {
-      shopName: 'Pharmacy',
-      tagline: null,
+      shopName: 'Maison & Thread',
+      tagline: 'Curated Contemporary Fashion & Bespoke Tailoring',
       logoUrl: null,
       isEmergencyOpen: false,
       googleReviewUrl: null,
     };
   }
+
+  const displayShopName = settings.shopName === 'Pharmacy' ? 'Maison & Thread' : settings.shopName;
+  const displayTagline = settings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
 
   // 3. Strictly validate configured Google Review URL from server settings
   const rawGoogleUrl = settings.googleReviewUrl?.trim();
@@ -45,13 +48,13 @@ export default async function CustomerReviewPage({ searchParams }: CustomerRevie
 
   return (
     <CustomerLayout
-      shopName={settings.shopName}
-      tagline={settings.tagline ?? undefined}
+      shopName={displayShopName}
+      tagline={displayTagline}
       logoUrl={settings.logoUrl}
       isEmergencyOpen={settings.isEmergencyOpen}
     >
       <FeedbackForm
-        shopName={settings.shopName}
+        shopName={displayShopName}
         logoUrl={settings.logoUrl}
         googleReviewUrl={safeGoogleReviewUrl}
         source={validatedSource}

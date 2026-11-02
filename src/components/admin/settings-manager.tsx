@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import type { DomainShopSettings, OpeningHourSlot } from '@/lib/domain/types';
 import {
   updateShopSettingsAction,
-  uploadPharmacyLogoAction,
-  removePharmacyLogoAction,
+  uploadBoutiqueLogoAction,
+  removeBoutiqueLogoAction,
 } from '@/lib/actions/settings-actions';
 import {
   Card,
@@ -19,51 +19,77 @@ import {
   Textarea,
   Badge,
 } from '@/components/ui';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import { StoreQrModal } from '@/components/admin/store-qr-modal';
-import { QrCode, Palette } from 'lucide-react';
-import {
-  HEALTHCARE_COLOR_PRESETS,
-  DEFAULT_PRIMARY_COLOR,
-  DEFAULT_SECONDARY_COLOR,
-  DEFAULT_ACCENT_COLOR,
-  type HealthcareColorPreset,
-} from '@/lib/branding/theme';
+import { QrCode, Sparkles, Palette, Globe } from 'lucide-react';
 import styles from './settings-manager.module.css';
 
 interface SettingsManagerProps {
   initialSettings: DomainShopSettings;
 }
 
+const PALETTE_PRESETS = [
+  {
+    name: 'Noir & Atelier Gold',
+    primary: '#171717',
+    secondary: '#3a3a3a',
+    accent: '#a88b64',
+  },
+  {
+    name: 'Cashmere & Sand',
+    primary: '#2b2621',
+    secondary: '#544b43',
+    accent: '#c2a68c',
+  },
+  {
+    name: 'Midnight & Silk',
+    primary: '#161b26',
+    secondary: '#323b4e',
+    accent: '#8b9eb7',
+  },
+  {
+    name: 'Atelier Olive & Linen',
+    primary: '#222b24',
+    secondary: '#465248',
+    accent: '#9eab9d',
+  },
+];
+
 export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSettings }) => {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [shopName, setShopName] = useState(initialSettings.shopName);
-  const [tagline, setTagline] = useState(initialSettings.tagline ?? '');
+  const defaultShopName = initialSettings.shopName === 'Pharmacy' ? 'Maison & Thread' : initialSettings.shopName;
+  const defaultTagline = initialSettings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
+
+  const [shopName, setShopName] = useState(defaultShopName);
+  const [tagline, setTagline] = useState(defaultTagline);
   const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(initialSettings.logoUrl ?? null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
 
-  // Pharmacy Brand Colors
-  const [primaryColor, setPrimaryColor] = useState(initialSettings.primaryColor ?? DEFAULT_PRIMARY_COLOR);
-  const [secondaryColor, setSecondaryColor] = useState(initialSettings.secondaryColor ?? DEFAULT_SECONDARY_COLOR);
-  const [accentColor, setAccentColor] = useState(initialSettings.accentColor ?? DEFAULT_ACCENT_COLOR);
+  // Custom Colors
+  const [primaryColor, setPrimaryColor] = useState(initialSettings.primaryColor || '#171717');
+  const [secondaryColor, setSecondaryColor] = useState(initialSettings.secondaryColor || '#3a3a3a');
+  const [accentColor, setAccentColor] = useState(initialSettings.accentColor || '#a88b64');
 
   const [phoneNumber, setPhoneNumber] = useState(initialSettings.phoneNumber ?? '');
   const [whatsappNumber, setWhatsappNumber] = useState(initialSettings.whatsappNumber ?? '');
-  const [emergencyContact, setEmergencyContact] = useState(initialSettings.emergencyContact ?? '');
-  const [websiteUrl, setWebsiteUrl] = useState(initialSettings.websiteUrl ?? '');
   const [address, setAddress] = useState(initialSettings.address ?? '');
   const [googleMapsUrl, setGoogleMapsUrl] = useState(initialSettings.googleMapsUrl ?? '');
   const [googleReviewUrl, setGoogleReviewUrl] = useState(initialSettings.googleReviewUrl ?? '');
+  const [websiteUrl, setWebsiteUrl] = useState(initialSettings.websiteUrl ?? '');
+  const [socialLinksText, setSocialLinksText] = useState(
+    Array.isArray(initialSettings.socialLinks) ? initialSettings.socialLinks.join(', ') : ''
+  );
+
   const [openingHours, setOpeningHours] = useState<OpeningHourSlot[]>(
     initialSettings.openingHours.length > 0
       ? initialSettings.openingHours
       : [
-          { days: 'Monday - Saturday', hours: '8:00 AM - 11:00 PM' },
-          { days: 'Sunday', hours: '9:00 AM - 9:00 PM' },
+          { days: 'Monday - Saturday', hours: '10:00 AM - 9:00 PM' },
+          { days: 'Sunday', hours: '11:00 AM - 7:00 PM' },
         ]
   );
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(initialSettings.isEmergencyOpen);
@@ -81,6 +107,13 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     setTimeout(() => {
       setNotification((curr) => (curr?.text === text ? null : curr));
     }, 4500);
+  };
+
+  const handleApplyPalette = (palette: typeof PALETTE_PRESETS[number]) => {
+    setPrimaryColor(palette.primary);
+    setSecondaryColor(palette.secondary);
+    setAccentColor(palette.accent);
+    showNotification('success', `Applied ${palette.name} theme colors.`);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,12 +138,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     const formData = new FormData();
     formData.append('logo', file);
 
-    const result = await uploadPharmacyLogoAction(formData);
+    const result = await uploadBoutiqueLogoAction(formData);
     setIsUploadingLogo(false);
 
     if (result.success && result.logoUrl) {
       setCurrentLogoUrl(result.logoUrl);
-      showNotification('success', 'Pharmacy logo uploaded and saved successfully.');
+      showNotification('success', 'Boutique logo uploaded and saved successfully.');
       startTransition(() => router.refresh());
     } else {
       setLogoError(result.message || 'Failed to upload logo.');
@@ -123,7 +156,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     setIsUploadingLogo(true);
     setLogoError(null);
 
-    const result = await removePharmacyLogoAction();
+    const result = await removeBoutiqueLogoAction();
     setIsUploadingLogo(false);
 
     if (result.success) {
@@ -131,7 +164,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-      showNotification('success', 'Pharmacy logo removed successfully.');
+      showNotification('success', 'Boutique logo removed successfully.');
       startTransition(() => router.refresh());
     } else {
       setLogoError(result.message || 'Failed to remove logo.');
@@ -149,7 +182,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
   };
 
   const handleAddSlot = () => {
-    setOpeningHours((prev) => [...prev, { days: 'New Day/Slot', hours: '8:00 AM - 10:00 PM' }]);
+    setOpeningHours((prev) => [...prev, { days: 'New Slot', hours: '10:00 AM - 9:00 PM' }]);
   };
 
   const handleRemoveSlot = (index: number) => {
@@ -163,18 +196,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
   const handleApplyPreset = (preset: 'standard' | 'alldays') => {
     if (preset === 'standard') {
       setOpeningHours([
-        { days: 'Monday - Saturday', hours: '8:00 AM - 11:00 PM' },
-        { days: 'Sunday', hours: 'Closed' },
+        { days: 'Monday - Saturday', hours: '10:00 AM - 9:00 PM' },
+        { days: 'Sunday', hours: '11:00 AM - 7:00 PM' },
       ]);
     } else if (preset === 'alldays') {
-      setOpeningHours([{ days: 'All Days', hours: '8:00 AM - 11:00 PM' }]);
+      setOpeningHours([{ days: 'All Days', hours: '10:00 AM - 9:00 PM' }]);
     }
-  };
-
-  const handleApplyColorPreset = (preset: HealthcareColorPreset) => {
-    setPrimaryColor(preset.primary);
-    setSecondaryColor(preset.secondary);
-    setAccentColor(preset.accent);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -185,19 +212,26 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     // Filter out completely empty rows
     const cleanedHours = openingHours.filter((slot) => slot.days.trim() && slot.hours.trim());
 
+    // Parse social links from comma-separated string
+    const socialLinksArray = socialLinksText
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const payload = {
       shopName: shopName.trim(),
       tagline: tagline.trim() ? tagline.trim() : null,
-      primaryColor: primaryColor.trim() ? primaryColor.trim() : null,
-      secondaryColor: secondaryColor.trim() ? secondaryColor.trim() : null,
-      accentColor: accentColor.trim() ? accentColor.trim() : null,
+      logoUrl: currentLogoUrl,
+      primaryColor,
+      secondaryColor,
+      accentColor,
       phoneNumber: phoneNumber.trim() ? phoneNumber.trim() : null,
       whatsappNumber: whatsappNumber.trim() ? whatsappNumber.trim() : null,
-      emergencyContact: emergencyContact.trim() ? emergencyContact.trim() : null,
       address: address.trim() ? address.trim() : null,
       googleMapsUrl: googleMapsUrl.trim() ? googleMapsUrl.trim() : null,
       googleReviewUrl: googleReviewUrl.trim() ? googleReviewUrl.trim() : null,
       websiteUrl: websiteUrl.trim() ? websiteUrl.trim() : null,
+      socialLinks: socialLinksArray,
       openingHours: cleanedHours,
       isEmergencyOpen,
     };
@@ -206,7 +240,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     setIsSubmitting(false);
 
     if (result.success) {
-      showNotification('success', 'Pharmacy settings and information saved successfully.');
+      showNotification('success', 'Boutique information and styling saved successfully.');
       startTransition(() => router.refresh());
     } else {
       if (result.fieldErrors) {
@@ -230,12 +264,12 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
       )}
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        {/* Section 1: Pharmacy Identity & Branding */}
+        {/* Section 1: Boutique Identity & Branding */}
         <Card>
           <CardHeader>
-            <CardTitle>Pharmacy Identity & Branding</CardTitle>
+            <CardTitle>Boutique Identity &amp; Branding</CardTitle>
             <CardDescription>
-              Pharmacy branding, official logo, and name displayed across customer portals and digital cards.
+              Store branding, official atelier logo, and name displayed across customer review pages and privilege cards.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -251,7 +285,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                     marginBottom: 'var(--space-2)',
                   }}
                 >
-                  Pharmacy Logo
+                  Boutique Logo
                 </label>
                 <div className={styles.logoSection}>
                   <div className={styles.logoPreviewContainer}>
@@ -259,11 +293,11 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={currentLogoUrl}
-                        alt="Pharmacy Logo Preview"
+                        alt="Boutique Logo Preview"
                         className={styles.logoImage}
                       />
                     ) : (
-                      <PharmacyLogo
+                      <BoutiqueLogo
                         shopName={shopName}
                         variant="mark"
                         size="md"
@@ -290,7 +324,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                         {isUploadingLogo
                           ? 'Uploading...'
                           : currentLogoUrl
-                          ? 'Change'
+                          ? 'Change Logo'
                           : 'Upload Logo'}
                       </Button>
                       {currentLogoUrl && (
@@ -306,7 +340,7 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                       )}
                     </div>
                     <p className={styles.logoHelpText}>
-                      Supported formats: PNG, JPEG, or WebP. Maximum size 3MB. Displayed on public pages and cards.
+                      Supported formats: PNG, JPEG, or WebP. Maximum size 3MB. Displayed on public review pages and digital passes.
                     </p>
                     {logoError && <p className={styles.logoError}>{logoError}</p>}
                   </div>
@@ -314,443 +348,290 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
               </div>
 
               <Input
-                label="Pharmacy Name"
+                label="Store Name"
                 required
                 value={shopName}
                 error={fieldErrors.shopName}
-                helpText="The primary business title for your pharmacy."
-                placeholder="e.g. Arogya Pharmacy"
+                helpText="The primary brand title for your clothing store."
+                placeholder="e.g. Maison & Thread"
                 onChange={(e) => setShopName(e.target.value)}
               />
 
               <Input
-                label="Tagline (Optional)"
+                label="Tagline & Brand Statement"
                 value={tagline}
                 error={fieldErrors.tagline}
-                helpText="Short trust banner (e.g. Better Health. Brighter Tomorrow.)."
-                placeholder="e.g. Better Health. Brighter Tomorrow."
+                helpText="Short editorial descriptor (e.g. Curated Contemporary Fashion & Bespoke Tailoring)."
+                placeholder="e.g. Luxury Apparel & Bespoke Studio"
+                maxLength={150}
                 onChange={(e) => setTagline(e.target.value)}
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Section 1.5: Brand Colors & Visual Theme */}
+        {/* Section 2: Visual Brand Palette Customization */}
         <Card>
           <CardHeader>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              <div>
-                <CardTitle>Brand Colors &amp; Visual Theme</CardTitle>
-                <CardDescription>
-                  Choose a clinically vetted healthcare palette or customize individual brand colors. Applied dynamically across your customer portal, digital card, and admin views.
-                </CardDescription>
-              </div>
-              <Badge variant="neutral" size="sm">
-                <Palette size={13} style={{ marginRight: '4px' }} />
-                Dynamic Theming
-              </Badge>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Palette size={18} style={{ color: 'var(--color-accent)' }} />
+              <CardTitle>Brand Colors &amp; Styling</CardTitle>
             </div>
+            <CardDescription>
+              Customize your boutique palette or select an editorial fashion preset.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: 'var(--color-text-primary)',
-                  marginBottom: 'var(--space-2)',
-                }}
-              >
-                Healthcare Color Palettes
-              </label>
-              <div className={styles.presetsGrid}>
-                {HEALTHCARE_COLOR_PRESETS.map((preset) => {
-                  const isSelected =
-                    primaryColor.toLowerCase() === preset.primary.toLowerCase() &&
-                    secondaryColor.toLowerCase() === preset.secondary.toLowerCase();
-                  return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div>
+                <label style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-text-secondary)', display: 'block', marginBottom: '8px' }}>
+                  Editorial Presets
+                </label>
+                <div className={styles.palettePresets}>
+                  {PALETTE_PRESETS.map((p) => (
                     <button
-                      key={preset.id}
+                      key={p.name}
                       type="button"
-                      className={`${styles.presetCard} ${isSelected ? styles.presetSelected : ''}`}
-                      onClick={() => handleApplyColorPreset(preset)}
+                      className={styles.palettePresetBtn}
+                      onClick={() => handleApplyPalette(p)}
                     >
-                      <div className={styles.presetHeader}>
-                        <span className={styles.presetName}>{preset.name}</span>
-                        <div className={styles.colorDots}>
-                          <span
-                            className={styles.colorDot}
-                            style={{ backgroundColor: preset.primary }}
-                            title={`Primary: ${preset.primary}`}
-                          />
-                          <span
-                            className={styles.colorDot}
-                            style={{ backgroundColor: preset.secondary }}
-                            title={`Secondary: ${preset.secondary}`}
-                          />
-                          <span
-                            className={styles.colorDot}
-                            style={{ backgroundColor: preset.accent }}
-                            title={`Accent: ${preset.accent}`}
-                          />
-                        </div>
+                      <div className={styles.swatchPreview}>
+                        <span className={styles.swatchDot} style={{ backgroundColor: p.primary }} />
+                        <span className={styles.swatchDot} style={{ backgroundColor: p.secondary }} />
+                        <span className={styles.swatchDot} style={{ backgroundColor: p.accent }} />
                       </div>
-                      <p className={styles.presetDesc}>{preset.description}</p>
+                      <span>{p.name}</span>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-
-              {/* Custom Hex Color Pickers */}
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--font-size-sm)',
-                  fontWeight: 'var(--font-weight-medium)',
-                  color: 'var(--color-text-primary)',
-                  marginBottom: 'var(--space-1)',
-                  marginTop: 'var(--space-4)',
-                }}
-              >
-                Custom Color Adjustments
-              </label>
-              <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)', margin: '0 0 var(--space-3) 0' }}>
-                Fine-tune each brand color individually using hex codes or the color picker.
-              </p>
 
               <div className={styles.colorPickerGrid}>
-                <div className={styles.colorFieldCard}>
-                  <span className={styles.colorFieldLabel}>Primary Brand</span>
+                <div className={styles.colorFieldGroup}>
+                  <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                    Primary Noir / Brand
+                  </label>
                   <div className={styles.colorInputRow}>
                     <input
                       type="color"
-                      value={primaryColor.length === 7 ? primaryColor : '#123e35'}
-                      className={styles.colorPickerInput}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                    />
-                    <input
-                      type="text"
                       value={primaryColor}
-                      maxLength={7}
-                      placeholder="#123e35"
-                      className={styles.colorHexInput}
                       onChange={(e) => setPrimaryColor(e.target.value)}
+                      className={styles.colorNativePicker}
+                      aria-label="Pick primary color"
+                    />
+                    <Input
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      placeholder="#171717"
+                      maxLength={7}
                     />
                   </div>
-                  {fieldErrors.primaryColor && (
-                    <span className={styles.logoError}>{fieldErrors.primaryColor}</span>
-                  )}
                 </div>
 
-                <div className={styles.colorFieldCard}>
-                  <span className={styles.colorFieldLabel}>Secondary Brand</span>
+                <div className={styles.colorFieldGroup}>
+                  <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                    Secondary Slate / Charcoal
+                  </label>
                   <div className={styles.colorInputRow}>
                     <input
                       type="color"
-                      value={secondaryColor.length === 7 ? secondaryColor : '#4a6b61'}
-                      className={styles.colorPickerInput}
-                      onChange={(e) => setSecondaryColor(e.target.value)}
-                    />
-                    <input
-                      type="text"
                       value={secondaryColor}
-                      maxLength={7}
-                      placeholder="#4a6b61"
-                      className={styles.colorHexInput}
                       onChange={(e) => setSecondaryColor(e.target.value)}
+                      className={styles.colorNativePicker}
+                      aria-label="Pick secondary color"
+                    />
+                    <Input
+                      value={secondaryColor}
+                      onChange={(e) => setSecondaryColor(e.target.value)}
+                      placeholder="#3a3a3a"
+                      maxLength={7}
                     />
                   </div>
-                  {fieldErrors.secondaryColor && (
-                    <span className={styles.logoError}>{fieldErrors.secondaryColor}</span>
-                  )}
                 </div>
 
-                <div className={styles.colorFieldCard}>
-                  <span className={styles.colorFieldLabel}>Accent Brand</span>
+                <div className={styles.colorFieldGroup}>
+                  <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                    Boutique Accent Gold
+                  </label>
                   <div className={styles.colorInputRow}>
                     <input
                       type="color"
-                      value={accentColor.length === 7 ? accentColor : '#92bfa9'}
-                      className={styles.colorPickerInput}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                    />
-                    <input
-                      type="text"
                       value={accentColor}
-                      maxLength={7}
-                      placeholder="#92bfa9"
-                      className={styles.colorHexInput}
                       onChange={(e) => setAccentColor(e.target.value)}
+                      className={styles.colorNativePicker}
+                      aria-label="Pick accent color"
+                    />
+                    <Input
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
+                      placeholder="#a88b64"
+                      maxLength={7}
                     />
                   </div>
-                  {fieldErrors.accentColor && (
-                    <span className={styles.logoError}>{fieldErrors.accentColor}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Live Theme Preview Box */}
-              <div
-                className={styles.themePreviewCard}
-                style={{
-                  backgroundColor: 'var(--color-bg-surface-subtle)',
-                  borderColor: 'var(--color-border)',
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-semibold)', color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Live Palette Preview
-                  </div>
-                  <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', marginTop: '2px' }}>
-                    {shopName || 'Your Pharmacy'}
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <span
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: 'var(--radius-full)',
-                      fontSize: 'var(--font-size-xs)',
-                      fontWeight: 'var(--font-weight-medium)',
-                      backgroundColor: accentColor,
-                      color: '#123e35',
-                    }}
-                  >
-                    Accent Pill
-                  </span>
-                  <button
-                    type="button"
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: 'var(--font-size-xs)',
-                      fontWeight: 'var(--font-weight-semibold)',
-                      backgroundColor: primaryColor,
-                      color: '#ffffff',
-                      border: 'none',
-                      cursor: 'default',
-                    }}
-                  >
-                    Primary Button
-                  </button>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Section 2: Contact Numbers & Location */}
+        {/* Section 3: Contact Channels & Location */}
         <Card>
           <CardHeader>
-            <CardTitle>Contact Details &amp; Physical Location</CardTitle>
+            <CardTitle>Contact Channels &amp; Store Location</CardTitle>
             <CardDescription>
-              Contact actions used for customer one-click Calls, WhatsApp, and Google Maps directions.
+              Direct contact options for customer inquiries, stylist consultations, and store directions.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <div className={styles.sectionGrid}>
                 <Input
-                  label="Phone Number"
+                  label="Store Phone Number"
+                  type="tel"
                   value={phoneNumber}
                   error={fieldErrors.phoneNumber}
-                  helpText="Customers click to initiate phone calls."
+                  helpText="Displayed on customer card for direct calls."
                   placeholder="e.g. +91 98765 43210"
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />
 
                 <Input
-                  label="WhatsApp Number"
+                  label="Stylist WhatsApp Number"
+                  type="tel"
                   value={whatsappNumber}
                   error={fieldErrors.whatsappNumber}
-                  helpText="Customers click to start a WhatsApp chat."
+                  helpText="Direct chat link for sizing questions & collections."
                   placeholder="e.g. +91 98765 43210"
                   onChange={(e) => setWhatsappNumber(e.target.value)}
                 />
               </div>
 
-              <div className={styles.sectionGrid}>
-                <Input
-                  label="Official Website or Portal Link"
-                  value={websiteUrl}
-                  error={fieldErrors.websiteUrl}
-                  helpText="Optional web link (e.g. https://arogyapharmacy.in) shown on your digital card."
-                  placeholder="e.g. https://yourpharmacy.com"
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                />
-
-                <Input
-                  label="Emergency / After-Hours Contact"
-                  value={emergencyContact}
-                  error={fieldErrors.emergencyContact}
-                  helpText="Optional emergency helpline or on-call pharmacist note."
-                  placeholder="e.g. On-call Pharmacist: +91 98765 00000"
-                  onChange={(e) => setEmergencyContact(e.target.value)}
-                />
-              </div>
-
               <Textarea
-                label="Physical Address"
+                label="Physical Store Address"
                 value={address}
                 error={fieldErrors.address}
-                helpText="Full storefront street address shown on your digital card."
-                placeholder="e.g. Shop No. 4, Ground Floor, Station Road, Opp. Civil Hospital Gate 2"
-                rows={3}
+                helpText="Full street address, landmark, and city."
+                placeholder="e.g. Shop 4B, Heritage Galleria, Fashion Boulevard, Mumbai"
+                rows={2}
+                maxLength={250}
                 onChange={(e) => setAddress(e.target.value)}
               />
 
               <Input
                 label="Google Maps Location URL"
+                type="url"
                 value={googleMapsUrl}
                 error={fieldErrors.googleMapsUrl}
-                helpText="Must start with http:// or https://. Powers the 'Directions' button."
-                placeholder="e.g. https://maps.google.com/?q=..."
+                helpText="Valid link to your location on Google Maps for the Directions button."
+                placeholder="https://maps.google.com/?q=..."
                 onChange={(e) => setGoogleMapsUrl(e.target.value)}
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Section 3: Review Configuration */}
+        {/* Section 4: Google Review Integration */}
         <Card>
           <CardHeader>
-            <CardTitle>Google Review Configuration</CardTitle>
+            <CardTitle>Google Review Integration</CardTitle>
             <CardDescription>
-              The destination link where customers are guided after drafting their review with the AI assistant.
+              Direct Google Reviews link where happy customers will paste their generated review drafts.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Input
-              label="Google Review Page Link"
+              label="Google Review Direct URL"
+              type="url"
               value={googleReviewUrl}
               error={fieldErrors.googleReviewUrl}
-              helpText="Must start with http:// or https://. Usually formatted like https://g.page/r/example/review."
-              placeholder="e.g. https://g.page/r/example/review"
+              helpText="Your Google Business Profile review link (e.g. https://g.page/r/your-shop/review)."
+              placeholder="https://g.page/r/.../review"
               onChange={(e) => setGoogleReviewUrl(e.target.value)}
             />
           </CardContent>
         </Card>
 
-        {/* Section 3.5: Store QR Codes & Standees */}
+        {/* Section 5: Web & Social Presence */}
         <Card>
           <CardHeader>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-              <div>
-                <CardTitle>Physical Store QR Codes &amp; Counter Standees</CardTitle>
-                <CardDescription>
-                  Generate, preview, and download print-ready QR codes for your billing counter, waiting tables, and customer cards.
-                </CardDescription>
-              </div>
-              <Button
-                type="button"
-                variant="primary"
-                size="sm"
-                onClick={() => setShowQrModal(true)}
-              >
-                <QrCode size={15} style={{ marginRight: '6px' }} />
-                Open QR Studio
-              </Button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Globe size={18} style={{ color: 'var(--color-accent)' }} />
+              <CardTitle>Web &amp; Social Links</CardTitle>
             </div>
+            <CardDescription>
+              Add your website or Instagram handles to connect with customers.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: 'var(--space-3) var(--space-4)',
-                backgroundColor: 'var(--color-bg-surface-subtle)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--color-border)',
-                flexWrap: 'wrap',
-                gap: 'var(--space-3)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                <div
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--color-primary-subtle)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--color-primary)',
-                    flexShrink: 0,
-                  }}
-                >
-                  <QrCode size={20} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                    Billing Counter Standee &amp; Card Placements
-                  </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-                    Tracks scans by location (counter, table, card) • Download high-res PNG, vector SVG, or printable tent standee
-                  </div>
-                </div>
-              </div>
+            <div className={styles.sectionGrid}>
+              <Input
+                label="Official Website URL"
+                type="url"
+                value={websiteUrl}
+                error={fieldErrors.websiteUrl}
+                helpText="e.g. https://maisonandthread.com"
+                placeholder="https://yourboutique.com"
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+              />
 
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowQrModal(true)}
-              >
-                View &amp; Download QR Codes →
-              </Button>
+              <Input
+                label="Instagram / Social Links"
+                value={socialLinksText}
+                helpText="Comma-separated URLs or handles (e.g. @maisonandthread, https://instagram.com/...)"
+                placeholder="@yourboutique, https://instagram.com/..."
+                onChange={(e) => setSocialLinksText(e.target.value)}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Section 4: Opening Hours */}
+        {/* Section 6: Store Hours */}
         <Card>
           <CardHeader>
-            <div className={styles.hoursHeader}>
-              <div>
-                <CardTitle>Store Hours & Schedule</CardTitle>
-                <CardDescription>
-                  Configure your operating hours so patients know when the pharmacy counter is open.
-                </CardDescription>
-              </div>
-              <div className={styles.hoursButtons}>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleApplyPreset('standard')}
-                >
-                  Preset: Mon-Sat + Sun Closed
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleApplyPreset('alldays')}
-                >
-                  Preset: All Days
-                </Button>
-              </div>
-            </div>
+            <CardTitle>Store Hours</CardTitle>
+            <CardDescription>
+              Manage your boutique opening hours shown on the customer portal and digital card.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className={styles.hoursContainer}>
+              <div className={styles.hoursHeader}>
+                <p className={styles.hoursHelp}>
+                  Configure days and opening hours below.
+                </p>
+                <div className={styles.hoursButtons}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleApplyPreset('standard')}
+                  >
+                    Boutique Retail Preset
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleApplyPreset('alldays')}
+                  >
+                    All Days 10am-9pm
+                  </Button>
+                </div>
+              </div>
+
               <div className={styles.hoursList}>
                 {openingHours.map((slot, index) => (
                   <div key={index} className={styles.slotRow}>
                     <Input
-                      label="Day(s)"
+                      label={`Slot ${index + 1} Days`}
                       value={slot.days}
-                      placeholder="e.g. Monday - Saturday, Sunday"
+                      placeholder="e.g. Monday - Saturday"
                       onChange={(e) => handleSlotChange(index, 'days', e.target.value)}
                     />
                     <Input
-                      label="Operating Hours"
+                      label="Hours"
                       value={slot.hours}
-                      placeholder="e.g. 8:00 AM - 11:00 PM, or Closed"
+                      placeholder="e.g. 10:00 AM - 9:00 PM"
                       onChange={(e) => handleSlotChange(index, 'hours', e.target.value)}
                     />
                     <div className={styles.slotActions}>
@@ -766,8 +647,8 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                         type="button"
                         variant="danger"
                         size="sm"
-                        disabled={openingHours.length <= 1}
                         onClick={() => handleRemoveSlot(index)}
+                        disabled={openingHours.length <= 1}
                       >
                         Remove
                       </Button>
@@ -776,62 +657,29 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
                 ))}
               </div>
 
-              <div>
+              <div style={{ marginTop: 'var(--space-2)' }}>
                 <Button type="button" variant="secondary" size="sm" onClick={handleAddSlot}>
-                  + Add Another Schedule Row
+                  + Add Another Time Slot
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Section 5: Emergency Availability */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Emergency Availability Notice</CardTitle>
-            <CardDescription>
-              Special indicator for off-hours medicine emergency counter service.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className={styles.toggleCard}>
-              <label className={styles.toggleLabel}>
-                <input
-                  type="checkbox"
-                  className={styles.toggleInput}
-                  checked={isEmergencyOpen}
-                  onChange={(e) => setIsEmergencyOpen(e.target.checked)}
-                />
-                <span className={styles.toggleText}>
-                  Enable Emergency / Night Availability Notice
-                </span>
-                {isEmergencyOpen && (
-                  <Badge variant="warning" size="sm">
-                    Notice Enabled
-                  </Badge>
-                )}
-              </label>
-              <p className={styles.toggleDescription}>
-                When checked, a discreet emergency availability notice appears on your Digital Customer Card for customers needing essential medicines outside standard hours. This does not claim 24/7 hospital emergency services.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Save Bar */}
+        {/* Form Submission Footer */}
         <div className={styles.footer}>
           <Button
             type="submit"
             variant="primary"
             size="lg"
+            isLoading={isSubmitting}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+            Save All Settings
           </Button>
         </div>
       </form>
 
-      {/* Store QR Codes & Standee Modal */}
       <StoreQrModal
         isOpen={showQrModal}
         onClose={() => setShowQrModal(false)}

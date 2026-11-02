@@ -1,8 +1,9 @@
 import type { AIServiceProvider, GenerateReviewDraftsInput, ReviewDraft } from './types';
 
 /**
- * Deterministic Mock AI Provider for testing and local development.
- * Produces 3 realistic drafts adhering to rating tone, selected tags, and language script.
+ * Deterministic Mock AI Provider for clothing boutique reviews.
+ * Produces 3 realistic drafts adhering to rating tone, fashion experience tags,
+ * optional notes, and language scripts (English, Hindi, Hinglish).
  */
 export class MockAIProvider implements AIServiceProvider {
   readonly name = 'mock';
@@ -32,25 +33,25 @@ export class MockAIProvider implements AIServiceProvider {
     const noteText = note ? ` ${note}` : '';
 
     if (rating >= 4) {
-      const tagSnippet = tags.length > 0 ? ` ${tags.join(' and ')} made a big difference.` : '';
+      const tagHighlights = tags.length > 0 ? ` The ${tags.map((t) => t.toLowerCase()).join(' and ')} were outstanding.` : '';
       return [
         {
           id: 'draft-1',
           text: note
-            ? `${note} Quick service and helpful staff.`
-            : `Quick service and the staff was really helpful. Got what I needed without waiting too long.${tagSnippet}`,
+            ? `${note} Great clothing collection and helpful staff.`
+            : `Loved shopping here. The clothing quality and fitting were excellent, and the staff was very polite.${tagHighlights ? ' ' + tagHighlights : ''}`,
           language: 'en',
         },
         {
           id: 'draft-2',
           text: note
-            ? `Very dependable pharmacy. ${note}`
-            : `Very helpful and reliable pharmacy. Medicines were easily available and the staff was polite.`,
+            ? `Wonderful boutique with great styling assistance. ${note}`
+            : `Really impressed with the fabric quality and the modern collection. Clean, elegant store ambience and smooth service.`,
           language: 'en',
         },
         {
           id: 'draft-3',
-          text: `Good experience overall. Dependable service and genuine medicines.`,
+          text: `Great overall shopping experience. High-quality garments and welcoming customer service. Will definitely visit again.`,
           language: 'en',
         },
       ];
@@ -60,17 +61,17 @@ export class MockAIProvider implements AIServiceProvider {
       return [
         {
           id: 'draft-1',
-          text: `Average visit today.${tagText}${noteText} Decent service overall.`,
+          text: `Decent collection and shopping experience.${tagText}${noteText}`,
           language: 'en',
         },
         {
           id: 'draft-2',
-          text: `The visit was okay.${noteText || ' Service was acceptable but could be smoother.'}`,
+          text: `The visit was okay.${noteText || ' Fabric and designs were fair, though sizing options could be broader.'}`,
           language: 'en',
         },
         {
           id: 'draft-3',
-          text: `Fair experience overall.${tagText}`,
+          text: `Fair experience overall.${tagText} Helpful staff during the visit.`,
           language: 'en',
         },
       ];
@@ -80,17 +81,17 @@ export class MockAIProvider implements AIServiceProvider {
     return [
       {
         id: 'draft-1',
-        text: `Had an unsatisfactory visit today.${noteText || ' The experience did not meet expectations.'}`,
+        text: `Had an unsatisfactory visit today.${noteText || ' The clothing collection or sizing did not meet expectations.'}`,
         language: 'en',
       },
       {
         id: 'draft-2',
-        text: `My experience needs improvement.${noteText ? ` Specifically: ${note}` : ''}`,
+        text: `My boutique experience needs improvement.${noteText ? ` Specifically: ${note}` : ' Sizing assistance and service fell short.'}`,
         language: 'en',
       },
       {
         id: 'draft-3',
-        text: `Disappointed with the service today.${noteText}`,
+        text: `Disappointed with the shopping experience today.${noteText}`,
         language: 'en',
       },
     ];
@@ -101,35 +102,25 @@ export class MockAIProvider implements AIServiceProvider {
     tags: string[],
     note: string
   ): ReviewDraft[] {
-    const hasQuick = tags.includes('Quick Service');
-    const hasStock = tags.includes('Medicines in Stock');
-    const hasPolite = tags.includes('Polite Staff');
-
-    let tagPhrase = '';
-    if (hasQuick && hasStock) tagPhrase = 'सेवा बहुत तेज़ थी और सभी ज़रूरी दवाइयाँ आसानी से मिल गईं।';
-    else if (hasStock) tagPhrase = 'दवाइयाँ आसानी से उपलब्ध थीं।';
-    else if (hasPolite) tagPhrase = 'यहाँ का स्टाफ बहुत विनम्र और मददगार है।';
-    else if (hasQuick) tagPhrase = 'सेवा बहुत तेज़ और अच्छी थी।';
-
-    const notePhrase = note ? ` ${note}` : '';
+    const noteText = note ? ` ${note}` : '';
 
     if (rating >= 4) {
       return [
         {
           id: 'draft-1',
           text: note
-            ? `${note} सेवा काफी अच्छी थी और स्टाफ भी मददगार था।`
-            : `सेवा काफी अच्छी थी और स्टाफ भी मददगार था। जरूरी दवाइयां आसानी से मिल गईं।`,
+            ? `${note} कपड़ों की क्वालिटी और डिजाइन बहुत बढ़िया है।`
+            : `स्टोर का कलेक्शन और कपड़ों की क्वालिटी बहुत अच्छी लगी। स्टाफ का व्यवहार भी बहुत मददगार था।`,
           language: 'hi',
         },
         {
           id: 'draft-2',
-          text: `भरोसेमंद मेडिकल स्टोर है। सही दवाइयां बिना किसी परेशानी के मिल गईं।${notePhrase}`,
+          text: `कपड़ों की फिटिंग और फैब्रिक क्वालिटी दोनों शानदार हैं। स्टोर का माहौल भी बहुत खूबसूरत और साफ-सुथरा है।${noteText}`,
           language: 'hi',
         },
         {
           id: 'draft-3',
-          text: `अच्छा अनुभव रहा। समय पर दवाइयां मिलीं और सेवा भी बहुत अच्छी थी।`,
+          text: `शॉपिंग का बहुत अच्छा अनुभव रहा। लेटेस्ट डिजाइन और बहुत बेहतरीन सर्विस मिली।`,
           language: 'hi',
         },
       ];
@@ -139,17 +130,17 @@ export class MockAIProvider implements AIServiceProvider {
       return [
         {
           id: 'draft-1',
-          text: `सामान्य अनुभव रहा। ${notePhrase || 'सेवा ठीक-ठाक थी।'}`,
+          text: `स्टोर पर शॉपिंग का अनुभव ठीक-ठाक रहा।${noteText} कलेक्शन सामान्य था।`,
           language: 'hi',
         },
         {
           id: 'draft-2',
-          text: `दुकान पर अनुभव सामान्य था। ${notePhrase || 'सुधार की थोड़ी गुंजाइश है।'}`,
+          text: `कपड़े ठीक थे लेकिन साइजिंग और वैरायटी में थोड़ा सुधार हो सकता है।`,
           language: 'hi',
         },
         {
           id: 'draft-3',
-          text: `काम हो गया लेकिन अनुभव साधारण रहा।`,
+          text: `औसत अनुभव रहा। स्टाफ ठीक था लेकिन चयन सीमित था।`,
           language: 'hi',
         },
       ];
@@ -159,17 +150,17 @@ export class MockAIProvider implements AIServiceProvider {
     return [
       {
         id: 'draft-1',
-        text: `आज का अनुभव अच्छा नहीं रहा। ${notePhrase || 'उम्मीद के मुताबिक सेवा नहीं मिली।'}`,
+        text: `आज का शॉपिंग अनुभव निराशाजनक रहा।${noteText}`,
         language: 'hi',
       },
       {
         id: 'draft-2',
-        text: `सेवा में सुधार की बहुत ज़रूरत है। ${notePhrase}`,
+        text: `सर्विस और कपड़ों की वैरायटी उम्मीद के मुताबिक नहीं थी। सुधार की जरूरत है।`,
         language: 'hi',
       },
       {
         id: 'draft-3',
-        text: `आज की सेवा से निराशा हुई। ${notePhrase}`,
+        text: `अनुभव अच्छा नहीं रहा।${noteText ? ` समस्या: ${note}` : ''}`,
         language: 'hi',
       },
     ];
@@ -180,35 +171,27 @@ export class MockAIProvider implements AIServiceProvider {
     tags: string[],
     note: string
   ): ReviewDraft[] {
-    const hasQuick = tags.includes('Quick Service');
-    const hasStock = tags.includes('Medicines in Stock');
-    const hasPolite = tags.includes('Polite Staff');
-
-    let tagPhrase = '';
-    if (hasQuick && hasStock) tagPhrase = 'Service quick thi aur medicines easily mil gayi.';
-    else if (hasStock) tagPhrase = 'Saari required medicines easily mil gayi.';
-    else if (hasPolite) tagPhrase = 'Staff kaafi helpful aur polite tha.';
-    else if (hasQuick) tagPhrase = 'Service fast thi.';
-
-    const notePhrase = note ? ` ${note}` : '';
+    const noteText = note ? ` ${note}` : '';
+    const hasTags = tags.length > 0;
+    const tagHighlights = hasTags ? ` aur ${tags.join(' aur ').toLowerCase()} bhi perfect thi` : '';
 
     if (rating >= 4) {
       return [
         {
           id: 'draft-1',
           text: note
-            ? `${note} Service kaafi quick tha aur staff bhi helpful tha.`
-            : `Service kaafi quick tha aur staff bhi helpful tha. Jo medicines chahiye thi easily mil gayi.`,
+            ? `${note} Cloth quality aur collection bohot accha hai.`
+            : `Bohot accha collection hai${tagHighlights}, aur fitting bhi ekdam sahi mili. Staff ka behaviour kaafi helpful tha.`,
           language: 'hinglish',
         },
         {
           id: 'draft-2',
-          text: `Bahut reliable pharmacy hai. Required medicines mil gayi aur ${tagPhrase || 'staff helpful tha'}.${notePhrase}`,
+          text: `Fabric quality premium lagi aur designs bhi trending hain. Store ambience bohot classy hai.${noteText}`,
           language: 'hinglish',
         },
         {
           id: 'draft-3',
-          text: `Fast service aur trusted pharmacy. Kaafi accha experience raha.`,
+          text: `Overall shopping experience bohot smooth aur pleasant raha. Customer service genuinely great thi.`,
           language: 'hinglish',
         },
       ];
@@ -218,17 +201,17 @@ export class MockAIProvider implements AIServiceProvider {
       return [
         {
           id: 'draft-1',
-          text: `Average visit tha. ${notePhrase || 'Service okay-okay thi.'}`,
+          text: `Shopping experience theek-thaak raha.${noteText} Collection decent tha.`,
           language: 'hinglish',
         },
         {
           id: 'draft-2',
-          text: `Experience normal raha. ${notePhrase || 'Thoda improvement ho sakta hai.'}`,
+          text: `Visit average tha. Fitting theek thi but variety aur ho sakti thi.`,
           language: 'hinglish',
         },
         {
           id: 'draft-3',
-          text: `Kaam ho gaya but visit bas average raha.`,
+          text: `Overall okay experience. Staff polite tha but size availability limited thi.`,
           language: 'hinglish',
         },
       ];
@@ -238,17 +221,17 @@ export class MockAIProvider implements AIServiceProvider {
     return [
       {
         id: 'draft-1',
-        text: `Experience bilkul accha nahi raha. ${notePhrase || 'Service expected level ki nahi thi.'}`,
+        text: `Visit expected standard ke hisaab se accha nahi tha.${noteText}`,
         language: 'hinglish',
       },
       {
         id: 'draft-2',
-        text: `Service improve karne ki zaroorat hai. ${notePhrase}`,
+        text: `Customer service aur fitting options improve karne ki zaroorat hai.`,
         language: 'hinglish',
       },
       {
         id: 'draft-3',
-        text: `Disappointed with today's visit. ${notePhrase}`,
+        text: `Shopping experience disappointing raha today.${noteText}`,
         language: 'hinglish',
       },
     ];

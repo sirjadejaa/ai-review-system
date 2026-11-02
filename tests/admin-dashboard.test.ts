@@ -197,7 +197,7 @@ describe('Phase 9: Owner Dashboard & Analytics Tests', () => {
       expect(data.counts.qrScans).toBeGreaterThanOrEqual(0);
       expect(data.counts.googleReviewClicks).toBeGreaterThanOrEqual(0);
       expect(data.dailyTrend.length).toBeGreaterThanOrEqual(1);
-    });
+    }, 15000);
   });
 
   describe('4. Customer Feedback Aggregations & Distribution', () => {

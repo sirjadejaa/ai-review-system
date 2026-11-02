@@ -1,5 +1,5 @@
 /**
- * Core Domain Types for Single Medical Shop Review & Customer Card System
+ * Core Domain Types for Boutique Review & Customer Card System
  * Strictly single-tenant. No SaaS or multi-tenancy constructs.
  */
 
@@ -22,7 +22,7 @@ export interface ShopSettings {
 
 export interface ReviewDraftInput {
   rating: number; // 1 to 5
-  tags: string[]; // e.g., ['Fast service', 'Polite staff', 'Medicines in stock']
+  tags: string[]; // e.g., ['Fabric Quality', 'Fitting & Sizing', 'Polite Staff']
   userNotes?: string;
   language: LanguageCode;
 }

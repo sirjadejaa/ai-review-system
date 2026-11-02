@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateThemeCss } from '@/lib/branding/theme';
+import { generateThemeCss, type ThemeColorOptions } from '@/lib/branding/theme';
 
 export interface BrandThemeStyleProps {
   primaryColor?: string | null;
@@ -8,19 +8,27 @@ export interface BrandThemeStyleProps {
 }
 
 /**
- * Injects dynamic CSS variables for custom pharmacy branding.
- * Server rendered to eliminate Flash of Unstyled Content (FOUC).
+ * Server component that injects dynamic CSS custom properties for brand colors.
+ * Ensures custom colors configured by the boutique admin in settings are immediately
+ * applied across the layout without requiring code rebuilding.
  */
 export const BrandThemeStyle: React.FC<BrandThemeStyleProps> = ({
   primaryColor,
   secondaryColor,
   accentColor,
 }) => {
-  const css = generateThemeCss(primaryColor, secondaryColor, accentColor);
+  const css = generateThemeCss({
+    primaryColor,
+    secondaryColor,
+    accentColor,
+  });
+
   return (
     <style
-      id="pharmacy-brand-theme"
+      id="boutique-brand-theme"
       dangerouslySetInnerHTML={{ __html: css }}
     />
   );
 };
+
+export default BrandThemeStyle;

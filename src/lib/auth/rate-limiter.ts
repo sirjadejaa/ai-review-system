@@ -1,6 +1,6 @@
 /**
  * In-Memory Rate Limiter for Login Brute-Force & Credential-Stuffing Protection
- * Designed for single-pharmacy deployment. Does not permanently persist user IP addresses.
+ * Designed for single-boutique deployment. Does not permanently persist user IP addresses.
  */
 
 interface RateLimitRecord {

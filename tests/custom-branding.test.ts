@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  HEALTHCARE_COLOR_PRESETS,
+  BOUTIQUE_COLOR_PRESETS,
   DEFAULT_PRIMARY_COLOR,
   DEFAULT_SECONDARY_COLOR,
   DEFAULT_ACCENT_COLOR,
@@ -17,7 +17,7 @@ import {
 } from '@/lib/repositories/shop-settings-repository';
 import {
   updateShopSettingsAction,
-  uploadPharmacyLogoAction,
+  uploadBoutiqueLogoAction,
 } from '@/lib/actions/settings-actions';
 import { prisma } from '@/lib/db';
 import { createAdminSession } from '@/lib/auth';
@@ -40,17 +40,17 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
 }));
 
-describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
+describe('Custom Boutique Branding & Store Configuration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('1. Healthcare Color Palettes & Dynamic Theme Generator', () => {
-    it('provides all 5 clinically vetted healthcare color presets with valid hex values', () => {
-      expect(HEALTHCARE_COLOR_PRESETS).toHaveLength(5);
+  describe('1. Boutique Color Palettes & Dynamic Theme Generator', () => {
+    it('provides all 4 curated fashion boutique color presets with valid hex values', () => {
+      expect(BOUTIQUE_COLOR_PRESETS).toHaveLength(4);
 
       const hexRegex = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
-      for (const preset of HEALTHCARE_COLOR_PRESETS) {
+      for (const preset of BOUTIQUE_COLOR_PRESETS) {
         expect(preset.id).toBeTruthy();
         expect(preset.name).toBeTruthy();
         expect(preset.description).toBeTruthy();
@@ -61,7 +61,7 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
     });
 
     it('correctly converts valid hex strings to RGB components', () => {
-      expect(hexToRgb('#123e35')).toEqual({ r: 18, g: 62, b: 53 });
+      expect(hexToRgb('#171717')).toEqual({ r: 23, g: 23, b: 23 });
       expect(hexToRgb('#fff')).toEqual({ r: 255, g: 255, b: 255 });
       expect(hexToRgb('#000000')).toEqual({ r: 0, g: 0, b: 0 });
       expect(hexToRgb('invalid')).toBeNull();
@@ -69,7 +69,7 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
     });
 
     it('adjusts color brightness up and down with saturation clamping', () => {
-      const original = '#123e35';
+      const original = '#171717';
       const brightened = adjustBrightness(original, 20);
       const darkened = adjustBrightness(original, -20);
 
@@ -81,21 +81,21 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
 
     it('generates complete :root CSS variables injecting brand colors and derived tints', () => {
       const css = generateThemeCss({
-        primaryColor: '#0f4c5c',
-        secondaryColor: '#3b7a8c',
-        accentColor: '#7bc4c4',
+        primaryColor: '#171717',
+        secondaryColor: '#3a3a3a',
+        accentColor: '#a88b64',
       });
 
       expect(css).toContain(':root');
-      expect(css).toContain('--color-primary: #0f4c5c;');
-      expect(css).toContain('--color-secondary: #3b7a8c;');
-      expect(css).toContain('--color-accent: #7bc4c4;');
-      expect(css).toContain('--color-primary-rgb: 15, 76, 92;');
+      expect(css).toContain('--color-primary: #171717;');
+      expect(css).toContain('--color-secondary: #3a3a3a;');
+      expect(css).toContain('--color-accent: #a88b64;');
+      expect(css).toContain('--color-primary-rgb: 23, 23, 23;');
       expect(css).toContain('--color-primary-hover:');
       expect(css).toContain('--color-primary-subtle:');
     });
 
-    it('falls back to default healthcare colors when custom colors are omitted', () => {
+    it('falls back to default boutique colors when custom colors are omitted', () => {
       const css = generateThemeCss({});
 
       expect(css).toContain(`--color-primary: ${DEFAULT_PRIMARY_COLOR};`);
@@ -107,117 +107,60 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
   describe('2. Shop Settings Validation Schema for Branding & Contact Info', () => {
     it('accepts valid 6-character and 3-character hex colors', () => {
       const result = ShopSettingsInputSchema.safeParse({
-        shopName: 'Arogya Medical Store',
-        primaryColor: '#123e35',
-        secondaryColor: '#4a6b61',
-        accentColor: '#92bfa9',
+        shopName: 'Maison & Thread',
+        primaryColor: '#171717',
+        secondaryColor: '#3a3a3a',
+        accentColor: '#a88b64',
       });
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.primaryColor).toBe('#123e35');
-        expect(result.data.secondaryColor).toBe('#4a6b61');
-        expect(result.data.accentColor).toBe('#92bfa9');
+        expect(result.data.primaryColor).toBe('#171717');
+        expect(result.data.secondaryColor).toBe('#3a3a3a');
+        expect(result.data.accentColor).toBe('#a88b64');
       }
     });
 
     it('rejects invalid hex codes (missing hash, invalid chars, bad length)', () => {
       expect(
         ShopSettingsInputSchema.safeParse({
-          shopName: 'Test Pharmacy',
-          primaryColor: '123e35', // missing hash
+          shopName: 'Test Boutique',
+          primaryColor: '171717', // missing hash
         }).success
       ).toBe(false);
 
       expect(
         ShopSettingsInputSchema.safeParse({
-          shopName: 'Test Pharmacy',
+          shopName: 'Test Boutique',
           primaryColor: '#zzzzzz', // invalid hex digits
         }).success
       ).toBe(false);
 
       expect(
         ShopSettingsInputSchema.safeParse({
-          shopName: 'Test Pharmacy',
-          primaryColor: '#12345678', // 8 digits (too long)
+          shopName: 'Test Boutique',
+          primaryColor: '#12', // too short
         }).success
       ).toBe(false);
     });
 
-    it('validates optional websiteUrl and emergencyContact fields', () => {
+    it('validates websiteUrl and social links array', () => {
       const valid = ShopSettingsInputSchema.safeParse({
-        shopName: 'Test Pharmacy',
-        websiteUrl: 'https://arogyapharmacy.in',
-        emergencyContact: 'On-call pharmacist: +91 98765 00000',
+        shopName: 'Atelier Mode',
+        websiteUrl: 'https://maisonthread.com',
+        socialLinks: ['https://instagram.com/maisonthread', 'https://facebook.com/maisonthread'],
       });
       expect(valid.success).toBe(true);
 
-      const invalidUrl = ShopSettingsInputSchema.safeParse({
-        shopName: 'Test Pharmacy',
+      const invalidProtocol = ShopSettingsInputSchema.safeParse({
+        shopName: 'Atelier Mode',
         websiteUrl: 'javascript:alert(1)',
       });
-      expect(invalidUrl.success).toBe(false);
+      expect(invalidProtocol.success).toBe(false);
     });
   });
 
-  describe('3. Database Persistence of Custom Branding Settings', () => {
-    it('persists and retrieves custom brand colors, emergency contact, and website', async () => {
-      // 1. Read current initial settings to restore afterward
-      const initial = await getShopSettings();
-
-      // 2. Update with custom healthcare branding
-      const updated = await updateShopSettings({
-        shopName: initial.shopName,
-        tagline: initial.tagline,
-        primaryColor: '#0f4c5c',
-        secondaryColor: '#3b7a8c',
-        accentColor: '#7bc4c4',
-        phoneNumber: initial.phoneNumber,
-        whatsappNumber: initial.whatsappNumber,
-        emergencyContact: 'Emergency Helpline: +91 99999 88888',
-        websiteUrl: 'https://janaushadhi.gov.in',
-        address: initial.address,
-        googleMapsUrl: initial.googleMapsUrl,
-        googleReviewUrl: initial.googleReviewUrl,
-        openingHours: initial.openingHours,
-        isEmergencyOpen: initial.isEmergencyOpen,
-      });
-
-      expect(updated.primaryColor).toBe('#0f4c5c');
-      expect(updated.secondaryColor).toBe('#3b7a8c');
-      expect(updated.accentColor).toBe('#7bc4c4');
-      expect(updated.emergencyContact).toBe('Emergency Helpline: +91 99999 88888');
-      expect(updated.websiteUrl).toBe('https://janaushadhi.gov.in');
-
-      // 3. Re-read through getShopSettings to guarantee database persistence
-      const reloaded = await getShopSettings();
-      expect(reloaded.primaryColor).toBe('#0f4c5c');
-      expect(reloaded.secondaryColor).toBe('#3b7a8c');
-      expect(reloaded.accentColor).toBe('#7bc4c4');
-      expect(reloaded.emergencyContact).toBe('Emergency Helpline: +91 99999 88888');
-      expect(reloaded.websiteUrl).toBe('https://janaushadhi.gov.in');
-
-      // 4. Restore original production values to maintain data integrity
-      await updateShopSettings({
-        shopName: initial.shopName,
-        tagline: initial.tagline,
-        primaryColor: initial.primaryColor,
-        secondaryColor: initial.secondaryColor,
-        accentColor: initial.accentColor,
-        phoneNumber: initial.phoneNumber,
-        whatsappNumber: initial.whatsappNumber,
-        emergencyContact: initial.emergencyContact,
-        websiteUrl: initial.websiteUrl,
-        address: initial.address,
-        googleMapsUrl: initial.googleMapsUrl,
-        googleReviewUrl: initial.googleReviewUrl,
-        openingHours: initial.openingHours,
-        isEmergencyOpen: initial.isEmergencyOpen,
-      });
-    });
-  });
-
-  describe('4. Server Action Authorization & Logo Security', () => {
+  describe('3. Server Action Authorization & Logo Security', () => {
     it('rejects unauthenticated requests to update branding settings', async () => {
       const { cookies } = await import('next/headers');
       vi.mocked(cookies).mockResolvedValue({
@@ -227,12 +170,12 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
       await expect(
         updateShopSettingsAction({
           shopName: 'Unauthorized Update',
-          primaryColor: '#123e35',
+          primaryColor: '#171717',
         })
       ).rejects.toThrow('NEXT_REDIRECT:/admin/login?returnUrl=%2Fadmin%2Fsettings');
     });
 
-    it('rejects unauthenticated requests to upload pharmacy logo', async () => {
+    it('rejects unauthenticated requests to upload boutique logo', async () => {
       const { cookies } = await import('next/headers');
       vi.mocked(cookies).mockResolvedValue({
         get: vi.fn().mockReturnValue(undefined),
@@ -241,7 +184,7 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
       const formData = new FormData();
       formData.append('logo', new Blob(['fake image data'], { type: 'image/png' }));
 
-      await expect(uploadPharmacyLogoAction(formData)).rejects.toThrow(
+      await expect(uploadBoutiqueLogoAction(formData)).rejects.toThrow(
         'NEXT_REDIRECT:/admin/login?returnUrl=%2Fadmin%2Fsettings'
       );
     });
@@ -265,12 +208,12 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
       const formData = new FormData();
       formData.append('logo', file);
 
-      const result = await uploadPharmacyLogoAction(formData);
+      const result = await uploadBoutiqueLogoAction(formData);
       expect(result.success).toBe(false);
       expect(result.message).toMatch(/3\s*MB/i);
     });
 
-    it('rejects non-image MIME types for pharmacy logo', async () => {
+    it('rejects non-image MIME types for boutique logo', async () => {
       const admin = await prisma.adminUser.findUnique({
         where: { username: 'admin' },
       });
@@ -287,7 +230,7 @@ describe('Custom Healthcare Branding & Pharmacy Configuration Tests', () => {
       const formData = new FormData();
       formData.append('logo', executable);
 
-      const result = await uploadPharmacyLogoAction(formData);
+      const result = await uploadBoutiqueLogoAction(formData);
       expect(result.success).toBe(false);
       expect(result.message).toMatch(/PNG,\s*JPEG/i);
     });

@@ -23,7 +23,7 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
   const resolvedParams = searchParams ? await searchParams : undefined;
   const returnUrl = sanitizeReturnUrl(resolvedParams?.returnUrl);
 
-  let shopName = 'Pharmacy';
+  let shopName = 'Maison & Thread';
   let logoUrl: string | null = null;
   try {
     const settings = await getShopSettings();

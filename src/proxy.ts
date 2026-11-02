@@ -4,12 +4,12 @@ import type { NextRequest } from 'next/server';
 const ADMIN_SESSION_COOKIE = 'admin_session';
 
 /**
- * Next.js Edge Middleware for early route interception
+ * Next.js Edge Proxy for early route interception (migrated from deprecated middleware convention)
  * Protects all /admin/* routes and handles authenticated /admin/login redirection.
  *
  * NOTE: Server-side validation via `requireAdmin()` remains mandatory for complete security.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
 
@@ -37,6 +37,11 @@ export function middleware(request: NextRequest) {
 
   return NextResponse.next();
 }
+
+// Backwards-compatibility alias
+export const middleware = proxy;
+
+export default proxy;
 
 export const config = {
   matcher: ['/admin/:path*'],

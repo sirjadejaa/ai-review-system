@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import styles from './admin-layout.module.css';
 import { logoutAction } from '@/lib/auth/actions';
-import { PharmacyLogo } from '@/components/brand/pharmacy-logo';
+import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import { StoreQrModal } from '@/components/admin/store-qr-modal';
 
 export interface AdminLayoutProps {
@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/reviews', label: 'Reviews & Feedback', icon: MessageSquare },
   { href: '/admin/offers', label: 'Promotional Offers', icon: Tag },
-  { href: '/admin/settings', label: 'Pharmacy Settings', icon: Settings },
+  { href: '/admin/settings', label: 'Boutique Settings', icon: Settings },
 ];
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -42,11 +42,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   title,
   subtitle,
   logoUrl,
-  shopName = 'Arogya Pharmacy',
+  shopName = 'Maison & Thread',
 }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+
+  const displayShopName = shopName === 'Pharmacy' ? 'Maison & Thread' : shopName;
 
   const navContent = (
     <>
@@ -56,7 +58,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
-              alt={`${shopName} logo`}
+              alt={`${displayShopName} logo`}
               style={{
                 width: 38,
                 height: 38,
@@ -67,7 +69,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               }}
             />
           ) : (
-            <PharmacyLogo size="md" variant="mark" inverted={true} />
+            <BoutiqueLogo size="md" variant="mark" inverted={true} shopName={displayShopName} />
           )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
@@ -80,14 +82,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 lineHeight: 1.15,
               }}
             >
-              {shopName}
+              {displayShopName}
             </span>
             <span
               style={{
                 fontSize: '0.625rem',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#92bfa9',
+                color: '#c5a880',
                 marginTop: '2px',
               }}
             >
@@ -102,7 +104,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: '#c4d7ce',
+              color: '#d4d0c8',
               cursor: 'pointer',
               padding: 'var(--space-1)',
             }}
@@ -113,7 +115,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         )}
       </div>
 
-      <nav className={styles.sidebarNav} aria-label="Pharmacy Workspace Navigation">
+      <nav className={styles.sidebarNav} aria-label="Boutique Workspace Navigation">
         <span className={styles.navSectionLabel}>Workspace</span>
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -138,14 +140,47 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       </nav>
 
       <div className={styles.sidebarFooter}>
-        <Link href="/" target="_blank" className={styles.liveStoreLink}>
-          <span>Public Customer View</span>
-          <ExternalLink size={14} />
-        </Link>
-        <form action={logoutAction} style={{ margin: 0 }}>
-          <button type="submit" className={styles.signOutBtn}>
+        <button
+          type="button"
+          onClick={() => setShowQrModal(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            width: '100%',
+            padding: '10px 14px',
+            backgroundColor: 'rgba(168, 139, 100, 0.2)',
+            border: '1px solid rgba(168, 139, 100, 0.4)',
+            borderRadius: 'var(--radius-md)',
+            color: '#FAF9F6',
+            fontSize: 'var(--font-size-xs)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all var(--transition-fast)',
+            marginBottom: 'var(--space-2)',
+          }}
+        >
+          <QrCode size={15} style={{ color: '#c5a880' }} />
+          <span>Get Store QR Standee</span>
+        </button>
+
+        <div className={styles.sidebarFooterUser}>
+          <div className={styles.userAvatar}>
+            <User size={16} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 'var(--font-size-xs)', fontWeight: 600, color: '#ffffff' }}>
+              Store Owner
+            </span>
+            <span className={styles.userRole}>Boutique Administrator</span>
+          </div>
+        </div>
+
+        <form action={logoutAction}>
+          <button type="submit" className={styles.logoutButton}>
             <LogOut size={14} />
-            <span>Sign Out Session</span>
+            <span>Sign Out</span>
           </button>
         </form>
       </div>
@@ -154,78 +189,89 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   return (
     <div className={styles.adminContainer}>
-      {/* Desktop Persistent Sidebar */}
-      <aside className={styles.sidebar}>
-        {navContent}
-      </aside>
+      <aside className={styles.sidebar}>{navContent}</aside>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <>
-          <div className={styles.backdrop} onClick={() => setMobileMenuOpen(false)} />
-          <aside className={`${styles.sidebar} ${styles.sidebarOpen}`}>
-            {navContent}
-          </aside>
-        </>
-      )}
-
-      {/* Main Content Area */}
-      <div className={styles.contentWrapper}>
-        <header className={styles.topHeader}>
-          <div className={styles.headerLeft}>
+      <div className={styles.mainContent}>
+        <header className={styles.topBar}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             <button
               type="button"
-              className={styles.mobileMenuBtn}
+              className={styles.mobileMenuToggle}
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open navigation menu"
+              aria-label="Open menu"
             >
-              <Menu size={20} />
+              <Menu size={22} />
             </button>
-            <div className={styles.headerContext}>
-              <div className={styles.headerContextDot} />
-              <span>{shopName}</span>
-              <span style={{ color: 'var(--color-border)' }}>•</span>
-              <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>
-                Management Console
-              </span>
+            <div>
+              <h1 className={styles.topBarTitle}>{title || 'Dashboard'}</h1>
+              {subtitle && (
+                <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 0 }}>
+                  {subtitle}
+                </p>
+              )}
             </div>
           </div>
 
-          <div className={styles.headerRight}>
+          <div className={styles.topBarActions}>
             <button
               type="button"
-              className={styles.qrHeaderBtn}
               onClick={() => setShowQrModal(true)}
-              title="View & Download Store QR Codes"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-bg-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 'var(--font-size-xs)',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
             >
-              <QrCode size={14} />
-              <span>Store QR Codes</span>
+              <QrCode size={14} style={{ color: 'var(--color-accent)' }} />
+              <span>QR Code</span>
             </button>
-            <div className={styles.ownerAvatar} title="Admin Session">
-              <div className={styles.avatarBadge} aria-label="Administrator">
-                <User size={14} />
-              </div>
-              <span>Admin</span>
-            </div>
+
+            <Link
+              href="/"
+              target="_blank"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-bg-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 'var(--font-size-xs)',
+                fontWeight: 500,
+                textDecoration: 'none',
+              }}
+            >
+              <span>View Customer Portal</span>
+              <ExternalLink size={13} style={{ color: 'var(--color-text-muted)' }} />
+            </Link>
           </div>
         </header>
 
-        <main className={styles.mainContent}>
-          {(title || subtitle) && (
-            <div className={styles.pageHeader}>
-              {title && <h1 className={styles.heading}>{title}</h1>}
-              {subtitle && <p className={styles.subheading}>{subtitle}</p>}
-            </div>
-          )}
-          {children}
-        </main>
+        <main className={styles.contentWrapper}>{children}</main>
       </div>
 
-      {/* Store QR Codes & Standee Modal */}
+      {mobileMenuOpen && (
+        <div className={styles.mobileDrawer} onClick={() => setMobileMenuOpen(false)}>
+          <div className={styles.mobileDrawerContent} onClick={(e) => e.stopPropagation()}>
+            {navContent}
+          </div>
+        </div>
+      )}
+
       <StoreQrModal
         isOpen={showQrModal}
         onClose={() => setShowQrModal(false)}
-        shopName={shopName}
+        shopName={displayShopName}
       />
     </div>
   );
