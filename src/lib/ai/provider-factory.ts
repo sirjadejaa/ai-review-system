@@ -17,7 +17,7 @@ export function getAIProvider(): AIServiceProvider {
     return overrideProvider;
   }
 
-  const providerType = (process.env.AI_PROVIDER || 'ollama').toLowerCase().trim();
+  const providerType = (process.env.AI_PROVIDER || 'mock').toLowerCase().trim();
 
   // Always use Mock in test environment or if specifically requested
   if (process.env.NODE_ENV === 'test' || providerType === 'mock') {

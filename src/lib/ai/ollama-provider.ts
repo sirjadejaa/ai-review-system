@@ -244,6 +244,22 @@ export class OllamaProvider implements AIServiceProvider {
           );
         }
 
+        // Check for payment required / credits exhausted (Ollama Cloud)
+        if (response.status === 402) {
+          console.warn('[OllamaProvider] Ollama Cloud usage credits exhausted (HTTP 402)', {
+            status: 402,
+            message: providerMessage,
+          });
+          throw new AIProviderError(
+            'AI_CONFIGURATION_ERROR',
+            `Ollama Cloud usage credits exhausted (HTTP 402). Add credits at https://ollama.com/plans or switch AI_PROVIDER to 'mock' or 'gemini'.`,
+            undefined,
+            undefined,
+            undefined,
+            402
+          );
+        }
+
         if (response.status === 404) {
           console.warn('[OllamaProvider] Ollama model or endpoint not found (404)', {
             model: this.model,
