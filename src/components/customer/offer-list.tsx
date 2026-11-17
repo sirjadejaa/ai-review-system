@@ -39,7 +39,7 @@ export const OfferList: React.FC<OfferListProps> = ({ offers }) => {
   };
 
   return (
-    <section className={styles.container} aria-label="Boutique Special Offers">
+    <section className={styles.container} aria-label="Restaurant Special Offers">
       <div className={styles.header}>
         <h2 className={styles.sectionTitle}>
           <Sparkles size={20} color="var(--color-accent, #a88b64)" aria-hidden="true" />

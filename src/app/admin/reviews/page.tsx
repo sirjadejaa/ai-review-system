@@ -41,8 +41,8 @@ export default async function AdminReviewsPage() {
     console.error('Non-fatal: Failed to load reviews for admin', error);
     return (
       <AdminLayout
-        title="Customer Reviews & Feedback"
-        subtitle="View and manage customer feedback."
+        title="Guest Reviews & Dining Feedback"
+        subtitle="Private diner ratings, food feedback, and guest satisfaction inbox."
       >
         <div style={{ padding: 'var(--space-6) 0' }}>
           <ErrorState
@@ -56,8 +56,8 @@ export default async function AdminReviewsPage() {
 
   return (
     <AdminLayout
-      title="Customer Reviews & Feedback"
-      subtitle="View and manage customer feedback."
+      title="Guest Reviews & Dining Feedback"
+      subtitle="Private diner ratings, food feedback, and guest satisfaction inbox."
       shopName={settings?.shopName}
       logoUrl={settings?.logoUrl}
     >

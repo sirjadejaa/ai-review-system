@@ -38,317 +38,383 @@ export interface TagTranslation {
   hinglish: string;
 }
 
-export const FASHION_TAG_TRANSLATIONS: TagTranslation[] = [
+/**
+ * 13 Specific Restaurant & Café Feedback Tags
+ */
+export const RESTAURANT_TAG_TRANSLATIONS: TagTranslation[] = [
   {
-    id: 'Clothing Quality',
-    en: 'Clothing Quality',
-    gujlish: 'Clothing ની Quality',
-    hinglish: 'Clothes ki Quality',
+    id: 'Food Quality',
+    en: 'Food Quality',
+    gujlish: 'Food Quality & Ingredients',
+    hinglish: 'Food Quality & Taste',
   },
   {
-    id: 'Fabric Quality',
-    en: 'Fabric Quality',
-    gujlish: 'Fabric & Material',
-    hinglish: 'Fabric & Kapda Quality',
+    id: 'Taste',
+    en: 'Taste & Flavours',
+    gujlish: 'Delicious Taste & Flavours',
+    hinglish: 'Lajawab Taste & Flavours',
   },
   {
-    id: 'Fitting & Sizing',
-    en: 'Fitting & Sizing',
-    gujlish: 'Fitting & Size Options',
-    hinglish: 'Fitting aur Sizing',
+    id: 'Freshness',
+    en: 'Freshness',
+    gujlish: 'Fresh & Hot Food',
+    hinglish: 'Fresh & Garam Khana',
   },
   {
-    id: 'Design & Collection',
-    en: 'Design & Collection',
-    gujlish: 'Latest Design & Collection',
-    hinglish: 'Design aur Collection',
+    id: 'Food Presentation',
+    en: 'Food Presentation',
+    gujlish: 'Food Plating & Presentation',
+    hinglish: 'Plating & Presentation',
   },
   {
-    id: 'Comfort',
-    en: 'Comfort',
-    gujlish: 'Comfortable Wear',
-    hinglish: 'Comfortable Fitting',
+    id: 'Portion Size',
+    en: 'Portion Size',
+    gujlish: 'Good Portion Size',
+    hinglish: 'Sahi Portion Size',
   },
   {
-    id: 'Pricing & Value',
-    en: 'Pricing & Value',
+    id: 'Menu Variety',
+    en: 'Menu Variety',
+    gujlish: 'Wide Menu Variety',
+    hinglish: 'Badiya Menu Variety',
+  },
+  {
+    id: 'Price and Value',
+    en: 'Price & Value',
     gujlish: 'Reasonable Price & Value',
-    hinglish: 'Value for Money Price',
+    hinglish: 'Value for Money Pricing',
   },
   {
     id: 'Staff Behaviour',
     en: 'Staff Behaviour',
-    gujlish: 'Polite & Helpful Staff',
-    hinglish: 'Polite Staff Behaviour',
+    gujlish: 'Polite & Friendly Staff',
+    hinglish: 'Polite & Courteous Staff',
   },
   {
-    id: 'Collection',
-    en: 'Collection',
-    gujlish: 'New Arrival Collection',
-    hinglish: 'Fresh Stock Collection',
+    id: 'Service Speed',
+    en: 'Service Speed',
+    gujlish: 'Fast & Prompt Service',
+    hinglish: 'Quick Service Speed',
   },
   {
-    id: 'Shopping Experience',
-    en: 'Shopping Experience',
-    gujlish: 'Great Shopping Experience',
-    hinglish: 'Smooth Shopping Experience',
+    id: 'Restaurant Ambience',
+    en: 'Restaurant Ambience',
+    gujlish: 'Cozy Café Ambience',
+    hinglish: 'Pleasant Restaurant Ambience',
   },
   {
-    id: 'Store Ambience',
-    en: 'Store Ambience',
-    gujlish: 'Store નું Ambience',
-    hinglish: 'Store ka Ambience',
+    id: 'Cleanliness',
+    en: 'Cleanliness & Hygiene',
+    gujlish: 'Hygienic & Clean Seating',
+    hinglish: 'Neat & Clean Hygiene',
   },
   {
-    id: 'Variety & Availability',
-    en: 'Variety & Availability',
-    gujlish: 'Variety & Stock Options',
-    hinglish: 'Variety aur Options',
+    id: 'Seating',
+    en: 'Seating & Comfort',
+    gujlish: 'Comfortable Seating',
+    hinglish: 'Aaramdayak Seating',
+  },
+  {
+    id: 'Overall Dining Experience',
+    en: 'Overall Dining Experience',
+    gujlish: 'Superb Dining Experience',
+    hinglish: 'Overall Great Dining Experience',
   },
 ];
+
+// Alias for backward compatibility
+export const FASHION_TAG_TRANSLATIONS = RESTAURANT_TAG_TRANSLATIONS;
 
 export const TRANSLATIONS = {
   en: {
     // Nav & General
-    shopCategory: 'Luxury Clothing Boutique',
-    privilegePass: 'Privilege Pass',
-    rateVisit: 'Rate Your Visit',
-    viewCard: 'VIP Pass',
-    backToHome: 'Back to boutique',
+    shopCategory: 'Artisan Kitchen & Café',
+    privilegePass: 'Dining Privilege Pass',
+    rateVisit: 'Rate Your Meal',
+    viewCard: 'VIP Dining Pass',
+    backToHome: 'Back to Café & Kitchen',
 
     // Hero Section
-    heroBadge: 'New Seasonal Collection',
-    heroTitle: 'Express Your Style & Share Your Experience',
+    heroBadge: 'Fresh Culinary Creations',
+    heroTitle: 'Savor Every Flavor & Share Your Dining Experience',
     heroSubtitle:
-      'We craft tailored elegance and contemporary fashion. Your voice helps us elevate our atelier collections and guide fellow shoppers.',
+      'We craft artisanal dishes with fresh locally-sourced ingredients. Your honest feedback inspires our kitchen and guides fellow food lovers.',
     rateExperienceCta: 'Rate & Review Your Visit',
-    viewCollectionCta: 'Explore Featured Products',
+    viewCollectionCta: 'Explore Digital Menu',
 
     // Rating & Feedback Form
-    ratingHeading: 'How was your shopping experience?',
+    ratingHeading: 'How was your dining experience?',
     ratingSubtitle: 'Select your rating to begin tailoring your review',
     ratingLabel: 'Select your rating',
-    ratingHintDefault: 'Tap a star to rate your boutique visit',
-    rating1: '1 Star — Disappointing visit',
-    rating2: '2 Stars — Needs improvement',
-    rating3: '3 Stars — Average shopping experience',
-    rating4: '4 Stars — Very pleased with collection',
-    rating5: '5 Stars — Exceeded expectations, exceptional styling!',
+    ratingHintDefault: 'Tap a star to rate your dining experience',
+    rating1: '1 Star — Disappointing meal or service',
+    rating2: '2 Stars — Below expectations, needs improvement',
+    rating3: '3 Stars — Average dining experience',
+    rating4: '4 Stars — Delicious food & pleasant ambience',
+    rating5: '5 Stars — Outstanding flavors & exceptional hospitality!',
     selectRatingError: 'Please select a star rating first.',
 
     // Tags
-    highlightsLabel: 'What made your visit memorable?',
-    highlightsSubtitle: 'Select all features that apply to your shopping experience',
+    highlightsLabel: 'What made your meal memorable?',
+    highlightsSubtitle: 'Select all highlights that describe your visit',
 
     // Feedback notes
     notesLabel: 'Additional Comments (Optional)',
-    notesPlaceholder: 'Share specific details about garments, sizing assistance, or your boutique visit...',
+    notesPlaceholder: 'Mention your favorite dishes, beverages, staff service, or dining notes...',
     charCount: 'characters remaining',
 
     // Contact
     contactOptionalLabel: 'Leave Phone or Email (100% Optional)',
-    contactPlaceholder: 'For boutique follow-ups regarding alterations or orders...',
+    contactPlaceholder: 'For restaurant follow-ups or table reservation perks...',
     privacyNotice:
-      'Your privacy is respected. Private feedback is shared only with store management. AI assistance generates public drafts for Google Reviews.',
+      'Your privacy is respected. Private feedback is shared only with restaurant management. AI assistance generates public drafts for Google Reviews.',
 
     // Actions
     generateReview: 'Generate Review with AI',
     generatingReview: 'Generating personalized drafts...',
-    submitPrivateFeedback: 'Send Private Feedback to Boutique',
+    submitPrivateFeedback: 'Send Private Feedback to Restaurant',
     submitting: 'Saving...',
     reviewReadyTitle: 'AI Review Suggestions Ready',
     reviewReadySubtitle: 'Select any draft below, edit if you wish, and copy to Google Reviews in one click.',
 
     // Success State
-    thankYouTitle: 'Thank You for Your Feedback!',
+    thankYouTitle: 'Thank You for Dining With Us!',
     thankYouMessage:
-      'Your feedback helps us continuously perfect our fabric selection, tailoring, and boutique customer service.',
+      'Your feedback helps our culinary team continuously perfect our recipes, hospitality, and dining ambience.',
     copyToGoogleCta: 'Copy & Continue to Google Reviews',
-    viewPrivilegeCardCta: 'View Your VIP Boutique Privilege Pass',
+    viewPrivilegeCardCta: 'View Your VIP Dining Pass',
 
-    // Products Section
-    featuredProductsTitle: 'Featured Collection',
-    featuredProductsSubtitle: 'Handpicked bespoke pieces, seasonal arrivals, and signature atelier garments.',
-    allCategories: 'All',
-    viewDetails: 'View Garment',
-    sizeLabel: 'Sizes:',
-    colorLabel: 'Colors:',
-    noProductsFound: 'No products currently displayed in this category.',
+    // Digital Menu Section
+    menuTitle: 'Our Digital Menu',
+    menuSubtitle: 'Artisanal dishes, fresh brews, wood-fired specials, and handcrafted desserts.',
+    searchPlaceholder: 'Search dishes, drinks, ingredients...',
+    allCategories: 'All Menu',
+    vegOnly: 'Veg Only',
+    nonVegOnly: 'Non-Veg',
+    allDietary: 'All',
+    chefSpecial: "Chef's Special",
+    spicyLevel: 'Spice Level',
+    serves: 'Serves',
+    soldOut: 'Sold Out Today',
+    available: 'Available',
+    addonsLabel: 'Available Add-ons:',
+    variantsLabel: 'Portion / Size Options:',
+    noMenuItemsFound: 'No dishes found matching your criteria. Try adjusting your search or filters.',
 
     // Offers Section
-    specialOffersTitle: 'Exclusive Boutique Offers',
-    specialOffersSubtitle: 'Seasonal promotions, festival collections, and personalized styling privileges.',
+    specialOffersTitle: 'Chef’s Specials & Dining Deals',
+    specialOffersSubtitle: 'Exclusive meal combos, happy hour beverages, and weekend culinary specials.',
     validTill: 'Valid until',
     offerTerms: 'Terms & Conditions',
-    claimOffer: 'Claim in Store',
-    noOffersFound: 'No active promotional offers right now. Check back soon for seasonal sales!',
+    claimOffer: 'Show to Server to Redeem',
+    noOffersFound: 'No active offers right now. Check back soon for weekend specials and tasting menus!',
+
+    // Products (Legacy alias)
+    featuredProductsTitle: 'Featured Dishes & Drinks',
+    featuredProductsSubtitle: 'Chef recommendations, seasonal specialties, and popular signature items.',
+    viewDetails: 'View Details',
+    sizeLabel: 'Portion:',
+    colorLabel: 'Type:',
+    noProductsFound: 'No featured dishes currently displayed in this category.',
 
     // Social & Footer
-    connectTitle: 'Follow Our Atelier Journey',
-    connectSubtitle: 'Stay updated with new arrivals, runway drops, and seasonal lookbooks.',
-    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
+    connectTitle: 'Follow Our Culinary Journey',
+    connectSubtitle: 'Tag us in your food photos, check daily specials, and join our culinary community.',
+    footerCopyright: 'All rights reserved. Artisan Culinary Experience.',
   },
 
   gujlish: {
     // Nav & General
-    shopCategory: 'Luxury Clothing Boutique',
-    privilegePass: 'Privilege Pass',
-    rateVisit: 'Visit ને Rate કરો',
-    viewCard: 'VIP Pass જુઓ',
-    backToHome: 'Boutique Home પર પાછા જાઓ',
+    shopCategory: 'Artisan Kitchen & Café',
+    privilegePass: 'Dining Privilege Pass',
+    rateVisit: 'Dining ને Rate કરો',
+    viewCard: 'VIP Dining Pass જુઓ',
+    backToHome: 'Restaurant Home પર પાછા જાઓ',
 
     // Hero Section
-    heroBadge: 'New Seasonal Collection',
-    heroTitle: 'તમારી Style દર્શાવો અને Shopping Experience share કરો',
+    heroBadge: 'Fresh Culinary Creations',
+    heroTitle: 'Delicious Food માણો અને Dining Experience share કરો',
     heroSubtitle:
-      'અમે modern અને contemporary fashion design કરીએ છીએ. તમારો feedback અમારું collection enhance કરવામાં help કરે છે.',
+      'અમે fresh ingredients સાથે artisanal food અને drinks serve કરીએ છીએ. તમારો feedback અમારા chef અને team ને help કરે છે.',
     rateExperienceCta: 'Rate & Review Your Visit',
-    viewCollectionCta: 'Featured Collection જુઓ',
+    viewCollectionCta: 'Digital Menu જુઓ',
 
     // Rating & Feedback Form
-    ratingHeading: 'તમારો shopping experience કેવો રહ્યો?',
+    ratingHeading: 'તમારો dining experience કેવો રહ્યો?',
     ratingSubtitle: 'Review customize કરવા માટે rating select કરો',
     ratingLabel: 'તમારું rating પસંદ કરો',
     ratingHintDefault: 'Rating આપવા માટે star પર click કરો',
     rating1: '1 Star — Disappointing experience',
-    rating2: '2 Stars — Improvement ની જરૂર છે',
-    rating3: '3 Stars — Average shopping experience',
-    rating4: '4 Stars — Collection ખૂબ જ પસંદ આવ્યું',
-    rating5: '5 Stars — Amazing collection & great staff service!',
+    rating2: '2 Stars — Food & service માં improvement જોઈએ',
+    rating3: '3 Stars — Average dining experience',
+    rating4: '4 Stars — Food અને ambience ખૂબ જ ગમ્યું',
+    rating5: '5 Stars — Outstanding food taste & great staff hospitality!',
     selectRatingError: 'કૃપા કરીને પહેલાં rating પસંદ કરો.',
 
     // Tags
-    highlightsLabel: 'તમને શું સૌથી વધારે ગમ્યું?',
-    highlightsSubtitle: 'તમારા visit સાથે match થતાં tags select કરો',
+    highlightsLabel: 'તમને સૌથી વધારે શું ગમ્યું?',
+    highlightsSubtitle: 'તમારા dining experience સાથે match થતાં tags select કરો',
 
     // Feedback notes
     notesLabel: 'Additional Comments (Optional)',
-    notesPlaceholder: 'Fabric, fitting અથવા store service વિશે કંઈક લખો...',
+    notesPlaceholder: 'તમારી favorite dishes, drinks કે service વિશે લખો...',
     charCount: 'characters બાકી',
 
     // Contact
     contactOptionalLabel: 'Phone Number અથવા Email (Optional)',
-    contactPlaceholder: 'Orders અથવા alteration updates માટે...',
+    contactPlaceholder: 'Reservation perks અથવા follow-ups માટે...',
     privacyNotice:
-      'તમારી privacy safe છે. Private feedback માત્ર store owner જોશે. AI suggestions Google Reviews માટે છે.',
+      'તમારી privacy 100% safe છે. Private feedback માત્ર restaurant management જોશે. AI suggestions Google Reviews માટે છે.',
 
     // Actions
     generateReview: 'Review બનાવો',
     generatingReview: 'Personalized drafts generate થઈ રહ્યાં છે...',
-    submitPrivateFeedback: 'Boutique ને Private Feedback મોકલો',
+    submitPrivateFeedback: 'Restaurant ને Private Feedback મોકલો',
     submitting: 'Saving...',
     reviewReadyTitle: 'તમારા AI Review Suggestions Ready છે',
-    reviewReadySubtitle: 'નીચેથી કોઈપણ review select કરો, જરૂર હોય તો edit કરો અને 1-click માં Google Reviews પર copy કરો.',
+    reviewReadySubtitle: 'નીચેથી કોઈપણ review select કરો, edit કરો અને 1-click માં Google Reviews પર copy કરો.',
 
     // Success State
-    thankYouTitle: 'તમારા feedback માટે Thank You!',
+    thankYouTitle: 'અમારી સાથે Dine કરવા બદલ Thank You!',
     thankYouMessage:
-      'તમારો feedback અમારા fabric selection, styling અને customer service ને improve કરવામાં help કરશે.',
+      'તમારો feedback અમારા kitchen recipes અને hospitality service ને વધુ better બનાવવામાં help કરશે.',
     copyToGoogleCta: 'Copy કરી Google Reviews પર Post કરો',
-    viewPrivilegeCardCta: 'તમારો VIP Privilege Pass જુઓ',
+    viewPrivilegeCardCta: 'તમારો VIP Dining Pass જુઓ',
 
-    // Products Section
-    featuredProductsTitle: 'Featured Collection',
-    featuredProductsSubtitle: 'Handpicked designs, trending outfits અને designer collection.',
-    allCategories: 'All Collections',
-    viewDetails: 'Garment Details',
-    sizeLabel: 'Sizes:',
-    colorLabel: 'Colors:',
-    noProductsFound: 'આ category માં હાલ કોઈ products available નથી.',
+    // Digital Menu Section
+    menuTitle: 'અમારું Digital Menu',
+    menuSubtitle: 'Fresh artisanal dishes, hot coffees, refreshing drinks અને delicious desserts.',
+    searchPlaceholder: 'Dishes, drinks અથવા ingredients search કરો...',
+    allCategories: 'All Menu',
+    vegOnly: 'Pure Veg',
+    nonVegOnly: 'Non-Veg',
+    allDietary: 'All',
+    chefSpecial: "Chef's Special",
+    spicyLevel: 'Spice Level',
+    serves: 'Serves',
+    soldOut: 'આજે Sold Out છે',
+    available: 'Available',
+    addonsLabel: 'Available Add-ons:',
+    variantsLabel: 'Size / Portion Options:',
+    noMenuItemsFound: 'કોઈ dish મળી નથી. Filters અથવા search keyword બદલીને try કરો.',
 
     // Offers Section
-    specialOffersTitle: 'Exclusive Boutique Offers',
-    specialOffersSubtitle: 'Seasonal discounts, festival offers અને VIP shopping perks.',
+    specialOffersTitle: 'Chef’s Specials & Food Offers',
+    specialOffersSubtitle: 'Exclusive meal combos, discounts અને weekend special offers.',
     validTill: 'Valid till:',
     offerTerms: 'Terms & Conditions',
-    claimOffer: 'Store પર Claim કરો',
-    noOffersFound: 'હાલ કોઈ active offers નથી. Seasonal sales માટે જલ્દી check કરો!',
+    claimOffer: 'Table પર Server ને બતાવો',
+    noOffersFound: 'હાલ કોઈ active offers નથી. Weekend specials માટે જલ્દી check કરો!',
+
+    // Products (Legacy alias)
+    featuredProductsTitle: 'Featured Dishes & Drinks',
+    featuredProductsSubtitle: 'Chef recommendations અને trending food specialties.',
+    viewDetails: 'Dish Details',
+    sizeLabel: 'Portion:',
+    colorLabel: 'Type:',
+    noProductsFound: 'આ category માં હાલ કોઈ dishes available નથી.',
 
     // Social & Footer
-    connectTitle: 'અમારા Social Media સાથે Connect થાઓ',
-    connectSubtitle: 'New arrivals અને fashion lookbooks માટે અમને follow કરો.',
-    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
+    connectTitle: 'અમારી Culinary Journey સાથે જોડાવો',
+    connectSubtitle: 'New recipes, daily specials અને food updates માટે follow કરો.',
+    footerCopyright: 'All rights reserved. Artisan Culinary Experience.',
   },
 
   hinglish: {
     // Nav & General
-    shopCategory: 'Luxury Clothing Boutique',
-    privilegePass: 'Privilege Pass',
-    rateVisit: 'Visit ko Rate karein',
-    viewCard: 'VIP Pass dekhein',
-    backToHome: 'Boutique Home par wapas jayein',
+    shopCategory: 'Artisan Kitchen & Café',
+    privilegePass: 'Dining Privilege Pass',
+    rateVisit: 'Dining ko Rate karein',
+    viewCard: 'VIP Dining Pass dekhein',
+    backToHome: 'Restaurant Home par wapas jayein',
 
     // Hero Section
-    heroBadge: 'New Seasonal Collection',
-    heroTitle: 'Apni Style show karein aur Experience share karein',
+    heroBadge: 'Fresh Culinary Creations',
+    heroTitle: 'Delicious Flavours ka Mazaa lein & Experience share karein',
     heroSubtitle:
-      'Hum contemporary elegance aur modern outfits design karte hain. Aapka feedback hamari collections ko improve karne me help karta hai.',
+      'Hum fresh ingredients ke saath authentic dishes aur refreshing drinks serve karte hain. Aapka feedback hamari team ko elevate karta hai.',
     rateExperienceCta: 'Rate & Review Your Visit',
-    viewCollectionCta: 'Featured Collection dekhein',
+    viewCollectionCta: 'Digital Menu dekhein',
 
     // Rating & Feedback Form
-    ratingHeading: 'Aapka shopping experience kaisa raha?',
+    ratingHeading: 'Aapka dining experience kaisa raha?',
     ratingSubtitle: 'Review customize karne ke liye rating select karein',
     ratingLabel: 'Apna rating choose karein',
     ratingHintDefault: 'Rating dene ke liye star par tap karein',
-    rating1: '1 Star — Disappointing experience',
-    rating2: '2 Stars — Improvement ki zarurat hai',
-    rating3: '3 Stars — Average shopping experience',
-    rating4: '4 Stars — Collection kaafi acchi lagi',
-    rating5: '5 Stars — Amazing collection & superb staff service!',
+    rating1: '1 Star — Disappointing food ya service',
+    rating2: '2 Stars — Food & service me improvement chahiye',
+    rating3: '3 Stars — Average dining experience',
+    rating4: '4 Stars — Delicious food aur accha ambience',
+    rating5: '5 Stars — Outstanding food taste & fantastic hospitality!',
     selectRatingError: 'Kripya pehle rating select karein.',
 
     // Tags
-    highlightsLabel: 'Aapko store me sabse accha kya laga?',
-    highlightsSubtitle: 'Apne shopping experience se related tags choose karein',
+    highlightsLabel: 'Aapko restaurant me sabse accha kya laga?',
+    highlightsSubtitle: 'Apne dining experience se related tags choose karein',
 
     // Feedback notes
     notesLabel: 'Additional Comments (Optional)',
-    notesPlaceholder: 'Fabric, fitting, ya store service ke baare me likhein...',
+    notesPlaceholder: 'Apni favorite dishes, mocktails, staff service ke baare me likhein...',
     charCount: 'characters remaining',
 
     // Contact
     contactOptionalLabel: 'Phone Number ya Email (Optional)',
-    contactPlaceholder: 'Orders ya alteration updates ke liye...',
+    contactPlaceholder: 'Table reservation perks ya updates ke liye...',
     privacyNotice:
-      'Aapki privacy 100% safe hai. Private feedback sirf store management ke paas jayega.',
+      'Aapki privacy 100% safe hai. Private feedback sirf restaurant owner ke paas jayega.',
 
     // Actions
     generateReview: 'Review generate karein',
     generatingReview: 'Personalized drafts generate ho rahe hain...',
-    submitPrivateFeedback: 'Store ko Private Feedback bhejein',
+    submitPrivateFeedback: 'Restaurant ko Private Feedback bhejein',
     submitting: 'Saving...',
     reviewReadyTitle: 'Aapke AI Review Suggestions Ready hain',
     reviewReadySubtitle: 'Neeche diye gaye kisi bhi draft ko select karein, edit karein aur 1-click me Google Reviews par copy karein.',
 
     // Success State
-    thankYouTitle: 'Aapke feedback ke liye Thank You!',
+    thankYouTitle: 'Hamare Saath Dine karne ke liye Thank You!',
     thankYouMessage:
-      'Aapka honest feedback hamare fabric, fitting aur customer service ko elevate karne me madad karega.',
+      'Aapka honest feedback hamare kitchen taste aur customer hospitality ko improve karne me madad karega.',
     copyToGoogleCta: 'Copy karein aur Google Reviews par Continue karein',
-    viewPrivilegeCardCta: 'Apna VIP Privilege Pass dekhein',
+    viewPrivilegeCardCta: 'Apna VIP Dining Pass dekhein',
 
-    // Products Section
-    featuredProductsTitle: 'Featured Collection',
-    featuredProductsSubtitle: 'Handpicked trending designs, seasonal drops aur designer wear.',
-    allCategories: 'All',
-    viewDetails: 'Details dekhein',
-    sizeLabel: 'Sizes:',
-    colorLabel: 'Colors:',
-    noProductsFound: 'Is category me abhi koi products available nahi hain.',
+    // Digital Menu Section
+    menuTitle: 'Hamara Digital Menu',
+    menuSubtitle: 'Freshly made food, signature coffees, refreshing coolers aur desserts.',
+    searchPlaceholder: 'Dishes, beverages ya ingredients search karein...',
+    allCategories: 'All Menu',
+    vegOnly: 'Pure Veg',
+    nonVegOnly: 'Non-Veg',
+    allDietary: 'All',
+    chefSpecial: "Chef's Special",
+    spicyLevel: 'Spice Level',
+    serves: 'Serves',
+    soldOut: 'Aaj Sold Out hai',
+    available: 'Available',
+    addonsLabel: 'Available Add-ons:',
+    variantsLabel: 'Portion / Size Options:',
+    noMenuItemsFound: 'Koi dish nahi mili. Filters ya search query change karke try karein.',
 
     // Offers Section
-    specialOffersTitle: 'Exclusive Boutique Offers',
-    specialOffersSubtitle: 'Seasonal discounts, festive sales aur VIP privileges.',
+    specialOffersTitle: 'Chef’s Specials & Food Offers',
+    specialOffersSubtitle: 'Exclusive dining combos, discounts aur weekend deals.',
     validTill: 'Valid till:',
     offerTerms: 'Terms & Conditions',
-    claimOffer: 'Store par Claim karein',
-    noOffersFound: 'Filhaal koi active offers nahi hain. Jald hi new offers check karein!',
+    claimOffer: 'Table par Server ko dikhayein',
+    noOffersFound: 'Filhaal koi active offers nahi hain. Jald hi weekend specials check karein!',
+
+    // Products (Legacy alias)
+    featuredProductsTitle: 'Featured Dishes & Drinks',
+    featuredProductsSubtitle: 'Chef recommendations aur popular signature items.',
+    viewDetails: 'Details dekhein',
+    sizeLabel: 'Portion:',
+    colorLabel: 'Type:',
+    noProductsFound: 'Is category me abhi koi dishes available nahi hain.',
 
     // Social & Footer
     connectTitle: 'Hamare Social Media se Judein',
-    connectSubtitle: 'New arrivals aur latest styling lookbooks ke liye follow karein.',
-    footerCopyright: 'All rights reserved. Luxury Retail Experience.',
+    connectSubtitle: 'Daily specials, new food items aur behind-the-scenes ke liye follow karein.',
+    footerCopyright: 'All rights reserved. Artisan Culinary Experience.',
   },
 };
 

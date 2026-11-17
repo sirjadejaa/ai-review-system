@@ -30,28 +30,28 @@ interface SettingsManagerProps {
 
 const PALETTE_PRESETS = [
   {
-    name: 'Noir & Atelier Gold',
-    primary: '#171717',
-    secondary: '#3a3a3a',
-    accent: '#a88b64',
+    name: 'Espresso & Honey (Default)',
+    primary: '#25221F',
+    secondary: '#57483D',
+    accent: '#B78348',
   },
   {
-    name: 'Cashmere & Sand',
-    primary: '#2b2621',
-    secondary: '#544b43',
-    accent: '#c2a68c',
+    name: 'Bistro & Terracotta',
+    primary: '#2A1D1A',
+    secondary: '#5A3E36',
+    accent: '#C06C47',
   },
   {
-    name: 'Midnight & Silk',
-    primary: '#161b26',
-    secondary: '#323b4e',
-    accent: '#8b9eb7',
+    name: 'Olive & Fresh Herb',
+    primary: '#1F291E',
+    secondary: '#414E3F',
+    accent: '#8E9C4B',
   },
   {
-    name: 'Atelier Olive & Linen',
-    primary: '#222b24',
-    secondary: '#465248',
-    accent: '#9eab9d',
+    name: 'Artisan Bakery & Plum',
+    primary: '#2B1B24',
+    secondary: '#5C3A4D',
+    accent: '#B26284',
   },
 ];
 
@@ -138,19 +138,26 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
   const [, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const defaultShopName = initialSettings.shopName === 'Pharmacy' ? 'Maison & Thread' : initialSettings.shopName;
-  const defaultTagline = initialSettings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
+  const defaultShopName =
+    initialSettings.shopName === 'Pharmacy' || initialSettings.shopName === 'Maison & Thread'
+      ? 'The Olive & Hearth'
+      : initialSettings.shopName;
+  const defaultTagline =
+    initialSettings.tagline || 'Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies';
 
   const [shopName, setShopName] = useState(defaultShopName);
   const [tagline, setTagline] = useState(defaultTagline);
+  const [restaurantType, setRestaurantType] = useState(initialSettings.restaurantType || 'Café & Restaurant');
+  const [coverImageUrl, setCoverImageUrl] = useState(initialSettings.coverImageUrl || '');
+  const [cuisineTypesStr, setCuisineTypesStr] = useState((initialSettings.cuisineTypes || []).join(', '));
   const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(initialSettings.logoUrl ?? null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
 
   // Custom Colors
-  const [primaryColor, setPrimaryColor] = useState(initialSettings.primaryColor || '#171717');
-  const [secondaryColor, setSecondaryColor] = useState(initialSettings.secondaryColor || '#3a3a3a');
-  const [accentColor, setAccentColor] = useState(initialSettings.accentColor || '#a88b64');
+  const [primaryColor, setPrimaryColor] = useState(initialSettings.primaryColor || '#25221F');
+  const [secondaryColor, setSecondaryColor] = useState(initialSettings.secondaryColor || '#57483D');
+  const [accentColor, setAccentColor] = useState(initialSettings.accentColor || '#B78348');
 
   const [phoneNumber, setPhoneNumber] = useState(initialSettings.phoneNumber ?? '');
   const [whatsappNumber, setWhatsappNumber] = useState(initialSettings.whatsappNumber ?? '');
@@ -168,8 +175,8 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
     initialSettings.openingHours.length > 0
       ? initialSettings.openingHours
       : [
-          { days: 'Monday - Saturday', hours: '10:00 AM - 9:00 PM' },
-          { days: 'Sunday', hours: '11:00 AM - 7:00 PM' },
+          { days: 'Monday - Friday', hours: '11:00 AM - 11:00 PM' },
+          { days: 'Saturday - Sunday', hours: '10:00 AM - 11:30 PM' },
         ]
   );
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(initialSettings.isEmergencyOpen);
@@ -309,9 +316,16 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
         });
       });
 
+    const cuisineTypes = cuisineTypesStr
+      ? cuisineTypesStr.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
     const payload = {
       shopName: shopName.trim(),
       tagline: tagline.trim() ? tagline.trim() : null,
+      restaurantType: restaurantType.trim() ? restaurantType.trim() : null,
+      coverImageUrl: coverImageUrl.trim() ? coverImageUrl.trim() : null,
+      cuisineTypes,
       logoUrl: currentLogoUrl,
       primaryColor,
       secondaryColor,
@@ -439,23 +453,50 @@ export const SettingsManager: React.FC<SettingsManagerProps> = ({ initialSetting
               </div>
 
               <Input
-                label="Store Name"
+                label="Restaurant Name"
                 required
                 value={shopName}
                 error={fieldErrors.shopName}
-                helpText="The primary brand title for your clothing store."
-                placeholder="e.g. Maison & Thread"
+                helpText="The primary culinary brand title for your restaurant or café."
+                placeholder="e.g. The Olive & Hearth"
                 onChange={(e) => setShopName(e.target.value)}
               />
 
               <Input
-                label="Tagline & Brand Statement"
+                label="Restaurant Type / Concept"
+                value={restaurantType}
+                error={fieldErrors.restaurantType}
+                helpText="Concept label (e.g. Café & Restaurant, Artisan Bakery, Wood-Fired Pizzeria, Fine Dining)."
+                placeholder="e.g. Café & Restaurant"
+                onChange={(e) => setRestaurantType(e.target.value)}
+              />
+
+              <Input
+                label="Tagline & Culinary Statement"
                 value={tagline}
                 error={fieldErrors.tagline}
-                helpText="Short editorial descriptor (e.g. Curated Contemporary Fashion & Bespoke Tailoring)."
-                placeholder="e.g. Luxury Apparel & Bespoke Studio"
+                helpText="Short descriptor (e.g. Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies)."
+                placeholder="e.g. Artisanal Kitchen & Specialty Café"
                 maxLength={150}
                 onChange={(e) => setTagline(e.target.value)}
+              />
+
+              <Input
+                label="Cuisine & Specialties (Comma-separated)"
+                value={cuisineTypesStr}
+                error={fieldErrors.cuisineTypes}
+                helpText="Tags displayed on hero header (e.g. Artisanal Pizza, Specialty Coffee, Continental, Desserts)."
+                placeholder="e.g. Italian, Wood-Fired Pizza, Specialty Coffee"
+                onChange={(e) => setCuisineTypesStr(e.target.value)}
+              />
+
+              <Input
+                label="Cover Photo URL"
+                value={coverImageUrl}
+                error={fieldErrors.coverImageUrl}
+                helpText="High-resolution food or restaurant atmosphere banner image URL."
+                placeholder="https://images.unsplash.com/photo-..."
+                onChange={(e) => setCoverImageUrl(e.target.value)}
               />
             </div>
           </CardContent>

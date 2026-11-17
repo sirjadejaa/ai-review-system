@@ -43,6 +43,20 @@ export const ShopSettingsInputSchema = z.object({
     .refine((val) => !val || val.startsWith('/uploads/') || val.startsWith('data:image/') || isValidExternalUrl(val), {
       message: 'Logo must be a valid image URL or upload path',
     }),
+  coverImageUrl: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().nullable().optional()
+    )
+    .refine((val) => !val || val.startsWith('/uploads/') || val.startsWith('data:image/') || isValidExternalUrl(val), {
+      message: 'Cover image must be a valid image URL or upload path',
+    }),
+  restaurantType: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? null : val),
+      z.string().trim().max(100, 'Restaurant type must be at most 100 characters').nullable().optional()
+    ),
+  cuisineTypes: z.array(z.string().trim()).default([]),
   primaryColor: HexColorSchema,
   secondaryColor: HexColorSchema,
   accentColor: HexColorSchema,

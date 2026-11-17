@@ -1,32 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CustomerLayout } from '@/components/layout/customer-layout';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  Button,
-  Badge,
-  Rating,
-  ErrorState,
-} from '@/components/ui';
+import { Button, ErrorState } from '@/components/ui';
 import { getShopSettings } from '@/lib/repositories/shop-settings-repository';
 import { listActiveOffers } from '@/lib/repositories/offer-repository';
-import { listFeaturedProducts } from '@/lib/repositories/product-repository';
+import { listMenuCategories, listMenuItems } from '@/lib/repositories/menu-repository';
 import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-schema';
 import { QrScanTracker } from '@/components/customer/qr-scan-tracker';
 import { CustomerContactActions } from '@/components/customer/customer-contact-actions';
 import { OfferList } from '@/components/customer/offer-list';
-import { FeaturedProducts } from '@/components/customer/featured-products';
+import { DigitalMenu } from '@/components/customer/digital-menu';
 import { SocialLinks } from '@/components/customer/social-links';
-import { BoutiqueLogo } from '@/components/brand/boutique-logo';
-import { Star, CreditCard, Sparkles, MapPin, Clock } from 'lucide-react';
+import { RestaurantLogo } from '@/components/brand/restaurant-logo';
+import { Star, Utensils, Sparkles, MapPin, Clock, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Home & Customer Experience',
-  description: 'Share your clothing store visit experience or access our digital boutique privilege card.',
+  title: 'Dining Experience & Digital Menu',
+  description: 'Explore our artisan culinary menu, savor fresh dishes, and share your dining review.',
 };
 
 interface CustomerLandingPageProps {
@@ -40,16 +30,18 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
   const parsedQuery = CustomerLandingQuerySchema.safeParse({ source: rawSource });
   const validatedSource = parsedQuery.success ? parsedQuery.data.source : undefined;
 
-  // 2. Retrieve ShopSettings, active offers & featured products from database
+  // 2. Retrieve ShopSettings, active offers & digital menu from database
   let settings;
   let activeOffers = [];
-  let featuredProducts = [];
+  let menuCategories = [];
+  let menuItems = [];
 
   try {
-    const [settingsResult, offersResult, productsResult] = await Promise.allSettled([
+    const [settingsResult, offersResult, categoriesResult, itemsResult] = await Promise.allSettled([
       getShopSettings(),
       listActiveOffers(),
-      listFeaturedProducts(12),
+      listMenuCategories(),
+      listMenuItems({ isAvailable: true }),
     ]);
 
     if (settingsResult.status === 'rejected') {
@@ -58,34 +50,35 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
 
     settings = settingsResult.value;
     activeOffers = offersResult.status === 'fulfilled' ? offersResult.value : [];
-    featuredProducts = productsResult.status === 'fulfilled' ? productsResult.value : [];
+    menuCategories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+    menuItems = itemsResult.status === 'fulfilled' ? itemsResult.value : [];
   } catch (err) {
     console.error('Non-fatal: Failed to load shop settings for customer landing', err);
     return (
-      <CustomerLayout shopName="Maison & Thread">
+      <CustomerLayout shopName="The Olive & Hearth">
         <div style={{ padding: 'var(--space-8) 0' }}>
           <ErrorState
-            title="Unable to load boutique information"
-            message="We're having trouble loading store details right now. Please try again shortly."
+            title="Unable to load restaurant information"
+            message="We're having trouble loading restaurant details right now. Please try again shortly."
           />
         </div>
       </CustomerLayout>
     );
   }
 
-  // Controlled empty setup state for a brand-new installation without store profile
-  const isUnconfigured =
-    !settings.shopName ||
-    ((settings.shopName === 'Pharmacy' || settings.shopName === 'Maison & Thread') &&
-      !settings.phoneNumber &&
-      !settings.address &&
-      !settings.googleReviewUrl);
-
-  const displayShopName = settings.shopName === 'Pharmacy' ? 'Maison & Thread' : settings.shopName;
-  const displayTagline = settings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
+  const displayShopName =
+    settings.shopName === 'Pharmacy' || settings.shopName === 'Maison & Thread'
+      ? 'The Olive & Hearth'
+      : settings.shopName;
+  const displayTagline =
+    settings.tagline || 'Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies';
+  const displayRestaurantType = settings.restaurantType || 'Café & Restaurant';
 
   const hasOpeningHours = settings.openingHours && settings.openingHours.length > 0;
   const hasAddress = Boolean(settings.address && settings.address.trim());
+  const coverImage =
+    settings.coverImageUrl ||
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80';
 
   return (
     <CustomerLayout
@@ -98,7 +91,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
       <QrScanTracker source={validatedSource} />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-        {/* Editorial Visual Hero Panel (PraiseUp Inspired Warm Canvas) */}
+        {/* Editorial Restaurant Hero Banner (PraiseUp Inspired Warm Aesthetic) */}
         <section
           style={{
             position: 'relative',
@@ -110,50 +103,62 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
           }}
           aria-labelledby="welcome-heading"
         >
-          {/* Fashion Atelier Header Pattern with Warm Gradient */}
+          {/* Cover Photo with Soft Warm Gradient Overlay */}
           <div
             style={{
               position: 'relative',
               width: '100%',
-              height: '180px',
-              backgroundColor: '#1E1E1E',
-              background: 'linear-gradient(135deg, #1A1A1A 0%, #2A2621 50%, #383127 100%)',
+              height: '190px',
+              backgroundColor: '#25221F',
+              backgroundImage: `linear-gradient(180deg, rgba(37, 34, 31, 0.25) 0%, rgba(37, 34, 31, 0.8) 100%), url(${coverImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              padding: 'var(--space-4)',
             }}
           >
-            {/* Subtle Atelier Ambient Geometric Lines */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                opacity: 0.15,
-                backgroundImage: 'radial-gradient(#A88B64 1px, transparent 1px)',
-                backgroundSize: '24px 24px',
-              }}
-            />
-            {/* Editorial Fashion Badge */}
+            {/* Restaurant Type Pill Badge */}
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '6px 14px',
+                padding: '5px 12px',
                 borderRadius: '9999px',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(168, 139, 100, 0.3)',
-                color: '#E8D8C3',
-                fontSize: '0.75rem',
-                letterSpacing: '0.12em',
+                backgroundColor: 'rgba(37, 34, 31, 0.75)',
+                border: '1px solid rgba(183, 131, 72, 0.4)',
+                color: '#FAF7F2',
+                fontSize: '0.6875rem',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase',
                 backdropFilter: 'blur(8px)',
+                fontWeight: 600,
               }}
             >
-              <Sparkles size={13} style={{ color: '#D49B44' }} />
-              <span>Autumn / Winter Collection</span>
+              <Sparkles size={12} style={{ color: '#D9953B' }} />
+              <span>{displayRestaurantType}</span>
             </div>
+
+            {settings.cuisineTypes && settings.cuisineTypes.length > 0 && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#ffffff',
+                  fontSize: '0.625rem',
+                  fontWeight: 500,
+                }}
+              >
+                {settings.cuisineTypes.slice(0, 2).join(' • ')}
+              </div>
+            )}
           </div>
 
           <div
@@ -193,7 +198,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   boxShadow: 'var(--shadow-md)',
                 }}
               >
-                <BoutiqueLogo size="lg" variant="mark" shopName={displayShopName} />
+                <RestaurantLogo size="lg" variant="mark" shopName={displayShopName} />
               </div>
             )}
 
@@ -221,14 +226,14 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   margin: 0,
                 }}
               >
-                Bespoke Quality<br />
-                <span style={{ color: 'var(--color-accent)' }}>Curated For You</span>
+                Artisanal Flavors &amp;<br />
+                <span style={{ color: 'var(--color-accent)' }}>Memorable Dining</span>
               </h1>
               <p
                 style={{
                   fontSize: 'var(--font-size-sm)',
                   color: 'var(--color-text-secondary)',
-                  maxWidth: '380px',
+                  maxWidth: '420px',
                   margin: 'var(--space-2) auto 0',
                   lineHeight: 'var(--line-height-normal)',
                 }}
@@ -239,12 +244,12 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
           </div>
         </section>
 
-        {/* Primary Action Hierarchy (PraiseUp Review Flow & Digital Card) */}
+        {/* Primary Action Buttons (PraiseUp Flow: Rate Meal & View Pass) */}
         <section
           style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
-          aria-label="Primary Boutique Actions"
+          aria-label="Primary Restaurant Actions"
         >
-          {/* Action 1: Give a Review (Primary CTA) */}
+          {/* Action 1: Rate & Review (Primary CTA) */}
           <Link
             href={validatedSource ? `/customer/review?source=${validatedSource}` : '/customer/review'}
             style={{ textDecoration: 'none' }}
@@ -264,12 +269,12 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 boxShadow: 'var(--shadow-sm)',
               }}
             >
-              <Star size={18} fill="#d49b44" stroke="#d49b44" aria-hidden="true" />
-              <span>Rate &amp; Review Your Visit</span>
+              <Star size={18} fill="#D9953B" stroke="#D9953B" aria-hidden="true" />
+              <span>Rate &amp; Review Your Dining Experience</span>
             </Button>
           </Link>
 
-          {/* Action 2: Digital Privilege Card (Secondary CTA) */}
+          {/* Action 2: Digital Dining Pass & Loyalty */}
           <Link
             href={validatedSource ? `/customer/card?source=${validatedSource}` : '/customer/card'}
             style={{ textDecoration: 'none' }}
@@ -287,14 +292,14 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                 gap: 'var(--space-2)',
               }}
             >
-              <CreditCard size={18} aria-hidden="true" />
-              <span>Boutique Privilege Card &amp; Offers</span>
+              <Award size={18} aria-hidden="true" style={{ color: 'var(--color-accent)' }} />
+              <span>VIP Dining Privilege Pass &amp; Perks</span>
             </Button>
           </Link>
         </section>
 
-        {/* Contact shortcuts: Call Stylist, WhatsApp, Directions */}
-        <section aria-label="Contact and Directions">
+        {/* Contact shortcuts: Call Host, WhatsApp, Directions */}
+        <section aria-label="Restaurant Contact and Directions">
           <CustomerContactActions
             phoneNumber={settings.phoneNumber}
             whatsappNumber={settings.whatsappNumber}
@@ -310,13 +315,13 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               alignItems: 'flex-start',
               gap: 'var(--space-2)',
               padding: 'var(--space-3) var(--space-4)',
-              backgroundColor: 'var(--color-bg-surface-subtle)',
+              backgroundColor: 'var(--color-bg-surface)',
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-md)',
               fontSize: 'var(--font-size-sm)',
               color: 'var(--color-text-secondary)',
             }}
-            aria-label="Boutique Location"
+            aria-label="Restaurant Location"
           >
             <MapPin size={18} style={{ color: 'var(--color-accent)', marginTop: '2px', flexShrink: 0 }} aria-hidden="true" />
             <span>{settings.address}</span>
@@ -335,7 +340,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
               flexDirection: 'column',
               gap: 'var(--space-3)',
             }}
-            aria-label="Boutique Hours"
+            aria-label="Restaurant Opening Hours"
           >
             <div
               style={{
@@ -357,7 +362,7 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
                   letterSpacing: '0.06em',
                 }}
               >
-                Store Hours
+                Kitchen &amp; Café Hours
               </h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -383,11 +388,11 @@ export default async function CustomerLandingPage({ searchParams }: CustomerLand
           </section>
         )}
 
-        {/* Active Offers & Promotions */}
+        {/* Active Dining Offers & Chef Specials */}
         <OfferList offers={activeOffers} />
 
-        {/* Featured Clothing Products Showcase */}
-        <FeaturedProducts products={featuredProducts} />
+        {/* Centerpiece: Full Restaurant Digital Menu */}
+        <DigitalMenu categories={menuCategories} items={menuItems} />
 
         {/* Social Media Links */}
         <SocialLinks socialLinks={settings.socialLinks} />

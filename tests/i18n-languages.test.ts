@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   TRANSLATIONS,
-  FASHION_TAG_TRANSLATIONS,
+  RESTAURANT_TAG_TRANSLATIONS,
   LANGUAGE_OPTIONS,
 } from '@/lib/i18n/translations';
 import type { SupportedLanguage } from '@/lib/i18n/translations';
@@ -33,29 +33,29 @@ describe('Multilingual i18n System (Exact 3 Languages: English, Gujlish, Hinglis
     const gujlishDict = TRANSLATIONS.gujlish;
 
     // Gujlish mixes conversational English terms with Gujarati script
-    expect(gujlishDict.ratingHeading).toBe('તમારો shopping experience કેવો રહ્યો?');
+    expect(gujlishDict.ratingHeading).toBe('તમારો dining experience કેવો રહ્યો?');
     expect(gujlishDict.ratingLabel).toBe('તમારું rating પસંદ કરો');
     expect(gujlishDict.generateReview).toBe('Review બનાવો');
     expect(gujlishDict.copyToGoogleCta).toContain('Google Reviews');
     expect(/[\u0A80-\u0AFF]/.test(gujlishDict.ratingHeading)).toBe(true);
-    expect(gujlishDict.ratingHeading.toLowerCase()).toContain('shopping experience');
+    expect(gujlishDict.ratingHeading.toLowerCase()).toContain('dining experience');
   });
 
   it('uses natural conversational Hindi-English phrasing in Hinglish', () => {
     const hinglishDict = TRANSLATIONS.hinglish;
 
     // Hinglish mixes conversational Hindi with common English words
-    expect(hinglishDict.ratingHeading).toBe('Aapka shopping experience kaisa raha?');
+    expect(hinglishDict.ratingHeading).toBe('Aapka dining experience kaisa raha?');
     expect(hinglishDict.ratingLabel).toBe('Apna rating choose karein');
     expect(hinglishDict.generateReview).toBe('Review generate karein');
-    expect(hinglishDict.ratingHeading.toLowerCase()).toContain('shopping experience');
+    expect(hinglishDict.ratingHeading.toLowerCase()).toContain('dining experience');
     expect(hinglishDict.ratingHeading.toLowerCase()).toContain('aapka');
   });
 
-  it('provides translations for all 11 clothing-specific review tags in en, gujlish, and hinglish', () => {
-    expect(FASHION_TAG_TRANSLATIONS).toHaveLength(11);
+  it('provides translations for all 13 restaurant review tags in en, gujlish, and hinglish', () => {
+    expect(RESTAURANT_TAG_TRANSLATIONS).toHaveLength(13);
 
-    for (const tag of FASHION_TAG_TRANSLATIONS) {
+    for (const tag of RESTAURANT_TAG_TRANSLATIONS) {
       expect(tag.id).toBeTruthy();
       expect(tag.en).toBeTruthy();
       expect(tag.gujlish).toBeTruthy();
@@ -63,16 +63,16 @@ describe('Multilingual i18n System (Exact 3 Languages: English, Gujlish, Hinglis
     }
   });
 
-  it('renders accurate Gujlish and Hinglish translations for key clothing tags', () => {
-    const tagMap = new Map(FASHION_TAG_TRANSLATIONS.map((t) => [t.id, t]));
+  it('renders accurate Gujlish and Hinglish translations for key restaurant tags', () => {
+    const tagMap = new Map(RESTAURANT_TAG_TRANSLATIONS.map((t) => [t.id, t]));
 
-    expect(tagMap.get('Clothing Quality')?.gujlish).toBe('Clothing ની Quality');
-    expect(tagMap.get('Clothing Quality')?.hinglish).toBe('Clothes ki Quality');
-    expect(tagMap.get('Fabric Quality')?.gujlish).toBe('Fabric & Material');
-    expect(tagMap.get('Fabric Quality')?.hinglish).toBe('Fabric & Kapda Quality');
-    expect(tagMap.get('Fitting & Sizing')?.gujlish).toBe('Fitting & Size Options');
-    expect(tagMap.get('Fitting & Sizing')?.hinglish).toBe('Fitting aur Sizing');
-    expect(tagMap.get('Shopping Experience')?.gujlish).toBe('Great Shopping Experience');
-    expect(tagMap.get('Shopping Experience')?.hinglish).toBe('Smooth Shopping Experience');
+    expect(tagMap.get('Food Quality')?.gujlish).toBe('Food Quality & Ingredients');
+    expect(tagMap.get('Food Quality')?.hinglish).toBe('Food Quality & Taste');
+    expect(tagMap.get('Taste')?.gujlish).toBe('Delicious Taste & Flavours');
+    expect(tagMap.get('Freshness')?.gujlish).toBe('Fresh & Hot Food');
+    expect(tagMap.get('Service Speed')?.hinglish).toBe('Quick Service Speed');
+    expect(tagMap.get('Restaurant Ambience')?.gujlish).toBe('Cozy Café Ambience');
+    expect(tagMap.get('Overall Dining Experience')?.gujlish).toBe('Superb Dining Experience');
+    expect(tagMap.get('Overall Dining Experience')?.hinglish).toBe('Overall Great Dining Experience');
   });
 });

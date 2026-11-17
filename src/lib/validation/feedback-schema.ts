@@ -2,51 +2,80 @@ import { z } from 'zod';
 
 export const FeedbackStatusSchema = z.enum(['NEW', 'REVIEWED', 'RESOLVED']);
 
+export const UpdateFeedbackStatusSchema = z.object({
+  status: FeedbackStatusSchema,
+});
+
+export type UpdateFeedbackStatusInput = z.infer<typeof UpdateFeedbackStatusSchema>;
+
 /**
- * Fashion boutique customer experience tags.
- * Designed for premium clothing stores, bespoke studios, and apparel retail.
+ * 13 Specific Restaurant & Café Customer Experience Tags.
  */
-export const FASHION_FEEDBACK_TAGS = [
-  'Clothing Quality',
-  'Fabric Quality',
-  'Fitting & Sizing',
-  'Design & Collection',
-  'Comfort',
-  'Pricing & Value',
+export const RESTAURANT_FEEDBACK_TAGS = [
+  'Food Quality',
+  'Taste',
+  'Freshness',
+  'Food Presentation',
+  'Portion Size',
+  'Menu Variety',
+  'Price and Value',
   'Staff Behaviour',
-  'Customer Service',
-  'Store Ambience',
-  'Variety & Availability',
-  'Overall Shopping Experience',
+  'Service Speed',
+  'Restaurant Ambience',
+  'Cleanliness',
+  'Seating',
+  'Overall Dining Experience',
 ] as const;
+
+export const FASHION_FEEDBACK_TAGS = RESTAURANT_FEEDBACK_TAGS;
 
 /**
  * Whitelist of all accepted feedback tags including legacy tags for backward compatibility.
  */
 export const PREDEFINED_FEEDBACK_TAGS = [
-  // Premium clothing store tags
+  // Restaurant & Café tags
+  'Food Quality',
+  'Taste',
+  'Freshness',
+  'Food Presentation',
+  'Portion Size',
+  'Menu Variety',
+  'Price and Value',
+  'Staff Behaviour',
+  'Service Speed',
+  'Restaurant Ambience',
+  'Cleanliness',
+  'Seating',
+  'Overall Dining Experience',
+  // Boutique tags (backward compatibility)
   'Clothing Quality',
   'Fabric Quality',
   'Fitting & Sizing',
   'Design & Collection',
   'Comfort',
   'Pricing & Value',
-  'Staff Behaviour',
   'Customer Service',
   'Store Ambience',
   'Variety & Availability',
   'Overall Shopping Experience',
-  // Legacy backward-compatibility tags
+  'Collection',
+  'Shopping Experience',
+  // Pharmacy & Legacy tags (backward compatibility)
   'Quick Service',
   'Medicines in Stock',
   'Polite Staff',
+  'Helpful Staff',
   'Helpful Service',
+  'Helpful Pharmacist',
   'Clean Store',
   'Good Prices',
+  'Long Wait Time',
+  'Waiting Time',
 ] as const;
 
 export type PredefinedFeedbackTag = (typeof PREDEFINED_FEEDBACK_TAGS)[number];
-export type FashionFeedbackTag = (typeof FASHION_FEEDBACK_TAGS)[number];
+export type RestaurantFeedbackTag = (typeof RESTAURANT_FEEDBACK_TAGS)[number];
+export type FashionFeedbackTag = RestaurantFeedbackTag;
 
 export const FeedbackTagSchema = z.enum(PREDEFINED_FEEDBACK_TAGS);
 
@@ -59,10 +88,7 @@ export const CreateFeedbackInputSchema = z.object({
     .int('Rating must be an integer')
     .min(1, 'Rating must be at least 1 star')
     .max(5, 'Rating cannot exceed 5 stars'),
-  tags: z
-    .array(z.string().trim().min(1, 'Tag cannot be empty'))
-    .max(15, 'Maximum 15 tags allowed')
-    .default([]),
+  tags: z.array(FeedbackTagSchema).default([]),
   notes: z
     .string()
     .trim()
@@ -72,44 +98,34 @@ export const CreateFeedbackInputSchema = z.object({
   customerContact: z
     .string()
     .trim()
-    .max(100, 'Customer contact cannot exceed 100 characters')
+    .max(100, 'Contact information cannot exceed 100 characters')
     .nullable()
     .optional(),
 });
 
+export type CreateFeedbackInput = z.infer<typeof CreateFeedbackInputSchema>;
+
 /**
- * Strict schema for public customer-facing feedback submission.
- * Enforces rating 1-5, predefined tag whitelist, and string limits.
+ * Schema for customer feedback submission.
  */
 export const CustomerFeedbackSubmissionSchema = z.object({
   rating: z
-    .number({ message: 'Please select a rating' })
+    .number()
     .int('Rating must be an integer')
-    .min(1, 'Please select a rating between 1 and 5 stars')
+    .min(1, 'Rating must be at least 1 star')
     .max(5, 'Rating cannot exceed 5 stars'),
-  tags: z
-    .array(FeedbackTagSchema)
-    .max(PREDEFINED_FEEDBACK_TAGS.length, 'Too many tags selected')
-    .optional()
-    .default([]),
+  tags: z.array(FeedbackTagSchema).optional().default([]),
   notes: z
-    .string()
-    .trim()
-    .max(1000, 'Please keep your message shorter (maximum 1000 characters)')
-    .optional()
-    .transform((val) => (val && val.length > 0 ? val : undefined)),
+    .preprocess(
+      (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val),
+      z.string().trim().max(1000, 'Notes cannot exceed 1000 characters').optional()
+    ),
   customerContact: z
-    .string()
-    .trim()
-    .max(100, 'Please enter a valid contact number or leave it blank')
-    .optional()
-    .transform((val) => (val && val.length > 0 ? val : undefined)),
+    .preprocess(
+      (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val),
+      z.string().trim().max(100, 'Contact information cannot exceed 100 characters').optional()
+    ),
 });
 
-export const UpdateFeedbackStatusSchema = z.object({
-  status: FeedbackStatusSchema,
-});
-
-export type CreateFeedbackInput = z.infer<typeof CreateFeedbackInputSchema>;
+export type CustomerFeedbackSubmission = z.infer<typeof CustomerFeedbackSubmissionSchema>;
 export type CustomerFeedbackSubmissionInput = z.input<typeof CustomerFeedbackSubmissionSchema>;
-export type UpdateFeedbackStatusInput = z.infer<typeof UpdateFeedbackStatusSchema>;

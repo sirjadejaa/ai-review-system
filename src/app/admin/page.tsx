@@ -62,7 +62,7 @@ export default async function AdminOverviewPage({ searchParams }: AdminDashboard
     return (
       <AdminLayout
         title="Dashboard"
-        subtitle="Overview of boutique reviews, customer satisfaction & store activity"
+        subtitle="Overview of restaurant reviews, diner satisfaction & culinary activity"
       >
         <div style={{ padding: 'var(--space-6) 0' }}>
           <ErrorState
@@ -79,7 +79,7 @@ export default async function AdminOverviewPage({ searchParams }: AdminDashboard
   return (
     <AdminLayout
       title="Dashboard"
-      subtitle="Overview of boutique reviews, customer satisfaction & store activity"
+      subtitle="Overview of restaurant reviews, diner satisfaction & culinary activity"
       shopName={settings?.shopName}
       logoUrl={settings?.logoUrl}
     >

@@ -121,8 +121,10 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       });
       const combined = drafts.map((d) => d.text).join(' ');
       expect(
-        combined.toLowerCase().includes('collection') ||
+        combined.toLowerCase().includes('food') ||
           combined.toLowerCase().includes('quality') ||
+          combined.toLowerCase().includes('taste') ||
+          combined.toLowerCase().includes('dining') ||
           combined.toLowerCase().includes('shopping')
       ).toBe(true);
     });
@@ -131,7 +133,7 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       const provider = new MockAIProvider();
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Clothing Quality'],
+        selectedTags: ['Food Quality'],
         language: 'gujlish',
       });
 
@@ -143,8 +145,10 @@ describe('Phase 6: AI Review Assistant Tests', () => {
       });
       const combined = drafts.map((d) => d.text).join(' ');
       expect(
-        combined.toLowerCase().includes('collection') ||
+        combined.toLowerCase().includes('food') ||
           combined.toLowerCase().includes('quality') ||
+          combined.toLowerCase().includes('taste') ||
+          combined.toLowerCase().includes('dining') ||
           combined.toLowerCase().includes('shopping')
       ).toBe(true);
     });

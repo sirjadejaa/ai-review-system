@@ -17,6 +17,8 @@ function isPrismaClientCurrent(client: PrismaClient | undefined): client is Pris
     'googleBusinessAccount' in client &&
     'googleReview' in client &&
     'googleReviewReplyDraft' in client &&
+    'menuCategory' in client &&
+    'menuItem' in client &&
     'product' in client &&
     'offer' in client &&
     'shopSettings' in client &&

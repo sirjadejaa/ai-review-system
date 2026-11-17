@@ -150,15 +150,15 @@ describe('Google Business Profile & AI Review Management System', () => {
       const reply = await provider.generateOwnerReplyDraft({
         reviewerName: 'Rajesh Kumar',
         rating: 5,
-        reviewText: 'Bahut achhi fitting aur kapda hai.',
-        shopName: 'Aura Boutique',
+        reviewText: 'Bahut achha taste aur pizza hai.',
+        shopName: 'The Olive & Hearth',
         language: 'hinglish',
       });
 
       expect(reply).toContain('Rajesh');
-      expect(reply).toContain('Aura Boutique');
+      expect(reply).toContain('The Olive & Hearth');
       expect(reply.toLowerCase()).toContain('feedback');
-      expect(reply.toLowerCase()).toContain('collection');
+      expect(reply.toLowerCase()).toContain('food');
     });
 
     it('generates natural Gujlish owner reply with conversational Gujarati-English mix', async () => {

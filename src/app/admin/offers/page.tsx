@@ -22,8 +22,8 @@ export default async function AdminOffersPage() {
 
     return (
       <AdminLayout
-        title="Promotional Offers"
-        subtitle="Manage boutique promotions, seasonal collections & store offers."
+        title="Dining Offers & Specials"
+        subtitle="Manage restaurant dining deals, meal combos, happy hour discounts & seasonal specials."
         shopName={settings?.shopName}
         logoUrl={settings?.logoUrl}
       >

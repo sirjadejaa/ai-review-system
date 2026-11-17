@@ -13,6 +13,9 @@ export interface DomainShopSettings {
   shopName: string;
   tagline: string | null;
   logoUrl: string | null;
+  coverImageUrl: string | null;
+  restaurantType: string | null;
+  cuisineTypes: string[];
   primaryColor: string | null;
   secondaryColor: string | null;
   accentColor: string | null;
@@ -109,3 +112,6 @@ export interface DomainAdminUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export * from './menu-types';
+

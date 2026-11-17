@@ -15,12 +15,13 @@ import {
   X,
   User,
   QrCode,
+  UtensilsCrossed,
   ShoppingBag,
   Star,
 } from 'lucide-react';
 import styles from './admin-layout.module.css';
 import { logoutAction } from '@/lib/auth/actions';
-import { BoutiqueLogo } from '@/components/brand/boutique-logo';
+import { RestaurantLogo } from '@/components/brand/restaurant-logo';
 import { StoreQrModal } from '@/components/admin/store-qr-modal';
 
 export interface AdminLayoutProps {
@@ -33,12 +34,12 @@ export interface AdminLayoutProps {
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/menu', label: 'Digital Menu', icon: UtensilsCrossed },
   { href: '/admin/google-reviews', label: 'Google Reviews', icon: Star },
-  { href: '/admin/products', label: 'Products Showcase', icon: ShoppingBag },
-  { href: '/admin/offers', label: 'Special Offers', icon: Tag },
-  { href: '/admin/reviews', label: 'Internal Feedback', icon: MessageSquare },
+  { href: '/admin/offers', label: 'Dining Offers', icon: Tag },
+  { href: '/admin/reviews', label: 'Guest Feedback', icon: MessageSquare },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/settings', label: 'Boutique Settings', icon: Settings },
+  { href: '/admin/settings', label: 'Restaurant Settings', icon: Settings },
 ];
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -46,13 +47,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   title,
   subtitle,
   logoUrl,
-  shopName = 'Maison & Thread',
+  shopName = 'The Olive & Hearth',
 }) => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
 
-  const displayShopName = shopName === 'Pharmacy' ? 'Maison & Thread' : shopName;
+  const displayShopName =
+    shopName === 'Pharmacy' || shopName === 'Maison & Thread' ? 'The Olive & Hearth' : shopName;
 
   const navContent = (
     <>
@@ -73,7 +75,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               }}
             />
           ) : (
-            <BoutiqueLogo size="md" variant="mark" inverted={true} shopName={displayShopName} />
+            <RestaurantLogo size="md" variant="mark" inverted={true} shopName={displayShopName} />
           )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
@@ -93,7 +95,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 fontSize: '0.625rem',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#c5a880',
+                color: '#D9953B',
                 marginTop: '2px',
               }}
             >

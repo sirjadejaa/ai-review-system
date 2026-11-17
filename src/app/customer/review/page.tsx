@@ -6,8 +6,8 @@ import { CustomerLandingQuerySchema } from '@/lib/validation/customer-query-sche
 import { isValidExternalUrl } from '@/lib/format/contact-links';
 
 export const metadata: Metadata = {
-  title: 'Rate & Review Boutique',
-  description: 'Share your shopping experience and generate a natural, AI-assisted review for our clothing boutique.',
+  title: 'Rate & Review Dining Experience',
+  description: 'Share your dining experience and generate a natural, AI-assisted review for our restaurant and café.',
 };
 
 export const maxDuration = 15;
@@ -30,16 +30,20 @@ export default async function CustomerReviewPage({ searchParams }: CustomerRevie
   } catch (error) {
     console.error('Non-fatal: Failed to load shop settings for review page', error);
     settings = {
-      shopName: 'Maison & Thread',
-      tagline: 'Curated Contemporary Fashion & Bespoke Tailoring',
+      shopName: 'The Olive & Hearth',
+      tagline: 'Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies',
       logoUrl: null,
       isEmergencyOpen: false,
       googleReviewUrl: null,
     };
   }
 
-  const displayShopName = settings.shopName === 'Pharmacy' ? 'Maison & Thread' : settings.shopName;
-  const displayTagline = settings.tagline || 'Curated Contemporary Fashion & Bespoke Tailoring';
+  const displayShopName =
+    settings.shopName === 'Pharmacy' || settings.shopName === 'Maison & Thread'
+      ? 'The Olive & Hearth'
+      : settings.shopName;
+  const displayTagline =
+    settings.tagline || 'Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies';
 
   // 3. Strictly validate configured Google Review URL from server settings
   const rawGoogleUrl = settings.googleReviewUrl?.trim();

@@ -1,7 +1,7 @@
 /**
  * ==============================================================================
  * CENTRALIZED DESIGN TOKENS
- * Premium Clothing Store / Fashion Boutique AI Review & Digital Customer Card System
+ * Premium Restaurant & Café AI Review & Digital Customer Card System
  * ==============================================================================
  * STRICT RULE: All components and views must consume these tokens.
  * Do not introduce arbitrary colors, spacing, shadows, or radii.
@@ -9,84 +9,98 @@
 
 :root {
   /* ----------------------------------------------------------------------------
-   * 1. PREMIUM CLOTHING BOUTIQUE & FASHION ATELIER COLOR SYSTEM
-   * Inspired by PraiseUp design language: Warm Linen, Crisp White, Luxury Noir,
-   * Tailored Charcoal, and Warm Boutique Camel / Champagne Gold Accent.
+   * 1. RESTAURANT & CAFÉ WARM EDITORIAL COLOR SYSTEM
+   * Inspired by PraiseUp design language: Warm Linen / Vanilla Cream, Crisp Porcelain White,
+   * Dark Roast Espresso, Rich Roasted Cocoa, and Warm Honey / Golden Saffron Accent.
    * ---------------------------------------------------------------------------- */
 
   /* Base & Surfaces */
-  --color-bg-app: #faf9f6;            /* Warm Linen / Canvas cream background */
-  --color-bg-surface: #ffffff;        /* Crisp White for elevated cards & panels */
-  --color-bg-surface-subtle: #f8f7f4; /* Soft warm ivory / cashmere panel */
-  --color-bg-surface-hover: #f1efea;  /* Refined warm hover surface */
-  --color-bg-inverse: #171717;        /* Luxury Noir / Deep tailored onyx */
+  --color-bg-app: #FAF7F2;            /* Warm Vanilla Linen / Cream background */
+  --color-bg-surface: #FFFFFF;        /* Crisp Porcelain White for elevated cards & panels */
+  --color-bg-surface-subtle: #F5EFEB; /* Soft warm ivory / toasted cream panel */
+  --color-bg-surface-hover: #EFE8DF;  /* Refined warm hover surface */
+  --color-bg-inverse: #25221F;        /* Deep Dark Roast Espresso */
   
   /* Text & Content */
-  --color-text-primary: #171717;      /* Deep Rich Charcoal / Black for high contrast editorial legibility */
-  --color-text-secondary: #5b616e;    /* Refined Muted Slate for descriptions and body copy */
-  --color-text-muted: #8a909c;        /* Subtle slate for helper text, timestamps & captions */
-  --color-text-subtle: #b3b0a8;       /* Warm neutral for placeholders & inactive icons */
-  --color-text-inverse: #ffffff;      /* Pure white text on dark surfaces */
+  --color-text-primary: #26231F;      /* Deep High-contrast Espresso */
+  --color-text-secondary: #57483D;    /* Rich Roasted Cocoa for descriptions and body copy */
+  --color-text-muted: #817970;        /* Warm Stone Muted for helper text, timestamps & captions */
+  --color-text-subtle: #A39B91;       /* Warm neutral for placeholders & inactive icons */
+  --color-text-inverse: #FFFFFF;      /* Pure white text on dark surfaces */
 
-  /* Primary Brand: Luxury Noir */
-  --color-primary: #171717;           /* Deep Luxury Noir: Timeless, sophisticated fashion authority */
-  --color-primary-hover: #2e2e2e;     /* Polished charcoal hover */
-  --color-primary-active: #0a0a0a;    /* Deep onyx press */
-  --color-primary-subtle: #f5f3ef;    /* Soft cashmere wash */
-  --color-primary-border: #e0ded9;    /* Clean tailored border */
-  --color-primary-text: #171717;      /* High-contrast noir text */
+  /* Primary Brand: Dark Roast Espresso */
+  --color-primary: #25221F;           /* Deep Espresso: Timeless culinary authority */
+  --color-primary-hover: #3A3530;     /* Rich roasted hover */
+  --color-primary-active: #181614;    /* Deep press */
+  --color-primary-subtle: #F5EFEB;    /* Soft toasted wash */
+  --color-primary-border: #EAE4DB;    /* Warm hairline border */
+  --color-primary-text: #25221F;      /* High-contrast espresso text */
 
-  /* Secondary Brand: Tailored Charcoal */
-  --color-secondary: #3a3a3a;         /* Tailored Charcoal */
-  --color-secondary-hover: #262626;
-  --color-secondary-subtle: #f1efea;
-  --color-secondary-text: #262626;
+  /* Secondary Brand: Roasted Cocoa */
+  --color-secondary: #57483D;         /* Roasted Cocoa */
+  --color-secondary-hover: #43372E;
+  --color-secondary-subtle: #F2ECE4;
+  --color-secondary-text: #43372E;
 
-  /* Accent: Warm Boutique Camel / Champagne Gold */
-  --color-accent: #a88b64;            /* Warm Boutique Camel / Atelier Champagne Gold */
-  --color-accent-hover: #93774f;
-  --color-accent-subtle: #faf6f0;
-  --color-accent-text: #705837;
+  /* Accent: Warm Honey / Golden Saffron */
+  --color-accent: #B78348;            /* Warm Honey / Golden Saffron Accent */
+  --color-accent-hover: #9E6F39;
+  --color-accent-subtle: #FAF2E6;
+  --color-accent-text: #7A5222;
+
+  /* Dietary Indicators (Veg / Non-Veg / Spice) */
+  --color-veg: #16a34a;               /* Fresh Green for Vegetarian */
+  --color-veg-bg: #f0fdf4;
+  --color-veg-border: #bbf7d0;
+  --color-veg-text: #166534;
+
+  --color-non-veg: #dc2626;           /* Warm Crimson for Non-Vegetarian */
+  --color-non-veg-bg: #fef2f2;
+  --color-non-veg-border: #fecaca;
+  --color-non-veg-text: #991b1b;
+
+  --color-spice: #ea580c;             /* Fiery Orange for Spice Rating */
+  --color-spice-bg: #fff7ed;
 
   /* Semantic Statuses */
-  --color-success: #15803d;           /* Emerald / forest green */
+  --color-success: #15803d;           /* Fresh garden green */
   --color-success-bg: #f0fdf4;
   --color-success-border: #bbf7d0;
   --color-success-text: #166534;
 
-  --color-warning: #b45309;           /* Amber-600 */
+  --color-warning: #b45309;           /* Warm Amber */
   --color-warning-bg: #fdf8ee;
   --color-warning-border: #f8e1ad;
   --color-warning-text: #78350f;
 
-  /* Danger: Restrained Burgundy */
-  --color-danger: #991b1b;            /* Refined Burgundy / Red */
+  /* Danger */
+  --color-danger: #991b1b;
   --color-danger-bg: #fef2f2;
   --color-danger-border: #fecaca;
   --color-danger-text: #7f1d1d;
 
-  --color-info: #1d4ed8;              /* Tailored royal blue */
+  --color-info: #1d4ed8;
   --color-info-bg: #eff6ff;
   --color-info-border: #bfdbfe;
   --color-info-text: #1e40af;
 
-  /* Review Stars (Warm Boutique Gold) */
-  --color-star-active: #d49b44;       /* Champagne warm gold */
-  --color-star-empty: #e2ddd5;        /* Soft cashmere warm gray */
-  --color-star-hover: #e0a752;
+  /* Review Stars (Golden Honey) */
+  --color-star-active: #D9953B;       /* Warm Honey Gold */
+  --color-star-empty: #E3DDD5;        /* Soft toasted warm gray */
+  --color-star-hover: #E5A348;
 
   /* Borders & Dividers */
-  --color-border: #e8e5df;            /* Hairline warm linen border */
-  --color-border-subtle: #f0ede8;     /* Soft inner dividers */
-  --color-border-strong: #dedad2;     /* High-contrast borders */
-  --color-border-hover: #cac5bc;
-  --color-border-focus: #171717;
-  --color-focus-ring: #a88b64;        /* Champagne gold focus ring */
+  --color-border: #EAE4DB;            /* Warm cream border */
+  --color-border-subtle: #F2ECE4;     /* Soft inner dividers */
+  --color-border-strong: #DCD4C9;     /* High-contrast borders */
+  --color-border-hover: #CEC4B7;
+  --color-border-focus: #25221F;
+  --color-focus-ring: #B78348;        /* Honey gold focus ring */
   --color-focus-ring-offset: #ffffff;
 
   /* Surface & Brand Aliases */
-  --color-bg-secondary: #f8f7f4;
-  --color-primary-light: #f5f3ef;
+  --color-bg-secondary: #F5EFEB;
+  --color-primary-light: #F5EFEB;
 
   /* ----------------------------------------------------------------------------
    * 2. EDITORIAL FASHION TYPOGRAPHY SYSTEM

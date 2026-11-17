@@ -9,8 +9,8 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
     it('generates 3 authentic positive Gujlish review drafts with natural Gujarati-English mix', async () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Clothing Quality', 'Staff Behaviour'],
-        customerNote: 'Super festive collection',
+        selectedTags: ['Food Quality', 'Staff Behaviour'],
+        customerNote: 'Super delicious pizza',
         language: 'gujlish',
       });
 
@@ -24,8 +24,9 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
       // Must contain Gujarati characters and English terms
       expect(/[\u0A80-\u0AFF]/.test(combined)).toBe(true);
       expect(
-        combined.toLowerCase().includes('collection') ||
+        combined.toLowerCase().includes('food') ||
           combined.toLowerCase().includes('quality') ||
+          combined.toLowerCase().includes('taste') ||
           combined.toLowerCase().includes('experience') ||
           combined.toLowerCase().includes('staff')
       ).toBe(true);
@@ -34,7 +35,7 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
     it('generates neutral (3-star) Gujlish review drafts', async () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 3,
-        selectedTags: ['Fitting & Sizing'],
+        selectedTags: ['Service Speed'],
         customerNote: '',
         language: 'gujlish',
       });
@@ -47,8 +48,8 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
     it('generates constructive negative (1-2 star) Gujlish review drafts', async () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 2,
-        selectedTags: ['Pricing & Value'],
-        customerNote: 'Expensive fabric',
+        selectedTags: ['Price and Value'],
+        customerNote: 'Food was cold',
         language: 'gujlish',
       });
 
@@ -64,7 +65,7 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
     it('generates 3 authentic positive Hinglish review drafts in natural Roman script', async () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 5,
-        selectedTags: ['Clothing Quality', 'Fabric Quality'],
+        selectedTags: ['Food Quality', 'Taste'],
         language: 'hinglish',
       });
 
@@ -76,16 +77,17 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
 
       const combined = drafts.map((d) => d.text).join(' ');
       expect(
-        combined.toLowerCase().includes('collection') ||
-          combined.toLowerCase().includes('quality') ||
-          combined.toLowerCase().includes('shopping')
+        combined.toLowerCase().includes('food') ||
+          combined.toLowerCase().includes('taste') ||
+          combined.toLowerCase().includes('khana') ||
+          combined.toLowerCase().includes('experience')
       ).toBe(true);
     });
 
     it('generates neutral (3-star) Hinglish review drafts', async () => {
       const drafts = await provider.generateReviewDrafts({
         rating: 3,
-        selectedTags: ['Fitting & Sizing'],
+        selectedTags: ['Service Speed'],
         language: 'hinglish',
       });
 
@@ -116,9 +118,9 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
       const replyEn = await provider.generateOwnerReplyDraft({
         reviewerName: 'Priya Sharma',
         rating: 5,
-        reviewText: 'Loved the silk saree collection and friendly staff!',
+        reviewText: 'Loved the wood-fired pizza and friendly staff!',
         language: 'en',
-        shopName: 'Aura Boutique',
+        shopName: 'The Olive & Hearth',
       });
 
       expect(replyEn).toContain('Priya');
@@ -127,21 +129,21 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
       const replyHinglish = await provider.generateOwnerReplyDraft({
         reviewerName: 'Rahul Patel',
         rating: 5,
-        reviewText: 'Great kurtas and fitting was perfect.',
+        reviewText: 'Great coffee and pasta was delicious.',
         language: 'hinglish',
-        shopName: 'Aura Boutique',
+        shopName: 'The Olive & Hearth',
       });
 
       expect(replyHinglish).toContain('Rahul');
-      expect(replyHinglish.toLowerCase()).toContain('collection');
+      expect(replyHinglish.toLowerCase()).toContain('food');
       expect(replyHinglish.toLowerCase()).toContain('shukriya');
 
       const replyGujlish = await provider.generateOwnerReplyDraft({
         reviewerName: 'Dharmesh Bhai',
         rating: 1,
-        reviewText: 'Size was not available.',
+        reviewText: 'Order arrived late.',
         language: 'gujlish',
-        shopName: 'Aura Boutique',
+        shopName: 'The Olive & Hearth',
       });
 
       expect(replyGujlish).toContain('Dharmesh');
@@ -154,26 +156,26 @@ describe('AI Review Generation for Gujlish and Hinglish', () => {
     it('constructs AI prompt with strict non-hallucination and Gujlish/Hinglish rules', () => {
       const promptGujlish = buildUserPrompt({
         rating: 5,
-        selectedTags: ['Clothing Quality', 'Comfort'],
-        customerNote: 'Great fitting kurta',
-        shopName: 'Heritage Silk Boutique',
+        selectedTags: ['Food Quality', 'Taste'],
+        customerNote: 'Great coffee',
+        shopName: 'The Olive & Hearth',
         language: 'gujlish',
       });
 
-      expect(promptGujlish).toContain('Heritage Silk Boutique');
+      expect(promptGujlish).toContain('The Olive & Hearth');
       expect(promptGujlish).toContain('Gujlish');
-      expect(promptGujlish).toContain('strictly no unstated facts or fabricated item purchases');
+      expect(promptGujlish).toContain('strictly no unstated facts or fabricated dishes');
 
       const promptHinglish = buildUserPrompt({
         rating: 4,
-        selectedTags: ['Fabric Quality'],
+        selectedTags: ['Freshness'],
         customerNote: '',
-        shopName: 'Maison & Thread',
+        shopName: 'The Olive & Hearth',
         language: 'hinglish',
       });
 
       expect(promptHinglish).toContain('Hinglish');
-      expect(promptHinglish).toContain('Maison & Thread');
+      expect(promptHinglish).toContain('The Olive & Hearth');
 
       // Verify system prompt safety constraints
       expect(AI_REVIEW_SYSTEM_PROMPT).toContain('CRITICAL NON-FABRICATION CONSTRAINTS');

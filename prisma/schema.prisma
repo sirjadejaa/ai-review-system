@@ -10,15 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// Single Pharmacy Shop Settings (Singleton record: id = "default_shop")
+/// Single Restaurant / Café Settings (Singleton record: id = "default_shop")
 model ShopSettings {
   id               String   @id @default("default_shop")
   shopName         String
   tagline          String?
   logoUrl          String?
-  primaryColor     String?  @default("#123e35")
-  secondaryColor   String?  @default("#4a6b61")
-  accentColor      String?  @default("#92bfa9")
+  coverImageUrl    String?
+  restaurantType   String?  @default("Café & Restaurant")
+  cuisineTypes     String?  @default("[]") // JSON array e.g. ["Italian", "Continental", "Beverages"]
+  primaryColor     String?  @default("#25221F")
+  secondaryColor   String?  @default("#57483D")
+  accentColor      String?  @default("#B78348")
   phoneNumber      String?
   whatsappNumber   String?
   emergencyContact String?
@@ -27,7 +30,7 @@ model ShopSettings {
   googleReviewUrl  String?
   websiteUrl       String?
   socialLinks      String?  @default("[]")
-  openingHours     String   @default("[]") // Structured JSON array: [{"days":"Mon-Sat","hours":"8:00 AM - 10:00 PM"}]
+  openingHours     String   @default("[]") // Structured JSON array: [{"days":"Mon-Sun","hours":"8:00 AM - 11:00 PM"}]
   isEmergencyOpen  Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
@@ -70,7 +73,49 @@ model Offer {
   @@index([startDate])
 }
 
-/// Clothing Store Featured & Catalog Products
+/// Restaurant & Café Digital Menu Category
+model MenuCategory {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  icon        String?    // e.g. "Pizza", "Coffee", "UtensilsCrossed", "IceCream", etc.
+  isActive    Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  items       MenuItem[]
+
+  @@index([isActive, sortOrder])
+}
+
+/// Restaurant & Café Food Item / Menu Item
+model MenuItem {
+  id            String        @id @default(cuid())
+  name          String
+  description   String?
+  imageUrl      String?
+  categoryId    String?
+  category      MenuCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryName  String        @default("General")
+  price         Float
+  originalPrice Float?
+  isVeg         Boolean       @default(true) // true = Veg, false = Non-Veg
+  dietaryLabels String        @default("[]") // JSON array e.g. ["Vegan", "Gluten-Free", "Chef's Special"]
+  spiceLevel    Int           @default(0)    // 0: None, 1: Mild, 2: Medium, 3: Spicy
+  servingInfo   String?                      // e.g. "Serves 1-2", "300ml", "8 slices"
+  variants      String        @default("[]") // JSON array: [{"name":"Small","price":199},{"name":"Large","price":299}]
+  addons        String        @default("[]") // JSON array: [{"name":"Extra Cheese","price":40}]
+  isAvailable   Boolean       @default(true)
+  isFeatured    Boolean       @default(false)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([categoryId, isAvailable, sortOrder])
+  @@index([isFeatured])
+}
+
+/// Clothing Store Featured & Catalog Products (Legacy / Backwards Compatibility)
 model Product {
   id            String   @id @default(cuid())
   name          String

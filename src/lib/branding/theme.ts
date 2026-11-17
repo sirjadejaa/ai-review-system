@@ -1,9 +1,9 @@
 /**
- * Centralized Boutique Branding & Dynamic Color Palette Generator
- * Premium Clothing Store / Fashion Boutique AI Review & Digital Customer Card System
+ * Centralized Restaurant & Café Branding & Dynamic Color Palette Generator
+ * Premium Restaurant & Café AI Review & Digital Customer Card System
  */
 
-export interface BoutiqueColorPreset {
+export interface RestaurantColorPreset {
   id: string;
   name: string;
   description: string;
@@ -12,44 +12,48 @@ export interface BoutiqueColorPreset {
   accent: string;
 }
 
-export const BOUTIQUE_COLOR_PRESETS: BoutiqueColorPreset[] = [
+export type BoutiqueColorPreset = RestaurantColorPreset;
+
+export const RESTAURANT_COLOR_PRESETS: RestaurantColorPreset[] = [
   {
-    id: 'noir_atelier_gold',
-    name: 'Noir & Atelier Gold (Default)',
-    description: 'Luxury Noir, Tailored Charcoal, and Warm Champagne Gold. Editorial high-fashion aesthetic.',
-    primary: '#171717',
-    secondary: '#3a3a3a',
-    accent: '#a88b64',
+    id: 'espresso_honey',
+    name: 'Espresso & Honey (Default)',
+    description: 'Dark Roast Espresso, Roasted Cocoa, and Golden Honey. Editorial warm café aesthetic.',
+    primary: '#25221F',
+    secondary: '#57483D',
+    accent: '#B78348',
   },
   {
-    id: 'cashmere_sand',
-    name: 'Cashmere & Sand',
-    description: 'Warm Espresso, Soft Cashmere, and Sandstone Beige. Relaxed luxury & minimalist chic.',
-    primary: '#2b2621',
-    secondary: '#544b43',
-    accent: '#c2a68c',
+    id: 'bistro_terracotta',
+    name: 'Bistro & Terracotta',
+    description: 'Deep Rust Espresso, Warm Cocoa, and Tuscan Terracotta. Cozy trattoria and artisan bistro.',
+    primary: '#2A1D1A',
+    secondary: '#5A3E36',
+    accent: '#C06C47',
   },
   {
-    id: 'midnight_silk',
-    name: 'Midnight & Silk',
-    description: 'Deep Midnight Navy, Slate Steel, and Silk Ice Blue. Modern eveningwear & refined tailoring.',
-    primary: '#161b26',
-    secondary: '#323b4e',
-    accent: '#8b9eb7',
+    id: 'olive_herb',
+    name: 'Olive & Fresh Herb',
+    description: 'Rich Forest Olive, Earthy Truffle, and Golden Mustard. Farm-to-table organic dining.',
+    primary: '#1F291E',
+    secondary: '#414E3F',
+    accent: '#8E9C4B',
   },
   {
-    id: 'atelier_olive',
-    name: 'Atelier Olive',
-    description: 'Rich Botanical Olive, Earth Sage, and Burnished Brass. Sustainable couture & heritage fabrics.',
-    primary: '#1c2419',
-    secondary: '#3b4535',
-    accent: '#9a8758',
+    id: 'artisan_berry',
+    name: 'Artisan Bakery & Plum',
+    description: 'Deep Dark Chocolate, Wild Berry, and Patisserie Glaze. High-end bakery and dessert bar.',
+    primary: '#2B1B24',
+    secondary: '#5C3A4D',
+    accent: '#B26284',
   },
 ];
 
-export const DEFAULT_PRIMARY_COLOR = '#171717';
-export const DEFAULT_SECONDARY_COLOR = '#3a3a3a';
-export const DEFAULT_ACCENT_COLOR = '#a88b64';
+export const BOUTIQUE_COLOR_PRESETS = RESTAURANT_COLOR_PRESETS;
+
+export const DEFAULT_PRIMARY_COLOR = '#25221f';
+export const DEFAULT_SECONDARY_COLOR = '#57483d';
+export const DEFAULT_ACCENT_COLOR = '#b78348';
 
 /**
  * Parses a hex color string (#rgb or #rrggbb) into numeric RGB components.

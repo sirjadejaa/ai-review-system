@@ -27,8 +27,8 @@ import { BoutiqueLogo } from '@/components/brand/boutique-logo';
 import styles from '@/components/customer/digital-card.module.css';
 
 export const metadata: Metadata = {
-  title: 'Boutique Privilege Card',
-  description: 'Operating hours, stylist contact channels, location, and seasonal offers for our clothing boutique.',
+  title: 'VIP Dining Privilege Pass',
+  description: 'Operating hours, restaurant reservations, location, and seasonal culinary offers.',
 };
 
 interface CustomerCardPageProps {

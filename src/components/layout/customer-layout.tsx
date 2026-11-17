@@ -16,8 +16,8 @@ export interface CustomerLayoutProps {
 
 export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
   children,
-  shopName = 'Maison & Thread',
-  tagline = 'Curated Contemporary Apparel & Studio',
+  shopName = 'The Olive & Hearth',
+  tagline = 'Artisanal Kitchen & Specialty Café',
   logoUrl,
   isEmergencyOpen = false,
 }) => {
@@ -42,7 +42,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
                   {shopName}
                 </span>
                 <span className={styles.shopCategory}>
-                  {tagline || 'Curated Contemporary Apparel & Studio'}
+                  {tagline || 'Artisanal Kitchen & Specialty Café'}
                 </span>
               </div>
             </Link>
@@ -59,7 +59,7 @@ export const CustomerLayout: React.FC<CustomerLayoutProps> = ({
           <div className="container-customer">
             <p className={styles.footerText}>
               © {new Date().getFullYear()} {shopName}
-              {tagline ? ` • ${tagline}` : ' • Curated Contemporary Apparel & Studio'}
+              {tagline ? ` • ${tagline}` : ' • Artisanal Kitchen & Specialty Café'}
             </p>
           </div>
         </footer>

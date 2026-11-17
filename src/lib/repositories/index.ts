@@ -3,3 +3,6 @@ export * from './feedback-repository';
 export * from './offer-repository';
 export * from './analytics-repository';
 export * from './admin-user-repository';
+export * from './product-repository';
+export * from './menu-repository';
+

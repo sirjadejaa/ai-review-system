@@ -74,7 +74,7 @@ export default async function AdminGoogleReviewsPage({
             rating: validRating,
             searchQuery,
           }}
-          shopName={settings?.shopName || 'Maison & Thread'}
+          shopName={settings?.shopName || 'The Olive & Hearth'}
         />
       </AdminLayout>
     );

@@ -6,21 +6,27 @@ const DEFAULT_SHOP_ID = 'default_shop';
 
 const DEFAULT_INITIAL_SETTINGS: DomainShopSettings = {
   id: DEFAULT_SHOP_ID,
-  shopName: 'Maison & Thread',
-  tagline: 'Curated Contemporary Fashion & Bespoke Tailoring',
+  shopName: 'The Olive & Hearth',
+  tagline: 'Artisanal Kitchen, Specialty Coffee & Wood-Fired Delicacies',
   logoUrl: null,
-  primaryColor: '#171717',
-  secondaryColor: '#3a3a3a',
-  accentColor: '#a88b64',
-  phoneNumber: null,
-  whatsappNumber: null,
+  coverImageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80',
+  restaurantType: 'Café & Restaurant',
+  cuisineTypes: ['Artisanal Pizza', 'Specialty Coffee', 'Continental', 'Desserts'],
+  primaryColor: '#25221F',
+  secondaryColor: '#57483D',
+  accentColor: '#B78348',
+  phoneNumber: '+91 98765 43210',
+  whatsappNumber: '+91 98765 43210',
   emergencyContact: null,
-  address: null,
-  googleMapsUrl: null,
-  googleReviewUrl: null,
+  address: 'Shop 4, Heritage Galleria, Near Central Park, Ahmedabad, Gujarat',
+  googleMapsUrl: 'https://maps.google.com',
+  googleReviewUrl: 'https://search.google.com/local/writereview',
   websiteUrl: null,
   socialLinks: [],
-  openingHours: [],
+  openingHours: [
+    { days: 'Mon - Fri', hours: '11:00 AM - 11:00 PM' },
+    { days: 'Sat - Sun', hours: '10:00 AM - 11:30 PM' },
+  ],
   isEmergencyOpen: false,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -31,6 +37,9 @@ function toDomain(record: {
   shopName: string;
   tagline: string | null;
   logoUrl?: string | null;
+  coverImageUrl?: string | null;
+  restaurantType?: string | null;
+  cuisineTypes?: string | null;
   primaryColor?: string | null;
   secondaryColor?: string | null;
   accentColor?: string | null;
@@ -61,14 +70,24 @@ function toDomain(record: {
     socialLinks = [];
   }
 
+  let cuisineTypes: string[] = [];
+  try {
+    cuisineTypes = record.cuisineTypes ? JSON.parse(record.cuisineTypes) : [];
+  } catch {
+    cuisineTypes = [];
+  }
+
   return {
     id: record.id,
     shopName: record.shopName,
     tagline: record.tagline,
     logoUrl: record.logoUrl ?? null,
-    primaryColor: record.primaryColor ?? '#171717',
-    secondaryColor: record.secondaryColor ?? '#3a3a3a',
-    accentColor: record.accentColor ?? '#a88b64',
+    coverImageUrl: record.coverImageUrl ?? null,
+    restaurantType: record.restaurantType ?? 'Café & Restaurant',
+    cuisineTypes,
+    primaryColor: record.primaryColor ?? '#25221F',
+    secondaryColor: record.secondaryColor ?? '#57483D',
+    accentColor: record.accentColor ?? '#B78348',
     phoneNumber: record.phoneNumber,
     whatsappNumber: record.whatsappNumber,
     emergencyContact: record.emergencyContact ?? null,
@@ -85,7 +104,7 @@ function toDomain(record: {
 }
 
 /**
- * Retrieves the single medical shop settings.
+ * Retrieves the single restaurant settings.
  * If no record exists yet, safely bootstraps clean initial settings (singleton constraint).
  */
 export async function getShopSettings(): Promise<DomainShopSettings> {
@@ -104,6 +123,9 @@ export async function getShopSettings(): Promise<DomainShopSettings> {
       shopName: DEFAULT_INITIAL_SETTINGS.shopName,
       tagline: DEFAULT_INITIAL_SETTINGS.tagline,
       logoUrl: DEFAULT_INITIAL_SETTINGS.logoUrl,
+      coverImageUrl: DEFAULT_INITIAL_SETTINGS.coverImageUrl,
+      restaurantType: DEFAULT_INITIAL_SETTINGS.restaurantType,
+      cuisineTypes: JSON.stringify(DEFAULT_INITIAL_SETTINGS.cuisineTypes),
       primaryColor: DEFAULT_INITIAL_SETTINGS.primaryColor,
       secondaryColor: DEFAULT_INITIAL_SETTINGS.secondaryColor,
       accentColor: DEFAULT_INITIAL_SETTINGS.accentColor,
@@ -135,9 +157,12 @@ export async function updateShopSettings(input: ShopSettingsInput): Promise<Doma
       shopName: validated.shopName,
       tagline: validated.tagline ?? null,
       logoUrl: validated.logoUrl ?? null,
-      primaryColor: validated.primaryColor ?? '#171717',
-      secondaryColor: validated.secondaryColor ?? '#3a3a3a',
-      accentColor: validated.accentColor ?? '#a88b64',
+      coverImageUrl: validated.coverImageUrl ?? null,
+      restaurantType: validated.restaurantType ?? 'Café & Restaurant',
+      cuisineTypes: JSON.stringify(validated.cuisineTypes || []),
+      primaryColor: validated.primaryColor ?? '#25221F',
+      secondaryColor: validated.secondaryColor ?? '#57483D',
+      accentColor: validated.accentColor ?? '#B78348',
       phoneNumber: validated.phoneNumber ?? null,
       whatsappNumber: validated.whatsappNumber ?? null,
       emergencyContact: validated.emergencyContact ?? null,
@@ -154,9 +179,12 @@ export async function updateShopSettings(input: ShopSettingsInput): Promise<Doma
       shopName: validated.shopName,
       tagline: validated.tagline ?? null,
       logoUrl: validated.logoUrl ?? null,
-      primaryColor: validated.primaryColor ?? '#171717',
-      secondaryColor: validated.secondaryColor ?? '#3a3a3a',
-      accentColor: validated.accentColor ?? '#a88b64',
+      coverImageUrl: validated.coverImageUrl ?? null,
+      restaurantType: validated.restaurantType ?? 'Café & Restaurant',
+      cuisineTypes: JSON.stringify(validated.cuisineTypes || []),
+      primaryColor: validated.primaryColor ?? '#25221F',
+      secondaryColor: validated.secondaryColor ?? '#57483D',
+      accentColor: validated.accentColor ?? '#B78348',
       phoneNumber: validated.phoneNumber ?? null,
       whatsappNumber: validated.whatsappNumber ?? null,
       emergencyContact: validated.emergencyContact ?? null,
